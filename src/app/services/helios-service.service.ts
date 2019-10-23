@@ -21,22 +21,21 @@ export class HeliosServiceService {
 
   async connectToFirstAvailableNode() {
 
-    for (let i = 0; i < this.availableNodes.length; i++) {
-        const API_address = this.availableNodes[i];
-        console.log('Connecting to node ' + API_address);
-        this.web3 = new Web3(new Web3.providers.WebsocketProvider(API_address));
+    for (const node of this.availableNodes) {
+        console.log('Connecting to node ' + node);
+        this.web3 = new Web3(new Web3.providers.WebsocketProvider(node));
 
         const isListening = await this.web3.eth.net.isListening();
         const numPeers = await this.web3.eth.net.getPeerCount();
         console.log( ' listening: ' + isListening.toString() + ' with ' + numPeers + ' peers');
 
         if (this.isConnected()) {
-            console.log('Successfully connected to ' + API_address);
-            this.web3.eth.getBalance('0x4A1383744eED3DBE37B7A0870b15FeA3cE319A66')
-            .then(console.log);
+            console.log('Successfully connected to ' + node);
+            /* const balance = await this.web3.eth.getBalance('0x4A1383744eED3DBE37B7A0870b15FeA3cE319A66');
+            console.log(balance); */
             return true;
         }
-        console.log('Failed to connect to node ' + API_address);
+        console.log('Failed to connect to node ' + node);
     }
     return false;
   }
