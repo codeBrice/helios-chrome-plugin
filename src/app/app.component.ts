@@ -21,10 +21,15 @@ export class AppComponent {
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
+    this.platform.ready().then(async () => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      this.heliosService.connectToFirstAvailableNode();
+      this.heliosService.connectToFirstAvailableNode().then(() => {
+        this.heliosService.getBalance('0x4A1383744eED3DBE37B7A0870b15FeA3cE319A66');
+        this.heliosService.getTransaction('0x6bc56e50ad6776793be1c2b001d1798404f58e1c794bd013d5288e62226a68bf');
+      }).catch( error => {
+        console.error(error);
+      });
     });
   }
 }
