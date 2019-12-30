@@ -112,6 +112,36 @@ export class HeliosServiceService {
     }
   }
 
+  async privateKeyToAccount(privateKey: string) {
+    try {
+      console.log('privateKeyToAccount');
+      if (await this.isConnected()) {
+        const account = await this.web3.eth.accounts.privateKeyToAccount(privateKey);
+        console.log(account);
+        // const encrypt = await this.web3.eth.accounts.encrypt(account.privateKey, '123');
+        // console.log(JSON.stringify(encrypt));
+        return account;
+      } else {
+        throw new Error('Fail Connect');
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async jsonToAccount(jsonAccount: string, password: string) {
+    try {
+      console.log('privateKeyToAccount');
+      const account = this.web3.eth.accounts.decrypt(JSON.parse(jsonAccount), password);
+      // const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
+      // const account = new Account(preAccount, encrypt);
+      console.log(account);
+      return account;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   /**
    * Gets balance
@@ -133,25 +163,7 @@ export class HeliosServiceService {
     }
   }
 
-  /**
-   * Gets transaction
-   * @param hash example: 0x6bc56e50ad6776793be1c2b001d1798404f58e1c794bd013d5288e62226a68bf
-   * @returns  transaction
-   * {
-   *  "hash": "0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b",
-   *  "nonce": 2,
-   *  "blockHash": "0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46",
-   *  "blockNumber": 3,
-   *  "transactionIndex": 0,
-   *  "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b",
-   *  "to": "0x6295ee1b4f6dd65047762f924ecd367c17eabf8f",
-   *  "value": '123450000000000000',
-   *  "gas": 314159,
-   *  "gasPrice": '2000000000000',
-   *  "input": "0x57cb2fc4"
-   * }
-   */
-  async getTransaction(hash: string) {
+  /* async getTransaction(hash: string) {
     try {
       console.log('getTransaction');
       if (await this.isConnected()) {
@@ -164,9 +176,9 @@ export class HeliosServiceService {
     } catch (error) {
       throw error;
     }
-  }
+  } */
 
-  async getTransactionReceipt(hash: string) {
+  /* async getTransactionReceipt(hash: string) {
     try {
       console.log('getTransaction');
       if (await this.isConnected()) {
@@ -179,19 +191,19 @@ export class HeliosServiceService {
     } catch (error) {
       throw error;
     }
-  }
+  } */
 
   async getAllTransactions(address: string, startDate, endDate) {
     try {
       console.log('getAllTransactions');
       if (await this.isConnected()) {
         const startBlockNumber = await this.web3.hls.getBlockNumber(address, startDate);
-        console.log(startBlockNumber);
+        // console.log(startBlockNumber);
         const output = [];
         for (let i = startBlockNumber; i >= (startBlockNumber - 10); i--) {
-          console.log('Getting all transactions at block number ' + i);
+          // console.log('Getting all transactions at block number ' + i);
           const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
-          console.log(newBlock);
+          // console.log(newBlock);
           if (newBlock.timestamp > startDate) {
             continue;
           }
