@@ -3,6 +3,8 @@ import Web3 from 'web3';
 import * as Utils from 'web3-utils';
 import {formatters} from 'web3-core-helpers';
 import { HlsUtils } from '../utils/hls-utils';
+import { Transaction } from '../entities/transaction';
+import { Account } from '../entities/account';
 
 @Injectable({
   providedIn: 'root'
@@ -33,11 +35,22 @@ export class HeliosServiceService {
         params: 2,
         inputFormatter: [formatters.inputAddressFormatter, HlsUtils.inputTimestampFormatter],
         outputFormatter: Utils.hexToNumber
-      }, {
+      } , {
+        name: 'getBlockByNumber',
+        call: 'hls_getBlockByNumber',
+        params: 3,
+        inputFormatter: [(val) => val, (val) => val, (val) => !!val],
+        outputFormatter: formatters.outputBlockFormatter
+      } , {
         name: 'getTransactionByHash',
         call: 'hls_getTransactionByHash',
         params: 1,
-        outputFormatter: HlsUtils.outputTransactionFormatter
+        outputFormatter: formatters.outputTransactionFormatter
+      }, {
+        name: 'getTransactionReceipt',
+        call: 'hls_getTransactionReceipt',
+        params: 1,
+        outputFormatter: formatters.outputTransactionReceiptFormatter
       }
     ]
   };
@@ -82,20 +95,17 @@ export class HeliosServiceService {
    *  encrypt: function(password){...}
    * }
    */
-  async accountCreate() {
+  async accountCreate(password: string) {
     try {
-      console.log('accountsCreate Connected?', this.isConnected());
-      if (this.isConnected()) {
-        const account = await this.web3.eth.accounts.create();
+      console.log('accountsCreate');
+      if (await this.isConnected()) {
+        const preAccount = await this.web3.eth.accounts.create();
+        const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
+        const account = new Account(preAccount, encrypt);
         console.log(account);
         return account;
       } else {
-        const connect = await this.connectToFirstAvailableNode();
-        if (connect && this.isConnected()) {
-          const account = await this.web3.eth.accounts.create();
-          console.log(account);
-          return account;
-        }
+        throw new Error('Fail Connect');
       }
     } catch (error) {
       throw error;
@@ -110,18 +120,13 @@ export class HeliosServiceService {
    */
   async getBalance(address: string) {
     try {
-      console.log('getBalance Connected?', this.isConnected());
-      if (this.isConnected()) {
+      console.log('getBalance');
+      if (await this.isConnected()) {
         const balance = await this.web3.hls.getBalance(address);
         console.log(balance);
         return balance;
       } else {
-        const connect = await this.connectToFirstAvailableNode();
-        if (connect && this.isConnected()) {
-          const balance = await this.web3.hls.getBalance(address);
-          console.log(balance);
-          return balance;
-        }
+        throw new Error('Fail Connect');
       }
     } catch (error) {
       throw error;
@@ -148,18 +153,93 @@ export class HeliosServiceService {
    */
   async getTransaction(hash: string) {
     try {
-      console.log('getTransaction Connected?', this.isConnected());
-      if (this.isConnected()) {
-        const transaction = await this.web3.hls.getTransactionByHash(hash);
-        console.log(transaction);
-        return transaction;
+      console.log('getTransaction');
+      if (await this.isConnected()) {
+        const transactionData = await this.web3.hls.getTransactionByHash(hash);
+        console.log(transactionData);
+        return Transaction;
       } else {
-        const connect = await this.connectToFirstAvailableNode();
-        if (connect && this.isConnected()) {
-          const transaction = await this.web3.hls.getTransactionByHash(hash);
-          console.log(transaction);
-          return transaction;
+        throw new Error('Fail Connect');
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getTransactionReceipt(hash: string) {
+    try {
+      console.log('getTransaction');
+      if (await this.isConnected()) {
+        const transactionData = await this.web3.hls.getTransactionReceipt(hash);
+        console.log(transactionData);
+        return Transaction;
+      } else {
+        throw new Error('Fail Connect');
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllTransactions(address: string, startDate, endDate) {
+    try {
+      console.log('getAllTransactions');
+      if (await this.isConnected()) {
+        const startBlockNumber = await this.web3.hls.getBlockNumber(address, startDate);
+        console.log(startBlockNumber);
+        const output = [];
+        for (let i = startBlockNumber; i >= (startBlockNumber - 10); i--) {
+          console.log('Getting all transactions at block number ' + i);
+          const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
+          console.log(newBlock);
+          if (newBlock.timestamp > startDate) {
+            continue;
+          }
+          if (newBlock.timestamp > endDate) {
+              break;
+          }
+          if (newBlock.transactions.length > 0) {
+              for (const transactionBlock of newBlock.transactions) {
+                  const tx = transactionBlock;
+                  output.push(new Transaction(newBlock.timestamp, 'Send transaction',
+                    formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.value).mul(this.web3.utils.toBN(-1))),
+                    formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
+                      .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
+                    tx.to, address, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+
+              }
+          }
+          if (newBlock.receiveTransactions.length > 0) {
+              for (const receiveTransactions of newBlock.receiveTransactions) {
+                  const tx = receiveTransactions;
+                  let description;
+                  if (tx.isRefund === '0x0') {
+                      description = 'Refund transaction';
+                  } else {
+                      description = 'Receive transaction';
+                  }
+                  output.push(new Transaction(newBlock.timestamp, description,
+                    formatters.outputBigNumberFormatter(tx.value),
+                    formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
+                      .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
+                    address, tx.from, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+              }
+          }
+          if (parseFloat(newBlock.rewardBundle.rewardType1.amount) !== parseFloat('0')) {
+              output.push(new Transaction(newBlock.timestamp, 'Reward type 1',
+              formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount), 0, address, 'Coinbase',
+              formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+          }
+          if (parseFloat(newBlock.rewardBundle.rewardType2.amount) !== parseFloat('0')) {
+              output.push(new Transaction(newBlock.timestamp, 'Reward type 2',
+              formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount), 0, address, 'Coinbase',
+              formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+          }
         }
+        console.log(output);
+        return output;
+      } else {
+        throw new Error('Fail Connect');
       }
     } catch (error) {
       throw error;
@@ -171,9 +251,14 @@ export class HeliosServiceService {
    * Determines whether connected is node
    * @returns  boolean
    */
-  private isConnected() {
+  private async isConnected() {
     try {
-      return !(this.web3.currentProvider == null || !this.web3.currentProvider.connected);
+      if (!(this.web3.currentProvider == null || !this.web3.currentProvider.connected)) {
+        return true;
+      } else {
+        const connect = await this.connectToFirstAvailableNode();
+        return connect;
+      }
     } catch (error) {
       throw error;
     }
