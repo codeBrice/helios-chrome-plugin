@@ -1,0 +1,25 @@
+<ion-content color="dark">
+  <ion-grid>
+    <ion-row style="margin-top: 25%;" align-items-center>
+      <ion-col size="6" align-self-center offset="3">
+        <ion-img src="../../../assets/images/helios_protocol.png"></ion-img>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-footer>
+	<ion-toolbar position="bottom" color="dark">
+    <ion-grid>
+      <ion-row align-items-center>
+        <ion-col size="12">
+          <ion-button expand="block" color="warning" [routerLink]="['/infowallet']" routerDirection="forward" class="button">Create wallet</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-button expand="block" color="warning" [routerLink]="['/import']" class="button">Import wallet</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+	</ion-toolbar>
+</ion-footer>
