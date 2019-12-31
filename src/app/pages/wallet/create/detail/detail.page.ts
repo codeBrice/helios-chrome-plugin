@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-detail',
@@ -7,9 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DetailPage implements OnInit {
 
+  helios_wallet: any;
   constructor() { }
 
   ngOnInit() {
+    this.helios_wallet = sessionStorage.getItem('walletCreate');
   }
 
 }
