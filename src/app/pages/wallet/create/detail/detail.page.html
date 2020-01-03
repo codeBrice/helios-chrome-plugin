@@ -5,5 +5,16 @@
 </ion-header>
 
 <ion-content color="dark">
-<ion-label>Your new wallet is {{helios_wallet}}</ion-label>
+  <form [formGroup]="generateWallet">
+    <ion-item  color="dark">
+      <ion-label position="floating">Your private key is</ion-label>
+      <ion-input type="text" formControlName="privateKey" readonly></ion-input>
+      <ion-icon color="warning" name="copy" slot="end" align-self-center (click)="copy('privateKey')"></ion-icon>
+    </ion-item>
+    <ion-item  color="dark">
+      <ion-label position="floating">Your keystore is</ion-label>
+      <ion-input type="text" formControlName="keystore" readonly></ion-input>
+      <ion-icon color="warning" name="copy" slot="end" align-self-center (click)="copy('keystore')"></ion-icon>
+    </ion-item>
+  </form>
 </ion-content>
