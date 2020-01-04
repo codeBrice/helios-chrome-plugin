@@ -29,8 +29,6 @@ export class AppComponent {
 
   initializeApp() {
     let startDate = moment().utc().subtract(3, 'months').valueOf();
-    console.log(startDate);
-
     let endDate = moment().utc().valueOf();
 
     this.platform.ready().then(async () => {
@@ -42,14 +40,16 @@ export class AppComponent {
       await loading.present();
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      this.heliosService.connectToFirstAvailableNode().then( async () => {
-        this.heliosService.getBalance('0x4A1383744eED3DBE37B7A0870b15FeA3cE319A66');
-        this.heliosService.getAllTransactions('0x4A1383744eED3DBE37B7A0870b15FeA3cE319A66', startDate, endDate);
+      //find wallet in device storage
+      /* const wallet = await this.storage.get('wallet');
+      if( wallet != null ) {
+        //redirect to dashboard
+        this.router.navigate(['/tabs/home']);
+      } else {
         this.router.navigate(['/homewallet']);
-        await loading.dismiss();
-      }).catch( error => {
-        console.error(error);
-      });
+      } */
+      this.router.navigate(['/homewallet']);
+      await loading.dismiss();
     });
   }
 }

@@ -1,6 +1,9 @@
 <ion-header color="dark">
     <ion-toolbar color="dark">
-      <ion-title color="warning"> Generate wallet </ion-title>
+      <ion-item color="dark">
+        <ion-title color="warning" no-padding > Generate wallet </ion-title>
+        <ion-icon name="wallet" slot="end"></ion-icon>
+      </ion-item>
     </ion-toolbar>
 </ion-header>
 <ion-content color="dark">
@@ -28,7 +31,7 @@
     <ion-grid>
       <ion-row align-items-center>
         <ion-col size="12">
-          <ion-button expand="block" color="tertiary" class="button" (click)="sendPassword()" [disabled]="!createWallet.valid">Generate wallet</ion-button>
+          <ion-button expand="block" color="light" class="button" (click)="sendPassword()" [disabled]="!createWallet.valid">Generate wallet</ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
