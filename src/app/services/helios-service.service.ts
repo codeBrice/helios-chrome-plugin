@@ -131,7 +131,7 @@ export class HeliosServiceService {
 
   async jsonToAccount(jsonAccount: string, password: string) {
     try {
-      console.log('privateKeyToAccount');
+      console.log('jsonAccount');
       const account = this.web3.eth.accounts.decrypt(JSON.parse(jsonAccount), password);
       // const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
       // const account = new Account(preAccount, encrypt);
