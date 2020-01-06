@@ -19,8 +19,7 @@ export class HomePage implements OnInit {
   balance: any;
   ngOnInit() {
     // Or to get a key/value pair
-    this.storage.get('wallet').then((wallet) => {
-      this.heliosService.connectToFirstAvailableNode().then( async () => {
+    this.storage.get('wallet').then(async (wallet) => {
         const loading = await this.loadingController.create({
           message: 'Please wait...',
           translucent: true,
@@ -31,9 +30,6 @@ export class HomePage implements OnInit {
         this.balance = await this.heliosService.getBalance('0x4A1383744eED3DBE37B7A0870b15FeA3cE319A66');
         //this.heliosService.getAllTransactions('0x4A1383744eED3DBE37B7A0870b15FeA3cE319A66', startDate, endDate);
         await loading.dismiss();
-      }).catch( error => {
-        console.error(error);
-      });
     });
   }
 

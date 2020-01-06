@@ -76,8 +76,9 @@ export class HeliosServiceService {
               console.log(`Successfully connected to ${node}`);
               return true;
           }
-          throw new Error(`Failed to connect to node ${node}`);
+          console.log(`Failed connected to ${node}`);
       }
+      throw new Error('Failed to connect to nodes');
     } catch (error) {
       throw error;
     }
@@ -104,11 +105,10 @@ export class HeliosServiceService {
         const account = new Account(preAccount, encrypt);
         console.log(account);
         return account;
-      } else {
-        throw new Error('Fail Connect');
       }
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw new Error('Failed to create account');
     }
   }
 
@@ -121,11 +121,10 @@ export class HeliosServiceService {
         // const encrypt = await this.web3.eth.accounts.encrypt(account.privateKey, '123');
         // console.log(JSON.stringify(encrypt));
         return account;
-      } else {
-        throw new Error('Fail Connect');
       }
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw new Error('Failed to import wallet for privateKey');
     }
   }
 
@@ -138,7 +137,8 @@ export class HeliosServiceService {
       console.log(account);
       return account;
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw new Error('Failed to import wallet for keyStore');
     }
   }
 
@@ -155,11 +155,10 @@ export class HeliosServiceService {
         const balance = await this.web3.hls.getBalance(address);
         console.log(balance);
         return balance;
-      } else {
-        throw new Error('Fail Connect');
       }
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw new Error('Failed to get balance');
     }
   }
 
@@ -250,11 +249,10 @@ export class HeliosServiceService {
         }
         console.log(output);
         return output;
-      } else {
-        throw new Error('Fail Connect');
       }
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw new Error('Failed to get All Transactions');
     }
   }
 
@@ -265,7 +263,7 @@ export class HeliosServiceService {
    */
   private async isConnected() {
     try {
-      if (!(this.web3.currentProvider == null || !this.web3.currentProvider.connected)) {
+      if (this.web3 && !(this.web3.currentProvider == null || !this.web3.currentProvider.connected)) {
         return true;
       } else {
         const connect = await this.connectToFirstAvailableNode();
