@@ -39,17 +39,26 @@ export class AppComponent {
       });
       await loading.present();
       this.statusBar.styleDefault();
-      this.splashScreen.hide();
-      //find wallet in device storage
-      /* const wallet = await this.storage.get('wallet');
-      if( wallet != null ) {
-        //redirect to dashboard
-        this.router.navigate(['/tabs/home']);
-      } else {
-        this.router.navigate(['/homewallet']);
-      } */
-      this.router.navigate(['/homewallet']);
-      await loading.dismiss();
+      // find wallet in device storage
+      console.log('app component');
+      this.storage.get( 'wallet').then(async (wallet) => {
+        if ( wallet != null) {
+          // redirect to dashboard
+          this.router.navigate(['/tabs/home']);
+          this.splashScreen.hide();
+          await loading.dismiss();
+        } else {
+          this.storage.get( 'tutorial').then(async (val) => {
+            if (val) {
+              this.router.navigate(['/homewallet']);
+            } else {
+              this.router.navigate(['/tutorial']);
+            }
+            this.splashScreen.hide();
+            await loading.dismiss();
+          });
+        }
+      });
     });
   }
 }
