@@ -152,7 +152,8 @@ export class HeliosServiceService {
     try {
       console.log('getBalance');
       if (await this.isConnected()) {
-        const balance = await this.web3.hls.getBalance(address);
+        const hls = await this.web3.hls.getBalance(address);
+        const balance = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(hls))).toFixed(2);
         console.log(balance);
         return balance;
       }

@@ -15,8 +15,15 @@ export class HomePage implements OnInit {
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController
     ) { }
+
   wallet: string;
   balance: any;
+  slideOpts = {
+    slidesPerView: 2,
+    initialSlide: 0,
+    speed: 400
+  };
+
   ngOnInit() {
     // Or to get a key/value pair
     this.storage.get('wallet').then(async (wallet) => {
