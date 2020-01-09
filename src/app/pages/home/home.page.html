@@ -1,7 +1,7 @@
 <ion-header>
     <ion-toolbar color=dark>
         <ion-title class="ion-text-center">
-            My Wallet
+            Dashboard
         </ion-title>
     </ion-toolbar>
 </ion-header>
@@ -9,57 +9,46 @@
     <!-- BALANCE -->
     <ion-card class="black">
         <ion-card-header>
-            <ion-card-title class="title text-white"><span>Balance</span></ion-card-title>
+            <ion-row>
+                <ion-col>
+                    <ion-card-title class="title text-yellow"><span>Balance</span></ion-card-title>
+                    <ion-card-subtitle class="text-white"><span>Today, {{today | date:'d MMM' }}</span></ion-card-subtitle>
+                </ion-col>
+                <ion-col>
+                        <ion-icon class="text-white balance-logo" src="/assets/images/heliosSvg.svg"></ion-icon>
+                </ion-col>
+            </ion-row>
         </ion-card-header>
         <ion-card-content class="ion-text-center ion-no-padding">
-            <span class="title">hls </span><span class="text-white balance">{{balance}}</span>
+            <span class="title text-yellow">$ </span><span class="text-white balance">{{balance}} </span>
+            <ion-icon class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
+            <br>
+            <span>+25% Comp. last week / </span>
+            <span>Gas price: </span><span>{{gasPrice}}</span>
         </ion-card-content>
     </ion-card>
     <!-- ACCOUNTS -->
     <ion-row>
         <ion-col size="10">
-            <ion-title class="title title-accounts ion-text-left ion-no-padding"><span>Accounts</span></ion-title>
+            <ion-title class="title title-accounts text-yellow  ion-text-left ion-no-padding"><span>Accounts</span></ion-title>
         </ion-col>
         <ion-col size="2">
-            <ion-fab-button size="small" color="light" class="fab">
-                <ion-icon style="color: #F2AA14;" name="add"></ion-icon>
+            <ion-fab-button size="small" color="dark" class="fab" [routerLink]="['/import']">
+                <ion-icon name="add"></ion-icon>
             </ion-fab-button>
         </ion-col>
         <ion-col size="12">
             <ion-slides pager="true" [options]="slideOpts">
-                <ion-slide>
-                    <ion-card class="yellow full-width">
+                <ion-slide *ngFor ="let wallet of wallets">
+                    <ion-card class="black full-width">
                         <ion-card-content>
-                            <ion-fab-button size="small" color="light" class="fab" style="margin-right: 40px;">
-                                <ion-icon name="logo-usd" class="icon-balance"></ion-icon>
+                            <ion-fab-button size="small" color="dark" class="fab">
+                                <ion-icon src="/assets/images/heliosSvg.svg"></ion-icon>
                             </ion-fab-button>
-                            <ion-icon name="more" class="icon-more"></ion-icon>
                             <br>
                             <span class="balance-accounts">{{balance}}</span>
-                        </ion-card-content>
-                    </ion-card>
-                </ion-slide>
-                <ion-slide>
-                    <ion-card class="yellow full-width">
-                        <ion-card-content>
-                            <ion-fab-button size="small" color="light" class="fab" style="margin-right: 40px;">
-                                <ion-icon name="logo-usd" class="icon-balance"></ion-icon>
-                            </ion-fab-button>
-                            <ion-icon name="more" class="icon-more"></ion-icon>
                             <br>
-                            <span class="balance-accounts">{{balance}}</span>
-                        </ion-card-content>
-                    </ion-card>
-                </ion-slide>
-                <ion-slide>
-                    <ion-card class="yellow full-width">
-                        <ion-card-content>
-                            <ion-fab-button size="small" color="light" class="fab" style="margin-right: 40px;">
-                                <ion-icon name="logo-usd" class="icon-balance"></ion-icon>
-                            </ion-fab-button>
-                            <ion-icon name="more" class="icon-more"></ion-icon>
-                            <br>
-                            <span class="balance-accounts">{{balance}}</span>
+                            <span class="text-yellow">$ </span><span class="bold-quicksand">{{balance}}</span>
                         </ion-card-content>
                     </ion-card>
                 </ion-slide>
@@ -67,10 +56,10 @@
         </ion-col>
         <!-- SEND -RECEIVE -->
         <ion-col>
-            <ion-card class="yellow">
+            <ion-card class="black">
                 <ion-card-content class="ion-text-center">
-                    <ion-fab-button size="small" color="light" class="fab">
-                        <ion-icon style="color: #F2AA14;" name="add"></ion-icon>
+                    <ion-fab-button size="small" color="dark" class="fab">
+                        <ion-icon class="text-yellow" src="/assets/images/send.svg" class="text-yellow icon-send"></ion-icon>
                     </ion-fab-button>
                     <br>
                     <span class="title">Send</span>
@@ -78,10 +67,10 @@
             </ion-card>
         </ion-col>
         <ion-col>
-            <ion-card class="yellow">
+            <ion-card class="black">
                 <ion-card-content class="ion-text-center">
-                    <ion-fab-button size="small" color="light" class="fab">
-                        <ion-icon style="color: #F2AA14;" name="logo-usd"></ion-icon>
+                    <ion-fab-button size="small" color="dark" class="fab">
+                        <ion-icon src="/assets/images/wallet.svg" class="text-yellow icon-send"></ion-icon>
                     </ion-fab-button>
                     <br>
                     <span class="title">Receive</span>

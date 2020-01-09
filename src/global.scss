@@ -26,8 +26,8 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
 
-$yellow-color: #FECD67;
-$black-color: #000000;
+$yellow-color: #e6d46a;
+$black-color: #272727;
 $white-color: #ffff;
 
 .button{
@@ -48,6 +48,19 @@ $white-color: #ffff;
     color: $white-color !important;
 }
 
+.text-yellow {
+    color: $yellow-color !important;
+}
+
 .full-width {
     width: 100%;
+}
+
+.bold-quicksand {
+    font-weight: bold;
+    font-family: Quicksand;
+}
+
+.swiper-pagination-bullet-active {
+    background:  $yellow-color !important;
 }
