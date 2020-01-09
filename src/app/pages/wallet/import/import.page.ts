@@ -56,26 +56,70 @@ export class ImportPage implements OnInit {
   }
 
   async sendMethodImport(){
-    if ( this.privateKey ) {
-      const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
-      this.storage.set( 'wallet', privateKey.address );
-    } else {
-      const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
-      this.storage.set( 'wallet', keystore.address );
-    }
-    const alert = await this.alertController.create({
-      header: 'Success!',
-      message: '<strong>Successfully imported wallet</strong>',
-      buttons: [
-      {
-          text: 'Continue',
-          handler: () => {
-            sessionStorage.clear();
-            this.router.navigate(['/tabs/home']);
+      this.storage.get( 'wallet').then(async (wallets) => {
+        try {
+          if ( this.privateKey ) {
+            const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
+            this.notRepeat(wallets, privateKey.address);
+            if ( wallets === null) {
+              const walletArray = [privateKey.address];
+              this.storage.set( 'wallet', walletArray );
+            } else {
+              wallets.push(privateKey.address);
+              this.storage.set( 'wallet', wallets );
+            }
+          } else {
+            const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
+            this.notRepeat(wallets, keystore.address);
+            if ( wallets === null) {
+            const walletArray = [keystore.address];
+            this.storage.set( 'wallet', walletArray );
+            } else {
+              wallets.push(keystore.address);
+              this.storage.set( 'wallet', wallets );
+            }
           }
+          const alert = await this.alertController.create({
+            header: 'Success!',
+            message: '<strong>Successfully imported wallet</strong>',
+            buttons: [
+            {
+                text: 'Continue',
+                handler: () => {
+                  sessionStorage.clear();
+                  this.router.navigate(['/tabs/home']);
+                }
+              }
+            ]
+          });
+          await alert.present();
+        } catch (error) {
+          const alert = await this.alertController.create({
+            header: 'Fail!',
+            message: `<strong>${error.message}</strong>`,
+            buttons: [
+            {
+                text: 'Continue'
+              }
+            ]
+          });
+          await alert.present();
         }
-      ]
-    });
-    await alert.present();
+      });
+  }
+
+  /**
+   * Nots repeat
+   * @param wallets 
+   * @param adress 
+   * @returns  
+   */
+  notRepeat(wallets, adress) {
+    for (const wallet of wallets) {
+      if (wallet === adress) {
+        throw new Error('Wallet Repeated');
+      }
+    }
+    return true;
   }
 }

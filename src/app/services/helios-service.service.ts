@@ -51,6 +51,12 @@ export class HeliosServiceService {
         call: 'hls_getTransactionReceipt',
         params: 1,
         outputFormatter: formatters.outputTransactionReceiptFormatter
+      },
+      {
+        name: 'getGasPrice',
+        call: 'hls_getGasPrice',
+        params: 0,
+        outputFormatter: Utils.hexToNumber
       }
     ]
   };
@@ -152,9 +158,28 @@ export class HeliosServiceService {
     try {
       console.log('getBalance');
       if (await this.isConnected()) {
-        const balance = await this.web3.hls.getBalance(address);
+        const hls = await this.web3.hls.getBalance(address);
+        const balance = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(hls))).toFixed(2);
         console.log(balance);
         return balance;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to get balance');
+    }
+  }
+
+  /**
+   * Gets gas price
+   * @returns  number
+   */
+  async getGasPrice() {
+    try {
+      console.log('getBalance');
+      if (await this.isConnected()) {
+        const gasPrice = await this.web3.hls.getGasPrice();
+        console.log(gasPrice);
+        return gasPrice;
       }
     } catch (error) {
       console.log(error);

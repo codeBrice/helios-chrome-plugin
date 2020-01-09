@@ -24,7 +24,43 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+@import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
+
+$yellow-color: #e6d46a;
+$black-color: #272727;
+$white-color: #ffff;
 
 .button{
     margin-top: 0%;
+}
+
+.yellow {
+    color: $white-color !important;
+    background-color: $yellow-color !important;
+}
+
+.black {
+    color: $white-color !important;
+    background-color: $black-color !important;
+}
+
+.text-white {
+    color: $white-color !important;
+}
+
+.text-yellow {
+    color: $yellow-color !important;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.bold-quicksand {
+    font-weight: bold;
+    font-family: Quicksand;
+}
+
+.swiper-pagination-bullet-active {
+    background:  $yellow-color !important;
 }

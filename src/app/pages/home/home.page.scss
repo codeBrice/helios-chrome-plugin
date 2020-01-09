@@ -1,0 +1,53 @@
+.title {
+    font-weight: bold;
+    font-size: 20px;
+    font-family: Quicksand;
+}
+
+.title-accounts {
+    padding-left: 20px;
+}
+
+.balance {
+    font-weight: bold; 
+    font-size: 40px;
+    font-family: Quicksand;
+}
+
+.icon-send {
+    font-size: 20px;
+}
+
+.icon-more {
+    font-size: 20px;
+    color: #fff;
+}
+
+.balance-accounts {
+    font-weight: bold;
+    font-size: 20px;
+    font-family: Quicksand;
+}
+
+.fab {
+    font-size: 12px;
+    display: inline-grid;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+}
+
+ion-card-content {
+    padding: 5px !important;
+}
+
+::ng-deep .swiper-container-horizontal>.swiper-pagination-bullets, .swiper-pagination-custom, .swiper-pagination-fraction {
+    bottom: -3px !important;
+    left: 0;
+    width: 100%;
+}
+
+.balance-logo {
+font-size: 35px;
+    float: right;
+}
