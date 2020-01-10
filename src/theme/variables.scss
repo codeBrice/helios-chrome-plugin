@@ -3,6 +3,8 @@
 
 /** Ionic CSS Variables **/
 :root {
+
+
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;
@@ -75,5 +77,25 @@
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
 
+  
+  /** helios **/
+  --ion-color-helios: #e6d46a;
+  --ion-color-helios-rgb: 230, 212, 106;
+  --ion-color-helios-contrast: #000000;
+  --ion-color-helios-contrast-rgb: 0, 0, 0;
+  --ion-color-helios-shade: #e0b500;
+  --ion-color-helios-tint: #ffd31a;
+
   font-family: 'Quicksand', sans-serif;
+  --ion-default-font: "Montserrat", Helvetica, sans-serif;
+  --ion-font-family: "Montserrat", Helvetica, sans-serif;
+}
+
+.ion-color-helios {
+  --ion-color-base: var(--ion-color-helios);
+  --ion-color-base-rgb: var(--ion-color-helios-rgb);
+  --ion-color-contrast: var(--ion-color-helios-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-helios-contrast-rgb);
+  --ion-color-shade: var(--ion-color-helios-shade);
+  --ion-color-tint: var(--ion-color-helios-tint);
 }

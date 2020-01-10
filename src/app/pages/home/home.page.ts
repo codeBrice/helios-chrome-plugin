@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
 import { LoadingController } from '@ionic/angular';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 
@@ -13,11 +13,12 @@ import { CoingeckoService } from 'src/app/services/coingecko.service';
 })
 export class HomePage implements OnInit {
 
-  constructor( 
+  constructor(
     private storage: Storage,
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController,
     private route: ActivatedRoute,
+    private router: Router,
     private coingeckoService: CoingeckoService
     ) {
       route.params.subscribe(val => {
@@ -31,22 +32,25 @@ export class HomePage implements OnInit {
   today: any;
   helios: any;
   up: boolean;
-  slideOpts = {
-    slidesPerView: 2,
-    initialSlide: 0,
-    speed: 400
-  };
+  slideOpts: any;
 
   private readonly HELIOS_ID = 'helios-protocol';
 
   ngOnInit() {
-    //this.inicialize();
+    // this.inicialize();
   }
 
   inicialize() {
     this.today = moment();
     this.storage.get('wallet').then(async (wallets) => {
       if (wallets != null) {
+
+        this.slideOpts = {
+          slidesPerView: wallets.length > 1 ? 2 : 1,
+          initialSlide: 0,
+          speed: 400
+        };
+
         const loading = await this.loadingController.create({
           message: 'Please wait...',
           translucent: true,
@@ -71,5 +75,9 @@ export class HomePage implements OnInit {
       }
       this.gasPrice = await this.heliosService.getGasPrice();
     });
+  }
+
+  goToImport() {
+    this.router.navigate(['/import', {add: true}]);
   }
 }

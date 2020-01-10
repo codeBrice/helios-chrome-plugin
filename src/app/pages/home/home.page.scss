@@ -1,7 +1,7 @@
 .title {
     font-weight: bold;
     font-size: 20px;
-    font-family: Quicksand;
+    //font-family: Quicksand;
 }
 
 .title-accounts {
@@ -11,7 +11,7 @@
 .balance {
     font-weight: bold; 
     font-size: 40px;
-    font-family: Quicksand;
+    //font-family: Quicksand;
 }
 
 .icon-send {
@@ -26,7 +26,7 @@
 .balance-accounts {
     font-weight: bold;
     font-size: 20px;
-    font-family: Quicksand;
+    //font-family: Quicksand;
 }
 
 .fab {
@@ -42,7 +42,7 @@ ion-card-content {
 }
 
 ::ng-deep .swiper-container-horizontal>.swiper-pagination-bullets, .swiper-pagination-custom, .swiper-pagination-fraction {
-    bottom: -3px !important;
+    bottom: -4px !important;
     left: 0;
     width: 100%;
 }

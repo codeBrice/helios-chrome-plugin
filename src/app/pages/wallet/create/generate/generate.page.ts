@@ -41,8 +41,16 @@ export class GeneratePage implements OnInit {
       sessionStorage.setItem( 'privateKey', accountWallet.account.privateKey );
       sessionStorage.setItem( 'keystore', JSON.stringify(accountWallet.encrypt) );
       //data storage for mobile
-      this.storage.set( 'wallet', accountWallet.account.address );
-      this.router.navigate(['/detailwallet']);
-      await loading.dismiss();
+      this.storage.get( 'wallet').then(async (wallets) => {
+        if ( wallets === null) {
+          const walletArray = [accountWallet.account.address];
+          this.storage.set( 'wallet', walletArray );
+        } else {
+          wallets.push(accountWallet.account.address);
+          this.storage.set( 'wallet', wallets );
+        }
+        this.router.navigate(['/detailwallet']);
+        await loading.dismiss();
+      });
   }
 }
