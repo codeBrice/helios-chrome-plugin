@@ -20,11 +20,12 @@
             </ion-row>
         </ion-card-header>
         <ion-card-content class="ion-text-center ion-no-padding">
-            <span class="title text-yellow">$ </span><span class="text-white balance">{{balance}} </span>
-            <ion-icon class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
+            <span class="title text-yellow">$ </span><span class="text-white balance">{{balance | number:'1.0-2'}} </span>
+            <ion-icon *ngIf="up" class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
+            <ion-icon *ngIf="!up" class="text-yellow" src="/assets/images/diagonal-arrow-down.svg"></ion-icon>
             <br>
-            <span>+25% Comp. last week / </span>
-            <span>Gas price: </span><span>{{gasPrice}}</span>
+            <span *ngIf="helios"><strong>{{helios.market_data.price_change_percentage_24h | number:'1.0-2'}}</strong> in the last 24 hours / </span>
+            <span>Gas price: </span><span>{{gasPrice | number:'1.0-2'}}</span>
         </ion-card-content>
     </ion-card>
     <!-- ACCOUNTS -->
@@ -46,9 +47,9 @@
                                 <ion-icon src="/assets/images/heliosSvg.svg"></ion-icon>
                             </ion-fab-button>
                             <br>
-                            <span class="balance-accounts">{{balance}}</span>
+                            <span class="balance-accounts">{{wallet.balance | number:'1.0-2'}}</span>
                             <br>
-                            <span class="text-yellow">$ </span><span class="bold-quicksand">{{balance}}</span>
+                            <span class="text-yellow">$ </span><span class="bold-quicksand">{{wallet.usd | number:'1.0-2'}}</span>
                         </ion-card-content>
                     </ion-card>
                 </ion-slide>
