@@ -35,7 +35,7 @@ $white-color: #ffff;
 }
 
 .yellow {
-    color: $white-color !important;
+    color: black !important;
     background-color: $yellow-color !important;
 }
 
@@ -56,11 +56,10 @@ $white-color: #ffff;
     width: 100%;
 }
 
-.bold-quicksand {
-    font-weight: bold;
-    font-family: Quicksand;
-}
-
 .swiper-pagination-bullet-active {
     background:  $yellow-color !important;
+}
+
+.item-has-focus.label-floating.sc-ion-label-md-h, .item-has-focus .label-floating.sc-ion-label-md-h, .item-has-focus.label-stacked.sc-ion-label-md-h, .item-has-focus .label-stacked.sc-ion-label-md-h {
+    color: var(--ion-color-hekios,#e6d46a);
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { HeliosServiceService } from '../../../services/helios-service.service';
 import { AlertController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Storage } from '@ionic/storage';
 
 @Component({
@@ -15,12 +15,14 @@ export class ImportPage implements OnInit {
   privateKey: boolean;
   keystore: boolean;
   importWallet: FormGroup;
+  add: any;
   constructor(
     private formBuilder: FormBuilder,
     private heliosService: HeliosServiceService,
     private alertController: AlertController,
     private router: Router,
-    private storage: Storage
+    private storage: Storage,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
@@ -28,6 +30,9 @@ export class ImportPage implements OnInit {
       'privateKey': new FormControl('', [Validators.required]),
       'password': new FormControl('', [Validators.required, Validators.minLength(16)]),
       'keystore': new FormControl('', [Validators.required])
+    });
+    this.add = this.route.params.subscribe(params => {
+      this.add = params.add;
     });
   }
 
@@ -55,7 +60,7 @@ export class ImportPage implements OnInit {
     }
   }
 
-  async sendMethodImport(){
+  async sendMethodImport() {
       this.storage.get( 'wallet').then(async (wallets) => {
         try {
           if ( this.privateKey ) {

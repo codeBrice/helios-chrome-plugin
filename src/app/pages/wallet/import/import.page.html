@@ -4,25 +4,41 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-item color="dark">
-      <ion-title color="warning" class="ion-no-padding">  Restore wallet </ion-title> 
-      <ion-icon name="wallet" slot="end"></ion-icon>
+      <ion-title color="helios" class="ion-no-padding">  Restore wallet </ion-title> 
+      <ion-icon color="helios" name="wallet" slot="end"></ion-icon>
     </ion-item>
   </ion-toolbar>
 </ion-header>
-<ion-content color="dark">
+<ion-content color="dark" *ngIf="add">
+  <ion-toolbar position="bottom" color="dark">
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+        <ion-col size="12">
+          <ion-button expand="block" color="helios" [routerLink]="['/infowallet']" routerDirection="forward" class="button">Create wallet</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-button expand="block" color="helios" (click)="add = false" class="button">Import wallet</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+	</ion-toolbar>
+</ion-content>
+<ion-content color="dark" *ngIf="!add">
     <ion-radio-group color="dark" class="ion-no-padding">
       <ion-list-header color="dark">
         <ion-label>Choose a option</ion-label>
       </ion-list-header>
   
       <ion-item color="dark">
-        <ion-label>Private Key</ion-label>
-        <ion-radio slot="start" value="privateKey" (click)="changeRadio('privateKey')"></ion-radio>
+        <ion-label >Private Key</ion-label >
+        <ion-radio color="helios" slot="start" value="privateKey" (click)="changeRadio('privateKey')"></ion-radio>
       </ion-item>
   
       <ion-item color="dark">
         <ion-label>Keystore</ion-label>
-        <ion-radio slot="start" value="keystore" (click)="changeRadio('keystore')"></ion-radio>
+        <ion-radio color="helios" slot="start" value="keystore" (click)="changeRadio('keystore')"></ion-radio>
       </ion-item>
     </ion-radio-group>
     <br>
@@ -43,12 +59,12 @@
     </form>
 </ion-content>
 
-<ion-footer>
+<ion-footer *ngIf="!add">
 	<ion-toolbar position="bottom" color="dark">
     <ion-grid>
       <ion-row class="ion-align-items-center">
         <ion-col size="12">
-          <ion-button expand="block" color="light" class="button" (click)="sendMethodImport()" [disabled]="!importWallet.valid">Import wallet</ion-button>
+          <ion-button expand="block" color="helios" class="button" (click)="sendMethodImport()" [disabled]="!importWallet.valid">Import wallet</ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>

@@ -20,11 +20,12 @@
             </ion-row>
         </ion-card-header>
         <ion-card-content class="ion-text-center ion-no-padding">
-            <span class="title text-yellow">$ </span><span class="text-white balance">{{balance}} </span>
-            <ion-icon class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
+            <span class="title text-yellow">$ </span><span class="text-white balance">{{balance | number:'1.0-2'}} </span>
+            <ion-icon *ngIf="up" class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
+            <ion-icon *ngIf="!up" class="text-yellow" src="/assets/images/diagonal-arrow-down.svg"></ion-icon>
             <br>
-            <span>+25% Comp. last week / </span>
-            <span>Gas price: </span><span>{{gasPrice}}</span>
+            <span *ngIf="helios"><strong>{{helios.market_data.price_change_percentage_24h | number:'1.0-2'}}%</strong> in the last 24 hours / </span>
+            <span>Gas price: </span><span>{{gasPrice | number:'1.0-2'}}</span>
         </ion-card-content>
     </ion-card>
     <!-- ACCOUNTS -->
@@ -33,12 +34,12 @@
             <ion-title class="title title-accounts text-yellow  ion-text-left ion-no-padding"><span>Accounts</span></ion-title>
         </ion-col>
         <ion-col size="2">
-            <ion-fab-button size="small" color="dark" class="fab" [routerLink]="['/import']">
+            <ion-fab-button size="small" color="dark" class="fab" (click)="goToImport();">
                 <ion-icon name="add"></ion-icon>
             </ion-fab-button>
         </ion-col>
         <ion-col size="12">
-            <ion-slides pager="true" [options]="slideOpts">
+            <ion-slides *ngIf="slideOpts" pager="true" [options]="slideOpts">
                 <ion-slide *ngFor ="let wallet of wallets">
                     <ion-card class="black full-width">
                         <ion-card-content>
@@ -46,9 +47,9 @@
                                 <ion-icon src="/assets/images/heliosSvg.svg"></ion-icon>
                             </ion-fab-button>
                             <br>
-                            <span class="balance-accounts">{{balance}}</span>
+                            <span class="balance-accounts">{{wallet.balance | number:'1.0-2'}}</span>
                             <br>
-                            <span class="text-yellow">$ </span><span class="bold-quicksand">{{balance}}</span>
+                            <span class="text-yellow">$ </span><span>{{wallet.usd | number:'1.0-2'}}</span>
                         </ion-card-content>
                     </ion-card>
                 </ion-slide>
@@ -59,7 +60,7 @@
             <ion-card class="black">
                 <ion-card-content class="ion-text-center">
                     <ion-fab-button size="small" color="dark" class="fab">
-                        <ion-icon class="text-yellow" src="/assets/images/send.svg" class="text-yellow icon-send"></ion-icon>
+                        <ion-icon src="/assets/images/send.svg" class="text-yellow icon-send"></ion-icon>
                     </ion-fab-button>
                     <br>
                     <span class="title">Send</span>
