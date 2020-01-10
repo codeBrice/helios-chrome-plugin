@@ -18,7 +18,6 @@ export class HomePage implements OnInit {
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController,
     private route: ActivatedRoute,
-    private router: Router,
     private coingeckoService: CoingeckoService
     ) {
       route.params.subscribe(val => {
@@ -75,9 +74,5 @@ export class HomePage implements OnInit {
       }
       this.gasPrice = await this.heliosService.getGasPrice();
     });
-  }
-
-  goToImport() {
-    this.router.navigate(['/import', {add: true}]);
   }
 }
