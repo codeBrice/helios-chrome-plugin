@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { HeliosServiceService } from '../../../services/helios-service.service';
 import { AlertController } from '@ionic/angular';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 
 @Component({
@@ -15,24 +15,20 @@ export class ImportPage implements OnInit {
   privateKey: boolean;
   keystore: boolean;
   importWallet: FormGroup;
-  add: any;
+  add: boolean;
   constructor(
     private formBuilder: FormBuilder,
     private heliosService: HeliosServiceService,
     private alertController: AlertController,
     private router: Router,
     private storage: Storage,
-    private route: ActivatedRoute
-  ) { }
+  ) {  }
 
   ngOnInit() {
     this.importWallet = this.formBuilder.group({
       'privateKey': new FormControl('', [Validators.required]),
       'password': new FormControl('', [Validators.required, Validators.minLength(16)]),
       'keystore': new FormControl('', [Validators.required])
-    });
-    this.add = this.route.params.subscribe(params => {
-      this.add = params.add;
     });
   }
 
@@ -65,21 +61,21 @@ export class ImportPage implements OnInit {
         try {
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
-            this.notRepeat(wallets, privateKey.address);
             if ( wallets === null) {
               const walletArray = [privateKey.address];
               this.storage.set( 'wallet', walletArray );
             } else {
+              this.notRepeat(wallets, privateKey.address);
               wallets.push(privateKey.address);
               this.storage.set( 'wallet', wallets );
             }
           } else {
             const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
-            this.notRepeat(wallets, keystore.address);
             if ( wallets === null) {
             const walletArray = [keystore.address];
             this.storage.set( 'wallet', walletArray );
             } else {
+              this.notRepeat(wallets, keystore.address);
               wallets.push(keystore.address);
               this.storage.set( 'wallet', wallets );
             }
