@@ -1,9 +1,20 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>transaction</ion-title>
+<ion-header color="dark">
+  <ion-toolbar color="dark">
+    <ion-title class="ion-no-padding">Transactions</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content  color="dark"> 
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-list>
+          <ion-item class="item-text-wrap card" *ngFor ="let transaction of transactions">
+            <ion-icon color="helios" name="wallet" slot="start"></ion-icon>
+            <span>{{ transaction.description }}</span>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
