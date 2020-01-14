@@ -296,6 +296,13 @@ export class HeliosServiceService {
       }
     } catch (error) {
       console.log(error);
+      try {
+        if (JSON.parse(error.message.replace('Returned error: ', '')).error === 'No canonical head set for this chain') {
+          return [];
+        }
+      } catch (error) {
+        throw new Error('Failed to get All Transactions');
+      }
       throw new Error('Failed to get All Transactions');
     }
   }

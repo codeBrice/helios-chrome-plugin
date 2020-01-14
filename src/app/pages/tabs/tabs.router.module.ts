@@ -38,6 +38,16 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'chart',
+        children: [
+          {
+            path: '',
+            loadChildren: () =>
+              import('../chart/chart.module').then(m => m.ChartPageModule)
+          }
+        ]
+      },
+      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full'
