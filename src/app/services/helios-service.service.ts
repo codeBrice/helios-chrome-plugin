@@ -76,8 +76,8 @@ export class HeliosServiceService {
           this.web3.extend(this.methods);
           // console.log(this.web3);
           try {
-            const isListening = await this.web3.eth.net.isListening();
-            const numPeers = await this.web3.eth.net.getPeerCount();
+            await this.web3.eth.net.isListening();
+            await this.web3.eth.net.getPeerCount();
             if (this.isConnected()) {
                 console.log(`Successfully connected to ${node}`);
                 return true;
@@ -189,36 +189,6 @@ export class HeliosServiceService {
       throw new Error('Failed to get balance');
     }
   }
-
-  /* async getTransaction(hash: string) {
-    try {
-      console.log('getTransaction');
-      if (await this.isConnected()) {
-        const transactionData = await this.web3.hls.getTransactionByHash(hash);
-        console.log(transactionData);
-        return Transaction;
-      } else {
-        throw new Error('Fail Connect');
-      }
-    } catch (error) {
-      throw error;
-    }
-  } */
-
-  /* async getTransactionReceipt(hash: string) {
-    try {
-      console.log('getTransaction');
-      if (await this.isConnected()) {
-        const transactionData = await this.web3.hls.getTransactionReceipt(hash);
-        console.log(transactionData);
-        return Transaction;
-      } else {
-        throw new Error('Fail Connect');
-      }
-    } catch (error) {
-      throw error;
-    }
-  } */
 
   async getAllTransactions(address: string, startDate, endDate, startIndex, length) {
     try {
