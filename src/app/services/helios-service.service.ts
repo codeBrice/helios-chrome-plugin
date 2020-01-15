@@ -75,14 +75,17 @@ export class HeliosServiceService {
           this.web3 = new Web3(new Web3.providers.WebsocketProvider(node));
           this.web3.extend(this.methods);
           // console.log(this.web3);
-          const isListening = await this.web3.eth.net.isListening();
-          const numPeers = await this.web3.eth.net.getPeerCount();
-          // console.log( ' listening: ' + isListening.toString() + ' with ' + numPeers + ' peers');
-          if (this.isConnected()) {
-              console.log(`Successfully connected to ${node}`);
-              return true;
+          try {
+            await this.web3.eth.net.isListening();
+            await this.web3.eth.net.getPeerCount();
+            if (this.isConnected()) {
+                console.log(`Successfully connected to ${node}`);
+                return true;
+            }
+          } catch( error ){
+            console.log(`Failed connected to ${node}`);
           }
-          console.log(`Failed connected to ${node}`);
+          // console.log( ' listening: ' + isListening.toString() + ' with ' + numPeers + ' peers');
       }
       throw new Error('Failed to connect to nodes');
     } catch (error) {
@@ -187,54 +190,40 @@ export class HeliosServiceService {
     }
   }
 
-  /* async getTransaction(hash: string) {
-    try {
-      console.log('getTransaction');
-      if (await this.isConnected()) {
-        const transactionData = await this.web3.hls.getTransactionByHash(hash);
-        console.log(transactionData);
-        return Transaction;
-      } else {
-        throw new Error('Fail Connect');
-      }
-    } catch (error) {
-      throw error;
-    }
-  } */
-
-  /* async getTransactionReceipt(hash: string) {
-    try {
-      console.log('getTransaction');
-      if (await this.isConnected()) {
-        const transactionData = await this.web3.hls.getTransactionReceipt(hash);
-        console.log(transactionData);
-        return Transaction;
-      } else {
-        throw new Error('Fail Connect');
-      }
-    } catch (error) {
-      throw error;
-    }
-  } */
-
-  async getAllTransactions(address: string, startDate, endDate) {
+  async getAllTransactions(address: string, startDate, endDate, startIndex, length) {
     try {
       console.log('getAllTransactions');
+
       if (await this.isConnected()) {
-        const startBlockNumber = await this.web3.hls.getBlockNumber(address, startDate);
+
+        if (!(startIndex || false)) {
+          startIndex = 0;
+        }
+
+        if (!(length || false)) {
+            length = 10;
+        }
+
+        let startBlockNumber = await this.web3.hls.getBlockNumber(address, startDate);
+
+        startBlockNumber = startBlockNumber - startIndex;
+        let endBlockNumber = startBlockNumber - length;
+        if (endBlockNumber < 0) {
+          endBlockNumber = 0;
+        }
         // console.log(startBlockNumber);
         const output = [];
-        for (let i = startBlockNumber; i >= (startBlockNumber - 10); i--) {
-          // console.log('Getting all transactions at block number ' + i);
-          const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
-          // console.log(newBlock);
-          if (newBlock.timestamp > startDate) {
+        for (let i = startBlockNumber; i >= endBlockNumber; i--) {
+           // console.log('Getting all transactions at block number ' + i);
+           const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
+           // console.log(newBlock);
+           if (newBlock.timestamp > startDate) {
             continue;
           }
-          if (newBlock.timestamp > endDate) {
+           if (newBlock.timestamp > endDate) {
               break;
           }
-          if (newBlock.transactions.length > 0) {
+           if (newBlock.transactions.length > 0) {
               for (const transactionBlock of newBlock.transactions) {
                   const tx = transactionBlock;
                   output.push(new Transaction(newBlock.timestamp, 'Send transaction',
@@ -245,11 +234,11 @@ export class HeliosServiceService {
 
               }
           }
-          if (newBlock.receiveTransactions.length > 0) {
+           if (newBlock.receiveTransactions.length > 0) {
               for (const receiveTransactions of newBlock.receiveTransactions) {
                   const tx = receiveTransactions;
                   let description;
-                  if (tx.isRefund === '0x0') {
+                  if (tx.isRefund.substring('2') !== '0') {
                       description = 'Refund transaction';
                   } else {
                       description = 'Receive transaction';
@@ -261,12 +250,12 @@ export class HeliosServiceService {
                     address, tx.from, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
               }
           }
-          if (parseFloat(newBlock.rewardBundle.rewardType1.amount) !== parseFloat('0')) {
+           if (parseFloat(newBlock.rewardBundle.rewardType1.amount.substring('2')) !== parseFloat('0')) {
               output.push(new Transaction(newBlock.timestamp, 'Reward type 1',
               formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount), 0, address, 'Coinbase',
               formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
           }
-          if (parseFloat(newBlock.rewardBundle.rewardType2.amount) !== parseFloat('0')) {
+           if (parseFloat(newBlock.rewardBundle.rewardType2.amount.substring('2')) !== parseFloat('0')) {
               output.push(new Transaction(newBlock.timestamp, 'Reward type 2',
               formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount), 0, address, 'Coinbase',
               formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
@@ -277,6 +266,13 @@ export class HeliosServiceService {
       }
     } catch (error) {
       console.log(error);
+      try {
+        if (JSON.parse(error.message.replace('Returned error: ', '')).error === 'No canonical head set for this chain') {
+          return [];
+        }
+      } catch (error) {
+        throw new Error('Failed to get All Transactions');
+      }
       throw new Error('Failed to get All Transactions');
     }
   }
