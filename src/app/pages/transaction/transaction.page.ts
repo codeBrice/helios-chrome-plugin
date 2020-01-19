@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, ModalController} from '@ionic/angular';
+import { TransactionDetailModalPage } from '../transactionDetail/transaction-detail-modal/transaction-detail-modal.page';
 
 @Component({
   selector: 'app-transaction',
@@ -15,7 +16,8 @@ export class TransactionPage implements OnInit {
   constructor(
     private heliosService: HeliosServiceService,
     private storage: Storage,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private modalController: ModalController
     ) { }
 
   ngOnInit() {
@@ -32,10 +34,27 @@ export class TransactionPage implements OnInit {
       for (const wallet of wallets) {
           const tx = await this.heliosService.getAllTransactions( wallet , startDate , endDate, null, null);
           this.transactions = tx;
+          this.transactions.map( data => data.timestamp = moment.unix(data.timestamp));
           console.log ( 'getTransactions', tx ); 
       }
       await loading.dismiss();
     });
+  }
+
+  doRefresh(event) {
+    setTimeout(() => {
+      event.target.complete();
+      this.ngOnInit();
+    }, 2000);
+  }
+
+  async presentModal( transaction: any ) {
+    const modal = await this.modalController.create({
+      component: TransactionDetailModalPage,
+      componentProps: {
+        'transactionDetail': transaction,      }
+    });
+    return await modal.present();
   }
 
 }

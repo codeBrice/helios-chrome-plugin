@@ -261,7 +261,11 @@ export class HeliosServiceService {
               formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
           }
         }
-        console.log(output);
+        output.map( data  => {
+          data.value = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(data.value))).toFixed(2);
+          data.balance = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(data.balance))).toFixed(2);
+          data.gasCost = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(data.gasCost))).toFixed(2);
+        });
         return output;
       }
     } catch (error) {

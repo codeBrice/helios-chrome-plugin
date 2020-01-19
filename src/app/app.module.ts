@@ -12,6 +12,8 @@ import { AppComponent } from './app.component';
 import { IonicStorageModule } from '@ionic/storage';
 import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { HttpClientModule } from '@angular/common/http';
+//modal
+import { TransactionDetailModalPageModule } from './pages/transactionDetail/transaction-detail-modal/transaction-detail-modal.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,7 +22,8 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule, IonicStorageModule.forRoot(),
-    HttpClientModule],
+    HttpClientModule,
+    TransactionDetailModalPageModule],
 
   providers: [
     StatusBar,

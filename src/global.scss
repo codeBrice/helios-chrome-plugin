@@ -29,6 +29,8 @@
 $yellow-color: #e6d46a;
 $black-color: #272727;
 $white-color: #ffff;
+$green-color: #d4edda;
+$red-color: #f8d7da;
 
 .button{
     margin-top: 0%;
@@ -50,6 +52,14 @@ $white-color: #ffff;
 
 .text-yellow {
     color: $yellow-color !important;
+}
+
+.text-green {
+    color: $green-color !important;
+}
+
+.text-red {
+    color: $red-color !important;
 }
 
 .full-width {
