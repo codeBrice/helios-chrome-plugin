@@ -46,9 +46,6 @@ const routes: Routes = [
     path: 'add',
     loadChildren: () => import('./pages/wallet/add/add.module').then(m => m.AddPageModule)
   },
-
-
-
 ];
 @NgModule({
   imports: [

@@ -5,14 +5,13 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { TransactionPage } from './transaction.page';
-import { DescriptionPipe } from '../../pipes/DescriptionPipe';
-import { WalletFormatPipeModule } from '../../pipes/WalletFormat/WalletFormatPipe.module';
+import { TransactionDetailModalPage } from './transaction-detail-modal.page';
+import { WalletFormatPipeModule } from '../../../pipes/WalletFormat/WalletFormatPipe.module';
 
 const routes: Routes = [
   {
     path: '',
-    component: TransactionPage
+    component: TransactionDetailModalPage
   }
 ];
 
@@ -24,6 +23,6 @@ const routes: Routes = [
     WalletFormatPipeModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [TransactionPage, DescriptionPipe]
+  declarations: [TransactionDetailModalPage]
 })
-export class TransactionPageModule {}
+export class TransactionDetailModalPageModule {}
