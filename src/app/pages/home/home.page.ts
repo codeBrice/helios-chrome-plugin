@@ -75,4 +75,13 @@ export class HomePage implements OnInit {
       this.gasPrice = await this.heliosService.getGasPrice();
     });
   }
+
+  doRefresh(event) {
+    console.log('Begin async operation');
+
+    setTimeout(() => {
+      event.target.complete();
+      this.inicialize();
+    }, 2000);
+  }
 }

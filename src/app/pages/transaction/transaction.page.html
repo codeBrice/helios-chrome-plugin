@@ -4,16 +4,37 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content  color="dark"> 
+<ion-content color="dark">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" color="dark">
+    <ion-refresher-content pullingIcon="arrow-dropdown"
+    pullingText="Pull to refresh"
+    refreshingSpinner="circles"
+    refreshingText="Refreshing..."> </ion-refresher-content>
+  </ion-refresher>
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-list>
-          <ion-item class="item-text-wrap card" *ngFor ="let transaction of transactions">
-            <ion-icon color="helios" name="wallet" slot="start"></ion-icon>
-            <span>{{ transaction.description }}</span>
-          </ion-item>
-        </ion-list>
+        <ion-card class="black" *ngFor ="let transaction of transactions">
+          <ion-card-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col size="1">
+                  <ion-icon *ngIf="transaction.description !== 'Send transaction'" class="text-white balance-logo" src="/assets/images/receive-arrow.svg" color="helios"></ion-icon>
+                  <ion-icon *ngIf="transaction.description === 'Send transaction'" class="text-white balance-logo" src="/assets/images/send-arrow.svg" color="helios"></ion-icon>
+                </ion-col>
+                <ion-col size="5"><span class="text-yellow" >{{ transaction.description | description }}</span></ion-col>
+                <ion-col size="4" *ngIf="transaction.description !== 'Send transaction'"> <span class="text-green balance-font ion-text-end"> +{{ transaction.value | number:'1.0-2' }}</span></ion-col>
+                <ion-col size="4" *ngIf="transaction.description === 'Send transaction'"> <span class="text-red balance-font ion-text-end"> {{ transaction.value | number:'1.0-2' }}</span></ion-col>
+                <ion-col size="2"><span class="balance-font text-yellow" style="float: left !important;">HLS</span></ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col >
+                  <span> {{ transaction.timestamp |  date:'d MMM y' }}</span>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>

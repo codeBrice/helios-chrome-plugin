@@ -32,10 +32,18 @@ export class TransactionPage implements OnInit {
       for (const wallet of wallets) {
           const tx = await this.heliosService.getAllTransactions( wallet , startDate , endDate, null, null);
           this.transactions = tx;
+          this.transactions.map( data => data.timestamp = moment());
           console.log ( 'getTransactions', tx ); 
       }
       await loading.dismiss();
     });
+  }
+
+  doRefresh(event) {
+    setTimeout(() => {
+      event.target.complete();
+      this.ngOnInit();
+    }, 2000);
   }
 
 }
