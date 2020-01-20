@@ -14,7 +14,7 @@ export class TransactionDetailModalPage{
   }
   dismiss() {
     this.modalController.dismiss({
-      'dismissed': true
+      dismissed: true
     });
   }
 }

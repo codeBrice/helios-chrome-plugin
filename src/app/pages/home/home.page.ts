@@ -5,7 +5,9 @@ import { LoadingController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
+import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 
+const CORRECT_PASSCODE = '1234';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',

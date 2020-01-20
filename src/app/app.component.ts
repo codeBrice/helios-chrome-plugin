@@ -8,6 +8,7 @@ import { Storage } from '@ionic/storage';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,10 @@ import { LoadingController } from '@ionic/angular';
   styleUrls: ['app.component.scss']
 })
 export class AppComponent {
+
+  isCorrect = false;
+  enableTouchIdFaceId = false;
+
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
@@ -22,7 +27,8 @@ export class AppComponent {
     private heliosService: HeliosServiceService,
     private storage: Storage,
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private lockscreenService: LockscreenService
   ) {
     this.initializeApp();
   }
@@ -43,12 +49,17 @@ export class AppComponent {
       console.log('app component');
       this.storage.get( 'wallet').then(async (wallet) => {
         if ( wallet != null) {
-          // redirect to dashboard
-          this.router.navigate(['/tabs/home']);
-          this.splashScreen.hide();
+          if (!this.isCorrect) {
+            this.showLockscreen();
+          } else {
+            // redirect to dashboard
+            this.router.navigate(['/tabs/home']);
+            this.splashScreen.hide();
+          }
           await loading.dismiss();
         } else {
           this.storage.get( 'tutorial').then(async (val) => {
+            this.isCorrect = true;
             if (val) {
               this.router.navigate(['/homewallet']);
             } else {
@@ -59,6 +70,30 @@ export class AppComponent {
           });
         }
       });
+    });
+  }
+
+  showLockscreen() {
+    this.storage.get( 'passcode').then(storageData => {
+      if (storageData.use) {
+        const options = {
+          passcode : storageData.passcode,
+          enableTouchIdFaceId: this.enableTouchIdFaceId,
+        };
+        this.lockscreenService.verify(options)
+          .then((response: any) => {
+            const { data } = response;
+            console.log('Response from lockscreen service: ', data);
+            if (data.type === 'dismiss') {
+              this.isCorrect = data.data;
+            } else {
+              this.isCorrect = false;
+            }
+          });
+      } else {
+        this.isCorrect = true;
+        this.router.navigate(['/tabs/home']);
+      }
     });
   }
 }

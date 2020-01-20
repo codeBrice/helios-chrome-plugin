@@ -1,15 +1,19 @@
-<ion-header color="dark">
+<ion-header>
   <ion-toolbar color="dark">
-    <ion-title class="ion-no-padding">Transactions</ion-title>
+    <ion-item color="dark">
+      <ion-title color="light" class="ion-no-padding" > Transactions </ion-title>
+      <ion-icon color="helios" src="/assets/images/exchange.svg" slot="end"></ion-icon>
+    </ion-item>
   </ion-toolbar>
 </ion-header>
 
 <ion-content color="dark">
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" color="dark">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="arrow-dropdown"
     pullingText="Pull to refresh"
     refreshingSpinner="circles"
-    refreshingText="Refreshing..."> </ion-refresher-content>
+    refreshingText="Refreshing..."
+    class="black"> </ion-refresher-content>
   </ion-refresher>
   <ion-grid>
     <ion-row>
@@ -18,19 +22,19 @@
           <ion-card-content class="ion-no-padding">
             <ion-grid>
               <ion-row >
-                <ion-col size="5" text-left><span class="text-yellow" >{{ transaction.description | description }}</span></ion-col>
-                <ion-col size="7" *ngIf="transaction.description !== 'Send transaction'" text-right> <span class="text-green balance-font"> +{{ transaction.value | number:'1.0-2' }}<span class="balance-font text-yellow"> HLS </span> </span></ion-col>
-                <ion-col size="7" *ngIf="transaction.description === 'Send transaction'" text-right> <span class="text-red balance-font"> {{ transaction.value | number:'1.0-2' }} <span class="balance-font text-yellow"> HLS </span> </span></ion-col>
+                <ion-col size="5" class="ion-text-left"><span class="text-yellow" >{{ transaction.description | description }}</span></ion-col>
+                <ion-col size="7" *ngIf="transaction.description !== 'Send transaction'" class="ion-text-right"> <span class="text-green balance-font"> +{{ transaction.value | number:'1.0-2' }}<span class="balance-font text-yellow"> HLS </span> </span></ion-col>
+                <ion-col size="7" *ngIf="transaction.description === 'Send transaction'" class="ion-text-right"> <span class="text-red balance-font"> {{ transaction.value | number:'1.0-2' }} <span class="balance-font text-yellow"> HLS </span> </span></ion-col>
               </ion-row>
               <ion-row>
-                <ion-col size="1" text-center>
+                <ion-col size="1" class="ion-text-center">
                   <ion-icon *ngIf="transaction.description !== 'Send transaction'" class="text-white balance-logo" src="/assets/images/receive-arrow.svg" color="helios"></ion-icon>
                   <ion-icon *ngIf="transaction.description === 'Send transaction'" class="text-white balance-logo" src="/assets/images/send-arrow.svg" color="helios"></ion-icon>
                 </ion-col>
-                <ion-col text-left>
+                <ion-col class="ion-text-left">
                   <span> {{ transaction.timestamp |  date:'d MMM y' }}</span>
                 </ion-col>
-                <ion-col text-right>
+                <ion-col class="ion-text-right">
                   <span> {{ transaction.from | walletformat }}</span>
                 </ion-col>
               </ion-row>
