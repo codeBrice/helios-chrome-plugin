@@ -73,3 +73,11 @@ $red-color: #f8d7da;
 .item-has-focus.label-floating.sc-ion-label-md-h, .item-has-focus .label-floating.sc-ion-label-md-h, .item-has-focus.label-stacked.sc-ion-label-md-h, .item-has-focus .label-stacked.sc-ion-label-md-h {
     color: var(--ion-color-hekios,#e6d46a);
 }
+
+.refresher-md .refresher-pulling-icon, .refresher-md .refresher-pulling-text, .refresher-md .refresher-refreshing-icon, .refresher-md .refresher-refreshing-text {
+    color: $white-color;
+}
+
+ion-spinner {
+    color: $white-color;
+}

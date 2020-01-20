@@ -76,13 +76,13 @@ export class HeliosServiceService {
           this.web3.extend(this.methods);
           // console.log(this.web3);
           try {
-            await this.web3.eth.net.isListening();
-            await this.web3.eth.net.getPeerCount();
-            if (this.isConnected()) {
+            const listen = await this.web3.eth.net.isListening();
+            // await this.web3.eth.net.getPeerCount();
+            if (this.isConnected() && listen) {
                 console.log(`Successfully connected to ${node}`);
                 return true;
             }
-          } catch( error ){
+          } catch ( error ) {
             console.log(`Failed connected to ${node}`);
           }
           // console.log( ' listening: ' + isListening.toString() + ' with ' + numPeers + ' peers');

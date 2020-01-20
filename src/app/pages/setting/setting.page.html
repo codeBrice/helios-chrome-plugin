@@ -1,9 +1,37 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>setting</ion-title>
+  <ion-toolbar color="dark">
+    <ion-item color="dark">
+      <ion-title color="light" class="ion-no-padding" > Settings </ion-title>
+      <ion-icon color="helios" src="/assets/images/settings.svg" slot="end"></ion-icon>
+    </ion-item>
   </ion-toolbar>
 </ion-header>
-
-<ion-content>
-
+<ion-content color=dark>
+  <ion-list color="dark">
+    <ion-list-header color="dark">
+      <ion-label color="light">Preferences</ion-label>
+    </ion-list-header>  
+    <ion-item color="dark" lines="full">
+      <ion-icon color="helios" name="unlock" slot="start"></ion-icon>
+      <ion-label color="light">Security</ion-label>
+    </ion-item>
+    <ion-list-header color="dark">
+      <ion-label color="light">Manage</ion-label>
+    </ion-list-header>
+    <ion-item color="dark" lines="full">
+      <ion-icon color="helios" name="contact" slot="start"></ion-icon>
+      <ion-label color="light">Contacts</ion-label>
+    </ion-item>
+    <ion-item color="dark" lines="full">
+      <ion-icon color="helios" name="share" slot="start"></ion-icon>
+      <ion-label color="light">Share app</ion-label>
+    </ion-item>
+    <ion-list-header color="dark">
+      <ion-label color="light">Other</ion-label>
+    </ion-list-header>
+    <ion-item color="dark" lines="full">
+      <ion-icon color="helios" name="help-circle-outline" slot="start"></ion-icon>
+      <ion-label color="light">Help</ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

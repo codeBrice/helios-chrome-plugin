@@ -5,12 +5,13 @@
         </ion-title>
     </ion-toolbar>
 </ion-header>
-<ion-content color="dark">
-    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" color="dark">
+<ion-content color=dark>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
         <ion-refresher-content pullingIcon="arrow-dropdown"
         pullingText="Pull to refresh"
         refreshingSpinner="circles"
-        refreshingText="Refreshing..."> </ion-refresher-content>
+        refreshingText="Refreshing..."
+        class="black"> </ion-refresher-content>
     </ion-refresher>
     <!-- BALANCE -->
     <ion-card class="black">
