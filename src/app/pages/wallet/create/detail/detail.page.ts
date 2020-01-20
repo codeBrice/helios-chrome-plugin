@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { ToastController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
+import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 
 @Component({
   selector: 'app-detail',
@@ -13,20 +14,23 @@ import { AlertController } from '@ionic/angular';
 export class DetailPage implements OnInit {
 
   generateWallet: FormGroup;
+  isCorrect = false;
+  enableTouchIdFaceId = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private clipboard: Clipboard,
     public toastController: ToastController,
     public alertController: AlertController,
     private router: Router,
+    private lockscreenService: LockscreenService
     ) { }
 
   ngOnInit() {
     this.generateWallet = this.formBuilder.group({
-      'privateKey': new FormControl(sessionStorage.getItem('privateKey')),
-      'keystore': new FormControl(sessionStorage.getItem('keystore'))
+      privateKey: new FormControl(sessionStorage.getItem('privateKey')),
+      keystore: new FormControl(sessionStorage.getItem('keystore'))
     });
-    //this.heliosWallet = sessionStorage.getItem('wallet');
   }
 
   private async  copy( formName: string)  {
@@ -57,12 +61,31 @@ export class DetailPage implements OnInit {
           text: 'Yes',
           handler: () => {
             sessionStorage.clear();
-            this.router.navigate(['/tabs/home']);
+            this.showLockscreen();
           }
         }
       ]
     });
 
     await alert.present();
+  }
+
+  showLockscreen() {
+      const options = {
+        passcode: null,
+        enableTouchIdFaceId: this.enableTouchIdFaceId,
+        newPasscode: true
+      };
+      this.lockscreenService.verify(options)
+        .then((response: any) => {
+          const { data } = response;
+          console.log('Response from lockscreen service: ', data);
+          if (data.type === 'dismiss') {
+            this.isCorrect = data.data;
+            this.router.navigate(['/tabs/home']);
+          } else {
+            this.isCorrect = false;
+          }
+        });
   }
 }

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { SecurityModalPage } from '../security-modal/security-modal.page';
 
 @Component({
   selector: 'app-setting',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SettingPage implements OnInit {
 
-  constructor() { }
+  constructor(private modalController: ModalController) { }
 
   ngOnInit() {
   }
 
+  async presentModalSecurity() {
+    const modal = await this.modalController.create({
+      component: SecurityModalPage,
+      componentProps: {
+        config: null,      }
+    });
+    return await modal.present();
+  }
 }

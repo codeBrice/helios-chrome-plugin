@@ -40,7 +40,7 @@ export class GeneratePage implements OnInit {
       sessionStorage.setItem( 'wallet', accountWallet.account.address );
       sessionStorage.setItem( 'privateKey', accountWallet.account.privateKey );
       sessionStorage.setItem( 'keystore', JSON.stringify(accountWallet.encrypt) );
-      //data storage for mobile
+      // data storage for mobile
       this.storage.get( 'wallet').then(async (wallets) => {
         if ( wallets === null) {
           const walletArray = [accountWallet.account.address];

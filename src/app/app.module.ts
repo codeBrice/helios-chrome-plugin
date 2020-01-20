@@ -14,6 +14,8 @@ import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { HttpClientModule } from '@angular/common/http';
 //modal
 import { TransactionDetailModalPageModule } from './pages/transactionDetail/transaction-detail-modal/transaction-detail-modal.module';
+import { LockscreenModule } from 'src/plugins/lockscreen/lockscreen.module';
+import { SecurityModalPageModule } from './pages/security-modal/security-modal.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -23,7 +25,10 @@ import { TransactionDetailModalPageModule } from './pages/transactionDetail/tran
     IonicModule.forRoot(),
     AppRoutingModule, IonicStorageModule.forRoot(),
     HttpClientModule,
-    TransactionDetailModalPageModule],
+    TransactionDetailModalPageModule,
+    SecurityModalPageModule,
+    LockscreenModule
+  ],
 
   providers: [
     StatusBar,

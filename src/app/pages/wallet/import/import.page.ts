@@ -4,6 +4,7 @@ import { HeliosServiceService } from '../../../services/helios-service.service';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
+import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 
 @Component({
   selector: 'app-import',
@@ -16,12 +17,17 @@ export class ImportPage implements OnInit {
   keystore: boolean;
   importWallet: FormGroup;
   add: boolean;
+
+  isCorrect = false;
+  enableTouchIdFaceId = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private heliosService: HeliosServiceService,
     private alertController: AlertController,
     private router: Router,
     private storage: Storage,
+    private lockscreenService: LockscreenService
   ) {  }
 
   ngOnInit() {
@@ -88,7 +94,7 @@ export class ImportPage implements OnInit {
                 text: 'Continue',
                 handler: () => {
                   sessionStorage.clear();
-                  this.router.navigate(['/tabs/home']);
+                  this.showLockscreen();
                 }
               }
             ]
@@ -123,4 +129,23 @@ export class ImportPage implements OnInit {
     }
     return true;
   }
+
+  showLockscreen() {
+    const options = {
+      passcode: null,
+      enableTouchIdFaceId: this.enableTouchIdFaceId,
+      newPasscode: true
+    };
+    this.lockscreenService.verify(options)
+      .then((response: any) => {
+        const { data } = response;
+        console.log('Response from lockscreen service: ', data);
+        if (data.type === 'dismiss') {
+          this.isCorrect = data.data;
+          this.router.navigate(['/tabs/home']);
+        } else {
+          this.isCorrect = false;
+        }
+      });
+}
 }

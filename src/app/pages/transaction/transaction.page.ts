@@ -52,7 +52,7 @@ export class TransactionPage implements OnInit {
     const modal = await this.modalController.create({
       component: TransactionDetailModalPage,
       componentProps: {
-        'transactionDetail': transaction,      }
+        transactionDetail: transaction,      }
     });
     return await modal.present();
   }
