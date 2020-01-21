@@ -140,11 +140,13 @@ export class HeliosServiceService {
   async jsonToAccount(jsonAccount: string, password: string) {
     try {
       console.log('jsonAccount');
-      const account = this.web3.eth.accounts.decrypt(JSON.parse(jsonAccount), password);
-      // const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
-      // const account = new Account(preAccount, encrypt);
-      console.log(account);
-      return account;
+      if (await this.isConnected()) {
+        const account = this.web3.eth.accounts.decrypt(JSON.parse(jsonAccount), password);
+        // const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
+        // const account = new Account(preAccount, encrypt);
+        console.log(account);
+        return account;
+      }
     } catch (error) {
       console.log(error);
       throw new Error('Failed to import wallet for keyStore');

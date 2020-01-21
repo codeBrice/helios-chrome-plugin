@@ -108,3 +108,10 @@ ion-header{
 body {
   background: var(--ion-color-dark) !important;
 }
+
+ion-toggle {
+  --background: #e8e8e8;
+  /* --background-checked: red;
+  --handle-background: green;
+  --handle-background-checked: yellow; */
+}

@@ -15,11 +15,9 @@ export class SettingPage implements OnInit {
   }
 
   async presentModalSecurity() {
-    const modal = await this.modalController.create({
-      component: SecurityModalPage,
-      componentProps: {
-        config: null,      }
-    });
-    return await modal.present();
+      const modal = await this.modalController.create({
+        component: SecurityModalPage,
+      });
+      return await modal.present();
   }
 }
