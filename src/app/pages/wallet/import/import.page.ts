@@ -131,21 +131,27 @@ export class ImportPage implements OnInit {
   }
 
   showLockscreen() {
-    const options = {
-      passcode: null,
-      enableTouchIdFaceId: this.enableTouchIdFaceId,
-      newPasscode: true
-    };
-    this.lockscreenService.verify(options)
-      .then((response: any) => {
-        const { data } = response;
-        console.log('Response from lockscreen service: ', data);
-        if (data.type === 'dismiss') {
-          this.isCorrect = data.data;
-          this.router.navigate(['/tabs/home']);
-        } else {
-          this.isCorrect = false;
-        }
-      });
+    this.storage.get( 'passcode').then(storageData => {
+      if (!storageData) {
+        const options = {
+          passcode: null,
+          enableTouchIdFaceId: this.enableTouchIdFaceId,
+          newPasscode: true
+        };
+        this.lockscreenService.verify(options)
+          .then((response: any) => {
+            const { data } = response;
+            console.log('Response from lockscreen service: ', data);
+            if (data.type === 'dismiss') {
+              this.isCorrect = data.data;
+              this.router.navigate(['/tabs/home']);
+            } else {
+              this.isCorrect = false;
+            }
+          });
+      } else {
+        this.router.navigate(['/tabs/home']);
+      }
+    });
 }
 }

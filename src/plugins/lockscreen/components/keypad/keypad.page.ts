@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { TapticEngine } from '@ionic-native/taptic-engine/ngx';
 import { Storage } from '@ionic/storage';
 
 const DEFAULT_THEME_COLOR = 'helios';
@@ -13,6 +12,7 @@ const PASSCODE_LENGTH = 6;
     '(document:keydown)': 'handleKeyboardEvent($event)'
   }
 })
+
 export class KeypadPage {
   themeColor: string = DEFAULT_THEME_COLOR;
   inputCombination = '';
@@ -24,7 +24,7 @@ export class KeypadPage {
   @Input() enableTouchId: boolean;
   @Input() newPasscode: boolean;
 
-  constructor(private modalCtrl: ModalController, private taptic: TapticEngine, private storage: Storage) {
+  constructor(private storage: Storage, private modalCtrl: ModalController) {
   }
 
   ionViewWillEnter() {
@@ -78,7 +78,6 @@ export class KeypadPage {
       this.dismiss();
     } else {
       this.isIncorrect = true;
-      this.taptic.notification({type: 'error'});
       setTimeout(() => {
         this.clear();
         this.isIncorrect = false;

@@ -3,8 +3,8 @@
     <ion-row class="ion-justify-content-center">
       <ion-col class="keypad-container ion-align-self-center" size="auto">
         <div>
-          <p *ngIf="!isRetry">Enter Passcode</p>
-          <p *ngIf="isRetry">Repeat Passcode</p>
+          <p *ngIf="!isRetry">Enter Pin Code</p>
+          <p *ngIf="isRetry">Repeat Pin Code</p>
           <div class="dots" [ngClass]="{'animated-shake': isIncorrect}">
             <ion-icon
               class="dot"

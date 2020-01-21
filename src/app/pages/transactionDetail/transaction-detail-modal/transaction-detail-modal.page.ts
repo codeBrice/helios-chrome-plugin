@@ -9,7 +9,7 @@ import { ModalController, NavParams } from '@ionic/angular';
 export class TransactionDetailModalPage{
   @Input() transactionDetail: any;
 
-  constructor( private modalController: ModalController, navParams: NavParams) { 
+  constructor( private modalController: ModalController, navParams: NavParams) {
     this.transactionDetail = navParams.get('transactionDetail');
   }
   dismiss() {
