@@ -33,7 +33,7 @@ export class DetailPage implements OnInit {
     });
   }
 
-  private async  copy( formName: string)  {
+  async  copy( formName: string)  {
     if ( formName === 'privateKey' ) {
       this.clipboard.copy( sessionStorage.getItem('privateKey') );
     } else {

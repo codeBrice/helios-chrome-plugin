@@ -217,51 +217,62 @@ export class HeliosServiceService {
         const output = [];
         for (let i = startBlockNumber; i >= endBlockNumber; i--) {
            // console.log('Getting all transactions at block number ' + i);
-           const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
-           // console.log(newBlock);
-           if (newBlock.timestamp > startDate) {
-            continue;
-          }
-           if (newBlock.timestamp > endDate) {
-              break;
-          }
-           if (newBlock.transactions.length > 0) {
-              for (const transactionBlock of newBlock.transactions) {
-                  const tx = transactionBlock;
-                  output.push(new Transaction(newBlock.timestamp, 'Send transaction',
-                    formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.value).mul(this.web3.utils.toBN(-1))),
-                    formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
-                      .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
-                    tx.to, address, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-
+           try {
+             const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
+             // console.log(newBlock);
+             if (newBlock.timestamp > startDate) {
+              continue;
+            }
+             if (newBlock.timestamp > endDate) {
+                break;
+            }
+             if (newBlock.transactions.length > 0) {
+                for (const transactionBlock of newBlock.transactions) {
+                    const tx = transactionBlock;
+                    output.push(new Transaction(newBlock.timestamp, 'Send transaction',
+                      formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.value).mul(this.web3.utils.toBN(-1))),
+                      formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
+                        .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
+                      tx.to, address, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+  
+                }
+            }
+             if (newBlock.receiveTransactions.length > 0) {
+                for (const receiveTransactions of newBlock.receiveTransactions) {
+                    const tx = receiveTransactions;
+                    let description;
+                    if (tx.isRefund.substring('2') !== '0') {
+                        description = 'Refund transaction';
+                    } else {
+                        description = 'Receive transaction';
+                    }
+                    output.push(new Transaction(newBlock.timestamp, description,
+                      formatters.outputBigNumberFormatter(tx.value),
+                      formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
+                        .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
+                      address, tx.from, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+                }
+            }
+             if (parseFloat(newBlock.rewardBundle.rewardType1.amount.substring('2')) !== parseFloat('0')) {
+                output.push(new Transaction(newBlock.timestamp, 'Reward type 1',
+                formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount), 0, address, 'Coinbase',
+                formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+            }
+             if (parseFloat(newBlock.rewardBundle.rewardType2.amount.substring('2')) !== parseFloat('0')) {
+                output.push(new Transaction(newBlock.timestamp, 'Reward type 2',
+                formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount), 0, address, 'Coinbase',
+                formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+            }
+           } catch (error) {
+            console.log(error, {block: i , address});
+            try {
+              if (JSON.parse(error.message.replace('Returned error: ', '')).error !== 'Value must be an instance of str or unicode') {
+                throw new Error('Failed to get block Transactions');
               }
-          }
-           if (newBlock.receiveTransactions.length > 0) {
-              for (const receiveTransactions of newBlock.receiveTransactions) {
-                  const tx = receiveTransactions;
-                  let description;
-                  if (tx.isRefund.substring('2') !== '0') {
-                      description = 'Refund transaction';
-                  } else {
-                      description = 'Receive transaction';
-                  }
-                  output.push(new Transaction(newBlock.timestamp, description,
-                    formatters.outputBigNumberFormatter(tx.value),
-                    formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
-                      .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
-                    address, tx.from, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-              }
-          }
-           if (parseFloat(newBlock.rewardBundle.rewardType1.amount.substring('2')) !== parseFloat('0')) {
-              output.push(new Transaction(newBlock.timestamp, 'Reward type 1',
-              formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount), 0, address, 'Coinbase',
-              formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-          }
-           if (parseFloat(newBlock.rewardBundle.rewardType2.amount.substring('2')) !== parseFloat('0')) {
-              output.push(new Transaction(newBlock.timestamp, 'Reward type 2',
-              formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount), 0, address, 'Coinbase',
-              formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-          }
+            } catch (error) {
+              throw new Error('Failed to get block Transactions');
+            }
+           }
         }
         output.map( data  => {
           data.value = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(data.value))).toFixed(2);
