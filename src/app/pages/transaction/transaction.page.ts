@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
 import { LoadingController, ModalController } from '@ionic/angular';
-import { TransactionDetailModalPage } from '../transactionDetail/transaction-detail-modal/transaction-detail-modal.page';
+import { TransactionDetailModalPage } from './transaction-detail-modal/transaction-detail-modal.page';
 
 @Component({
   selector: 'app-transaction',
@@ -22,8 +22,8 @@ export class TransactionPage implements OnInit {
     ) { }
 
   ngOnInit() {
-    let startDate = moment().utc().subtract(3, 'months').valueOf();
-    let endDate = moment().utc().valueOf();
+    const startDate = moment().utc().subtract(3, 'months').valueOf();
+    const endDate = moment().utc().valueOf();
 
     this.storage.get('wallet').then(async (wallets) => {
       const loading = await this.loadingController.create({
@@ -63,8 +63,8 @@ export class TransactionPage implements OnInit {
   }
 
   loadTransaction( event ) {
-    let startDate = moment().utc().subtract(3, 'months').valueOf();
-    let endDate = moment().utc().valueOf();
+    const startDate = moment().utc().subtract(3, 'months').valueOf();
+    const endDate = moment().utc().valueOf();
     this.fromTx = this.fromTx + 11 ;
     this.toTx = this.toTx + 10;
     this.storage.get('wallet').then(async (wallets) => {

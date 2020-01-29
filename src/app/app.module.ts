@@ -13,10 +13,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { HttpClientModule } from '@angular/common/http';
 //modal
-import { TransactionDetailModalPageModule } from './pages/transactionDetail/transaction-detail-modal/transaction-detail-modal.module';
 import { LockscreenModule } from 'src/plugins/lockscreen/lockscreen.module';
-import { SecurityModalPageModule } from './pages/security-modal/security-modal.module';
-
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -25,8 +22,6 @@ import { SecurityModalPageModule } from './pages/security-modal/security-modal.m
     IonicModule.forRoot(),
     AppRoutingModule, IonicStorageModule.forRoot(),
     HttpClientModule,
-    TransactionDetailModalPageModule,
-    SecurityModalPageModule,
     LockscreenModule
   ],
 

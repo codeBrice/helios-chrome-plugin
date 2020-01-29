@@ -8,6 +8,7 @@ import { IonicModule } from '@ionic/angular';
 import { TransactionPage } from './transaction.page';
 import { DescriptionPipe } from '../../pipes/DescriptionPipe';
 import { WalletFormatPipeModule } from '../../pipes/WalletFormat/WalletFormatPipe.module';
+import { TransactionDetailModalPage } from './transaction-detail-modal/transaction-detail-modal.page';
 
 const routes: Routes = [
   {
@@ -24,6 +25,7 @@ const routes: Routes = [
     WalletFormatPipeModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [TransactionPage, DescriptionPipe]
+  declarations: [TransactionPage, DescriptionPipe , TransactionDetailModalPage],
+  entryComponents: [TransactionDetailModalPage]
 })
 export class TransactionPageModule {}
