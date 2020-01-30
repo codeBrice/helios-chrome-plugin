@@ -8,6 +8,7 @@ import { IonicModule } from '@ionic/angular';
 import { SettingPage } from './setting.page';
 import { SecurityModalPage } from './security-modal/security-modal.page';
 import { ContactsModalPage } from './contacts-modal/contacts-modal.page';
+import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatPipe.module';
 
 const routes: Routes = [
   {
@@ -23,6 +24,7 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
     ReactiveFormsModule,
+    WalletFormatPipeModule
   ],
   declarations: [SettingPage, SecurityModalPage, ContactsModalPage],
   entryComponents: [SecurityModalPage, ContactsModalPage]

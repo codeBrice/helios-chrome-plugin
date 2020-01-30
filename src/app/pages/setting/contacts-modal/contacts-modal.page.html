@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header *ngIf="!add">
   <ion-toolbar color="dark">
     <ion-item color="dark">
       <ion-title color="light" class="ion-no-padding" > Contacts </ion-title>
@@ -7,18 +7,57 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content color="dark">
-  <ion-item color="dark">
+<ion-content color="dark" *ngIf="!add">
+  <ion-item color="dark" *ngFor="let contact of contactsList;let i = index" (click)='presentActionSheet(i)'>
     <ion-avatar slot="start">
-      <img src="http://ui-avatars.com/api/?background=e6d46a&color=000000&name=Carlos+Molina">
+      <img src="http://ui-avatars.com/api/?background=e6d46a&color=000000&name={{contact.name}}+{{contact.lastName}}">
     </ion-avatar>
     <ion-label>
-      <h2>Finn</h2>
-      <h3 style="color: #e6d46a;">0x610DA...be6ec</h3>
+      <h2>{{contact.name}} {{contact.lastName}}</h2>
+      <h3 style="color: #e6d46a;">{{contact.address  | walletformat}}</h3>
     </ion-label>
   </ion-item>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="helios">
+    <ion-fab-button color="helios" (click)="add = true">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+
+<!-- ADD CONTACT -->
+
+<ion-header *ngIf="add">
+  <ion-toolbar color="dark">
+    <ion-item color="dark">
+      <ion-title color="light" class="ion-no-padding" > Contacts </ion-title>
+      <ion-text color="helios" slot="end" (click)="add = false">Close</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="dark" *ngIf="add">
+  <form [formGroup]="contactForm">
+  <ion-item color="dark">
+    <ion-label position="floating">Name</ion-label>
+    <ion-input type="text" formControlName="name"></ion-input>
+  </ion-item>
+  <ion-item color="dark">
+    <ion-label position="floating">Last Name</ion-label>
+    <ion-input type="text" formControlName="lastName"></ion-input>
+  </ion-item>
+  <ion-item color="dark">
+    <ion-label position="floating">Address</ion-label>
+    <ion-input type="text" formControlName="address"></ion-input>
+  </ion-item>
+  <p ion-text class="ion-no-padding" style="padding-left: 16px;" *ngIf="contactForm.get('address').touched && contactForm.get('address').hasError('addressError')">
+    <ion-text color="danger">
+      Address Invalid
+    </ion-text>
+  </p>
+  </form>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="helios" (click)="addContact()" [disabled]="contactForm.invalid">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>

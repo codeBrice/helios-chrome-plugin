@@ -234,7 +234,7 @@ export class HeliosServiceService {
                       formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
                         .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
                       tx.to, address, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-  
+
                 }
             }
              if (newBlock.receiveTransactions.length > 0) {
@@ -309,6 +309,20 @@ export class HeliosServiceService {
       }
     } catch (error) {
       throw error;
+    }
+  }
+
+  /**
+   * Determines whether address is
+   * @param address
+   * @returns  boolean
+   */
+  isAddress(address: string) {
+    try {
+        return this.web3.utils.isAddress(address);
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed validate address');
     }
   }
 
