@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
-import { LoadingController, ActionSheetController } from '@ionic/angular';
+import { LoadingController, ActionSheetController, AlertController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
@@ -21,7 +21,8 @@ export class HomePage implements OnInit {
     private loadingController: LoadingController,
     private route: ActivatedRoute,
     private coingeckoService: CoingeckoService,
-    public actionSheetController: ActionSheetController
+    public actionSheetController: ActionSheetController,
+    public alertController: AlertController
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -93,17 +94,28 @@ export class HomePage implements OnInit {
     const actionSheet = await this.actionSheetController.create({
       header: 'Account Options',
       buttons: [{
-        text: 'Edit',
-        icon: 'create',
-        handler: () => {
-          console.log('Edit clicked');
-        }
-      }, {
         text: 'Delete',
         role: 'destructive',
         icon: 'trash',
-        handler: () => {
-          console.log('Delete clicked', index , wallet);
+        handler: async () => {
+          const alert = await this.alertController.create({
+            header: 'Are you sure?',
+            message: `Delete Wallet <strong>${wallet.adress}?</strong>`,
+            buttons: [
+              {
+                text: 'Cancel',
+                role: 'cancel',
+                cssClass: 'secondary',
+              }, {
+                text: 'Okay',
+                handler: () => {
+                  this.wallets.splice(index, 1);
+                  this.storage.set( 'wallet', this.wallets );
+                }
+              }
+            ]
+          });
+          await alert.present();
         }
       }, {
         text: 'Share',

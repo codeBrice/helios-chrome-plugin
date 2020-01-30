@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, ActionSheetController } from '@ionic/angular';
+import { ModalController, ActionSheetController, AlertController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
@@ -13,10 +13,12 @@ export class ContactsModalPage implements OnInit {
 
   add = false;
   contactForm: FormGroup;
-  contactsList: {}[] = [];
+  contactsList: {name: string, lastName: string, address: string}[] = [];
+  edit = false;
+  index: number;
 
   constructor(private modalController: ModalController, private storage: Storage, public actionSheetController: ActionSheetController,
-              private formBuilder: FormBuilder, private heliosService: HeliosServiceService) { }
+              private formBuilder: FormBuilder, private heliosService: HeliosServiceService, public alertController: AlertController) { }
 
   ngOnInit() {
     this.contactForm = this.formBuilder.group({
@@ -47,6 +49,16 @@ export class ContactsModalPage implements OnInit {
     this.add = false;
   }
 
+  editContact() {
+      this.contactsList.splice(this.index, 1);
+      const name = this.contactForm.value.name;
+      const lastName = this.contactForm.value.lastName;
+      const address = this.contactForm.value.address;
+      this.contactsList.push({name, lastName, address});
+      this.storage.set( 'contacts', this.contactsList );
+      this.edit = false;
+  }
+
   async presentActionSheet(index: number, contact) {
     const actionSheet = await this.actionSheetController.create({
       header: 'Contact Options',
@@ -54,15 +66,35 @@ export class ContactsModalPage implements OnInit {
         text: 'Edit',
         icon: 'create',
         handler: () => {
-          console.log('Edit clicked');
+          this.edit = true;
+          this.index = index;
+          this.contactForm.controls.name.setValue(contact.name);
+          this.contactForm.controls.lastName.setValue(contact.lastName);
+          this.contactForm.controls.address.setValue(contact.address);
         }
       }, {
         text: 'Delete',
         role: 'destructive',
         icon: 'trash',
-        handler: () => {
-          this.contactsList.splice(index, 1);
-          this.storage.set( 'contacts', this.contactsList );
+        handler: async () => {
+          const alert = await this.alertController.create({
+            header: 'Are you sure?',
+            message: `Delete contact <strong>${contact.name}?</strong>`,
+            buttons: [
+              {
+                text: 'Cancel',
+                role: 'cancel',
+                cssClass: 'secondary',
+              }, {
+                text: 'Okay',
+                handler: () => {
+                  this.contactsList.splice(index, 1);
+                  this.storage.set( 'contacts', this.contactsList );
+                }
+              }
+            ]
+          });
+          await alert.present();
         }
       }, {
         text: 'Share',
