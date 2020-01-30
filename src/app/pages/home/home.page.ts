@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, ActionSheetController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
@@ -20,7 +20,8 @@ export class HomePage implements OnInit {
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController,
     private route: ActivatedRoute,
-    private coingeckoService: CoingeckoService
+    private coingeckoService: CoingeckoService,
+    public actionSheetController: ActionSheetController
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -85,5 +86,40 @@ export class HomePage implements OnInit {
       event.target.complete();
       this.inicialize();
     }, 2000);
+  }
+
+  async presentActionSheet(index: number, wallet) {
+    console.log('presentActionSheet', index , wallet);
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Account Options',
+      buttons: [{
+        text: 'Edit',
+        icon: 'create',
+        handler: () => {
+          console.log('Edit clicked');
+        }
+      }, {
+        text: 'Delete',
+        role: 'destructive',
+        icon: 'trash',
+        handler: () => {
+          console.log('Delete clicked', index , wallet);
+        }
+      }, {
+        text: 'Share',
+        icon: 'share',
+        handler: () => {
+          console.log('Share clicked');
+        }
+      }, {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel',
+        handler: () => {
+          console.log('Cancel clicked');
+        }
+      }]
+    });
+    await actionSheet.present();
   }
 }

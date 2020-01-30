@@ -66,6 +66,9 @@ $red-color: #f8d7da;
     width: 100%;
 }
 
+
+//REFRESHER
+
 .swiper-pagination-bullet-active {
     background:  $yellow-color !important;
 }
@@ -80,4 +83,22 @@ $red-color: #f8d7da;
 
 ion-spinner {
     color: $white-color;
+}
+
+// ACTION SHEET
+
+.action-sheet-group.sc-ion-action-sheet-md {
+    background: $black-color;
+}
+
+.action-sheet-title.sc-ion-action-sheet-md {
+    color: $white-color;
+}
+
+.action-sheet-button-inner.sc-ion-action-sheet-md {
+    color: $white-color;
+}
+
+.action-sheet-icon.sc-ion-action-sheet-md {
+    color: $yellow-color;
 }

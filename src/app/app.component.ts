@@ -33,43 +33,48 @@ export class AppComponent {
     this.initializeApp();
   }
 
-  initializeApp() {
-    let startDate = moment().utc().subtract(3, 'months').valueOf();
-    let endDate = moment().utc().valueOf();
+  async ionViewWillUnload() {
+    await this.loadWallets();
+  }
 
+  initializeApp() {
     this.platform.ready().then(async () => {
-      const loading = await this.loadingController.create({
-        message: 'Please wait...',
-        translucent: true,
-        cssClass: 'custom-class custom-loading'
-      });
-      await loading.present();
-      this.statusBar.styleDefault();
-      // find wallet in device storage
-      console.log('app component');
-      this.storage.get( 'wallet').then(async (wallet) => {
-        if ( wallet != null) {
-          if (!this.isCorrect) {
-            this.showLockscreen();
-          } else {
-            // redirect to dashboard
-            this.router.navigate(['/tabs/home']);
-            this.splashScreen.hide();
-          }
-          await loading.dismiss();
+      await this.loadWallets();
+    });
+  }
+
+  private async loadWallets() {
+    const loading = await this.loadingController.create({
+      message: 'Please wait...',
+      translucent: true,
+      cssClass: 'custom-class custom-loading'
+    });
+    await loading.present();
+    this.statusBar.styleDefault();
+    // find wallet in device storage
+    console.log('app component');
+    this.storage.get('wallet').then(async (wallet) => {
+      if (wallet != null) {
+        if (!this.isCorrect) {
+          this.showLockscreen();
         } else {
-          this.storage.get( 'tutorial').then(async (val) => {
-            this.isCorrect = true;
-            if (val) {
-              this.router.navigate(['/homewallet']);
-            } else {
-              this.router.navigate(['/tutorial']);
-            }
-            this.splashScreen.hide();
-            await loading.dismiss();
-          });
+          // redirect to dashboard
+          this.router.navigate(['/tabs/home']);
+          this.splashScreen.hide();
         }
-      });
+        await loading.dismiss();
+      } else {
+        this.storage.get('tutorial').then(async (val) => {
+          this.isCorrect = true;
+          if (val) {
+            this.router.navigate(['/homewallet']);
+          } else {
+            this.router.navigate(['/tutorial']);
+          }
+          this.splashScreen.hide();
+          await loading.dismiss();
+        });
+      }
     });
   }
 

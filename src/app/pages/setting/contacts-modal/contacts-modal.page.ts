@@ -47,7 +47,7 @@ export class ContactsModalPage implements OnInit {
     this.add = false;
   }
 
-  async presentActionSheet(index: number) {
+  async presentActionSheet(index: number, contact) {
     const actionSheet = await this.actionSheetController.create({
       header: 'Contact Options',
       buttons: [{

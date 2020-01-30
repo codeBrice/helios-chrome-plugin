@@ -47,8 +47,8 @@
         </ion-col>
         <ion-col size="12">
             <ion-slides *ngIf="slideOpts" pager="true" [options]="slideOpts">
-                <ion-slide *ngFor ="let wallet of wallets">
-                    <ion-card class="black full-width">
+                <ion-slide *ngFor ="let wallet of wallets;let i = index">
+                    <ion-card class="black full-width" (click)="presentActionSheet(i, wallet);">
                         <ion-card-content>
                             <ion-fab-button size="small" color="dark" class="fab">
                                 <ion-icon src="/assets/images/heliosSvg.svg"></ion-icon>
