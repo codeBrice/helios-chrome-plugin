@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
-import { LoadingController, ActionSheetController, AlertController } from '@ionic/angular';
+import { LoadingController, ActionSheetController, AlertController, ModalController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
+import { SendModalPage } from './send-modal/send-modal.page';
 
 const CORRECT_PASSCODE = '1234';
 @Component({
@@ -22,7 +23,8 @@ export class HomePage implements OnInit {
     private route: ActivatedRoute,
     private coingeckoService: CoingeckoService,
     public actionSheetController: ActionSheetController,
-    public alertController: AlertController
+    public alertController: AlertController,
+    private modalController: ModalController
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -134,4 +136,11 @@ export class HomePage implements OnInit {
     });
     await actionSheet.present();
   }
+
+  async presentModalSend() {
+    const modal = await this.modalController.create({
+      component: SendModalPage,
+    });
+    return await modal.present();
+}
 }
