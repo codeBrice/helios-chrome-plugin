@@ -2,10 +2,7 @@ import { Component } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
-import { HeliosServiceService } from './services/helios-service.service';
 import { Storage } from '@ionic/storage';
-import * as moment from 'moment';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
@@ -23,22 +20,39 @@ export class AppComponent {
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
-    private heliosService: HeliosServiceService,
     private storage: Storage,
     private router: Router,
     private loadingController: LoadingController,
-    private lockscreenService: LockscreenService
+    private lockscreenService: LockscreenService,
   ) {
     this.initializeApp();
   }
 
-  async ionViewWillUnload() {
-    await this.loadWallets();
+  ionViewWillEnter() {
+    console.log('ionViewWillEnter');
+  }
+
+  ionViewWillLeave() {
+    console.log('ionViewWillLeave');
   }
 
   initializeApp() {
     this.platform.ready().then(async () => {
+      this.platform.pause.subscribe(() => {
+        console.log('****UserdashboardPage PAUSED****');
+        this.isCorrect = false;
+      });
+      this.platform.resume.subscribe(() => {
+        this.isCorrect = false;
+        console.log('****UserdashboardPage RESUMED****');
+        this.storage.get('wallet').then(async (wallet) => {
+          if (wallet != null) {
+            if (!this.isCorrect) {
+              this.showLockscreen();
+            }
+          }
+        });
+      });
       await this.loadWallets();
     });
   }
@@ -50,7 +64,7 @@ export class AppComponent {
       cssClass: 'custom-class custom-loading'
     });
     await loading.present();
-    this.statusBar.styleDefault();
+    // this.statusBar.styleDefault();
     // find wallet in device storage
     console.log('app component');
     this.storage.get('wallet').then(async (wallet) => {
