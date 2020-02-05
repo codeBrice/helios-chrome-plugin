@@ -3,6 +3,7 @@ import { ModalController, ActionSheetController, AlertController } from '@ionic/
 import { Storage } from '@ionic/storage';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
+import { Contact } from 'src/app/entities/contact';
 
 @Component({
   selector: 'app-contacts',
@@ -13,7 +14,7 @@ export class ContactsModalPage implements OnInit {
 
   add = false;
   contactForm: FormGroup;
-  contactsList: {name: string, lastName: string, address: string}[] = [];
+  contactsList: Contact[] = [];
   edit = false;
   index: number;
 

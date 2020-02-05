@@ -118,12 +118,12 @@ export class ImportPage implements OnInit {
   /**
    * Nots repeat
    * @param wallets 
-   * @param adress 
+   * @param address 
    * @returns  
    */
-  notRepeat(wallets, adress) {
+  notRepeat(wallets, address) {
     for (const wallet of wallets) {
-      if (wallet === adress) {
+      if (wallet === address) {
         throw new Error('Wallet Repeated');
       }
     }

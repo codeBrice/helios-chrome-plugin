@@ -2,13 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
 import { LoadingController, ActionSheetController, AlertController, ModalController } from '@ionic/angular';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
-import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 import { SendModalPage } from './send-modal/send-modal.page';
 
-const CORRECT_PASSCODE = '1234';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -70,7 +68,7 @@ export class HomePage implements OnInit {
           const balance = await this.heliosService.getBalance(wallet);
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           this.wallets.push({
-            adress: wallet ,
+            address: wallet ,
             balance ,
             usd
           });
@@ -102,7 +100,7 @@ export class HomePage implements OnInit {
         handler: async () => {
           const alert = await this.alertController.create({
             header: 'Are you sure?',
-            message: `Delete Wallet <strong>${wallet.adress}?</strong>`,
+            message: `Delete Wallet <strong>${wallet.address}?</strong>`,
             buttons: [
               {
                 text: 'Cancel',

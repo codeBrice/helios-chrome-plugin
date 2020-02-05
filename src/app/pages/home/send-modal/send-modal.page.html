@@ -7,5 +7,61 @@
   </ion-toolbar>
 </ion-header>
 <ion-content color=dark>
-
+  <form [formGroup]="sendForm">
+    <ion-item color="dark">
+      <ion-label position="floating">Amount</ion-label>
+      <ion-input type="number" inputmode="decimal" formControlName="amount" (ionChange)="updateTotals()"></ion-input>
+    </ion-item>
+    <ion-item color="dark">
+      <ion-label>Currency</ion-label>
+    <ion-select placeholder="Select One" formControlName="currency">
+      <ion-select-option value="hls">Helios</ion-select-option>
+      <ion-select-option value="usd">Usd</ion-select-option>
+    </ion-select>
+    </ion-item>
+    <ion-item color="dark">
+      <ion-label>To</ion-label>
+    <ion-select placeholder="Select One" formControlName="to">
+      <ion-select-option *ngFor="let contact of contactsList" [value]="contact.address">{{contact.name + ' ' + contact.lastName}}</ion-select-option>
+    </ion-select>
+    </ion-item>
+    <ion-item color="dark">
+      <ion-label>From</ion-label>
+    <ion-select placeholder="Select One" formControlName="from">
+      <ion-select-option *ngFor="let wallet of wallets" [value]="wallet.address">hls: {{wallet.balance | number:'1.0-2'}} usd: {{wallet.usd | number:'1.0-2'}}</ion-select-option>
+    </ion-select>
+    </ion-item>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          Fees  
+        </ion-col>
+        <ion-col>
+          <span class="text-yellow">Gas price:</span> {{gasPrice}}
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          Helios  
+        </ion-col>
+        <ion-col>
+          <span class="text-yellow">hls:</span> {{totalHls | number:'1.0-2'}}
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <strong class="title">Total</strong>
+        </ion-col>
+        <ion-col>
+         <strong class="text-yellow">$</strong><strong  class="title"> {{totalUsd | number:'1.0-2'}}</strong>
+        </ion-col>
+      </ion-row>
+      <br>
+      <ion-row>
+        <ion-col size="12">
+          <ion-button expand="block" color="helios" (click)="send()" class="button" [disabled]="sendForm.invalid">Send</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
 </ion-content>

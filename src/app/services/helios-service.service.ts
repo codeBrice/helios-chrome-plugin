@@ -57,6 +57,12 @@ export class HeliosServiceService {
         call: 'hls_getGasPrice',
         params: 0,
         outputFormatter: Utils.hexToNumber
+      },
+      {
+        name: 'sendTransaction',
+        call: 'personal_sendTransaction',
+        params: 2,
+        inputFormatter: [formatters.inputTransactionFormatter, null]
       }
     ]
   };
@@ -183,7 +189,6 @@ export class HeliosServiceService {
       console.log('getBalance');
       if (await this.isConnected()) {
         const gasPrice = await this.web3.hls.getGasPrice();
-        console.log(gasPrice);
         return gasPrice;
       }
     } catch (error) {
@@ -294,6 +299,21 @@ export class HeliosServiceService {
     }
   }
 
+  async sendTransaction(tx) {
+    try {
+      console.log('sendTransaction');
+      if (await this.isConnected()) {
+        const transaction = await this.web3.hls.sendTransaction(tx);
+        //const transaction = await this.web3.eth.personal.sendTransaction(tx);
+        console.log(transaction);
+        return transaction;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to get balance');
+    }
+  }
+
 
   /**
    * Determines whether connected is node
@@ -326,4 +346,17 @@ export class HeliosServiceService {
     }
   }
 
+  /**
+   * To wei
+   * @param value 
+   * @returns  
+   */
+  toWei(value: string) {
+    try {
+        return this.web3.utils.toWei(value, 'Gwei');
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed toWei');
+    }
+  }
 }
