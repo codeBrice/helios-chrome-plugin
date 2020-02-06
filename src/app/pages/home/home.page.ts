@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { SendModalPage } from './send-modal/send-modal.page';
+import { ReceiveModalPage } from './receive-modal/receive-modal.page';
 
 @Component({
   selector: 'app-home',
@@ -140,5 +141,12 @@ export class HomePage implements OnInit {
       component: SendModalPage,
     });
     return await modal.present();
-}
+  }
+
+  async presentModalReceive() {
+    const modal = await this.modalController.create({
+      component: ReceiveModalPage,
+    });
+    return await modal.present();
+  }
 }

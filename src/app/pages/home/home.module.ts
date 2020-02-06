@@ -7,7 +7,9 @@ import { IonicModule } from '@ionic/angular';
 
 import { HomePage } from './home.page';
 import { SendModalPage } from './send-modal/send-modal.page';
-
+import { QRCodeModule } from 'angularx-qrcode';
+import { ReceiveModalPage } from './receive-modal/receive-modal.page';
+import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatPipe.module';
 const routes: Routes = [
   {
     path: '',
@@ -21,9 +23,11 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    QRCodeModule,
+    WalletFormatPipeModule
   ],
-  declarations: [HomePage , SendModalPage],
-  entryComponents: [SendModalPage]
+  declarations: [HomePage , SendModalPage, ReceiveModalPage],
+  entryComponents: [SendModalPage, ReceiveModalPage]
 })
 export class HomePageModule {}

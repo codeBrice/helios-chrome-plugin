@@ -5,7 +5,7 @@ import { Storage } from '@ionic/storage';
 import { Contact } from 'src/app/entities/contact';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
-
+import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 @Component({
   selector: 'app-send-modal',
   templateUrl: './send-modal.page.html',
@@ -15,7 +15,8 @@ export class SendModalPage implements OnInit {
 
   constructor(private modalController: ModalController, private formBuilder: FormBuilder,
               private storage: Storage, private loadingController: LoadingController,
-              private coingeckoService: CoingeckoService, private heliosService: HeliosServiceService) { }
+              private coingeckoService: CoingeckoService, private heliosService: HeliosServiceService,
+              private barcodeScanner: BarcodeScanner) { }
 
   sendForm: FormGroup;
   contactsList: Contact[];
@@ -32,7 +33,10 @@ export class SendModalPage implements OnInit {
       amount: new FormControl('', [Validators.required, Validators.min(1)]),
       currency: new FormControl('hls', [Validators.required]),
       to: new FormControl('', [Validators.required]),
+      toAddress: new FormControl('', [Validators.required]),
       from: new FormControl('', [Validators.required])
+    }, {
+      validator: [this.isAddress('toAddress')]
     });
 
     this.storage.get( 'contacts').then(contacts => {
@@ -78,14 +82,42 @@ export class SendModalPage implements OnInit {
   async send() {
     const transaction = {
       from: this.sendForm.value.from,
-      to: this.sendForm.value.to,
-      // value: web3.utils.toWei('1337', 'ether'),
-      value: this.sendForm.value.amount,
+      to: this.sendForm.value.toAddress,
+      value: this.heliosService.toWei((String(this.sendForm.value.amount))),
+      //value: this.sendForm.value.amount,
       gas: 21000,
       gasPrice: this.heliosService.toWei(String(this.gasPrice))
     };
     await this.heliosService.sendTransaction(transaction,
       this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
+  }
+
+  updateRequired() {
+    if (this.sendForm.value.to !== '99') {
+      this.sendForm.controls.toAddress.setValue(this.sendForm.value.to);
+    } else {
+      this.sendForm.controls.toAddress.setValue('');
+    }
+  }
+
+  isAddress(addressData: string) {
+    return (formGroup: FormGroup) => {
+      const address = formGroup.controls[addressData];
+      if (this.heliosService.isAddress(address.value)) {
+        address.setErrors(null);
+      } else {
+        address.setErrors({ addressError: true });
+      }
+    };
+  }
+
+  scanQr() {
+    this.barcodeScanner.scan().then(barcodeData => {
+      console.log('Barcode data', barcodeData);
+      this.sendForm.controls.toAddress.setValue(barcodeData.text || '');
+     }).catch(err => {
+         console.log('Error', err);
+     });
   }
 
   dismiss() {

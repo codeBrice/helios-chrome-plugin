@@ -14,6 +14,7 @@ import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { HttpClientModule } from '@angular/common/http';
 //modal
 import { LockscreenModule } from 'src/plugins/lockscreen/lockscreen.module';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -22,13 +23,14 @@ import { LockscreenModule } from 'src/plugins/lockscreen/lockscreen.module';
     IonicModule.forRoot(),
     AppRoutingModule, IonicStorageModule.forRoot(),
     HttpClientModule,
-    LockscreenModule
+    LockscreenModule,
   ],
 
   providers: [
     StatusBar,
     SplashScreen,
     Clipboard,
+    BarcodeScanner,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

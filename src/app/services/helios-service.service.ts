@@ -305,7 +305,6 @@ export class HeliosServiceService {
       if (await this.isConnected()) {
         await this.web3.hls.accounts.wallet.add(privateKey);
         const transaction = await this.web3.hls.sendTransaction(tx);
-        //const transaction = await this.web3.eth.personal.sendTransaction(tx);
         console.log(transaction);
         return transaction;
       }

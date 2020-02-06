@@ -28,19 +28,10 @@ export class AppComponent {
     this.initializeApp();
   }
 
-  ionViewWillEnter() {
-    console.log('ionViewWillEnter');
-  }
-
-  ionViewWillLeave() {
-    console.log('ionViewWillLeave');
-  }
-
   initializeApp() {
     this.platform.ready().then(async () => {
       this.platform.pause.subscribe(() => {
         console.log('****UserdashboardPage PAUSED****');
-        this.isCorrect = false;
       });
       this.platform.resume.subscribe(() => {
         this.isCorrect = false;

@@ -21,9 +21,15 @@
     </ion-item>
     <ion-item color="dark">
       <ion-label>To</ion-label>
-    <ion-select placeholder="Select One" formControlName="to">
+    <ion-select placeholder="Select One" formControlName="to" (ionChange)="updateRequired()">
+      <ion-select-option value="99">It is not a contact</ion-select-option>
       <ion-select-option *ngFor="let contact of contactsList" [value]="contact.address">{{contact.name + ' ' + contact.lastName}}</ion-select-option>
     </ion-select>
+    </ion-item>
+    <ion-item color="dark" *ngIf="sendForm.value.to === '99'">
+      <ion-label position="floating">Address</ion-label>
+      <ion-input type="text" formControlName="toAddress"></ion-input>
+      <ion-icon color="helios" name="camera" slot="end" (click)="scanQr()"></ion-icon>
     </ion-item>
     <ion-item color="dark">
       <ion-label>From</ion-label>
@@ -45,7 +51,7 @@
           Helios  
         </ion-col>
         <ion-col>
-          <span class="text-yellow">hls:</span> {{totalHls | number:'1.0-2'}}
+          <span class="text-yellow">HLS:</span> {{totalHls | number:'1.0-2'}}
         </ion-col>
       </ion-row>
       <ion-row>
