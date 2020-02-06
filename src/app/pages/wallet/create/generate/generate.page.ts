@@ -4,6 +4,7 @@ import { HeliosServiceService } from '../../../../services/helios-service.servic
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
+import { Wallet } from 'src/app/entities/wallet';
 
 @Component({
   selector: 'app-generate',
@@ -43,10 +44,10 @@ export class GeneratePage implements OnInit {
       // data storage for mobile
       this.storage.get( 'wallet').then(async (wallets) => {
         if ( wallets === null) {
-          const walletArray = [accountWallet.account.address];
+          const walletArray = [new Wallet(accountWallet.account.address, accountWallet.account.privateKey)];
           this.storage.set( 'wallet', walletArray );
         } else {
-          wallets.push(accountWallet.account.address);
+          wallets.push(new Wallet(accountWallet.account.address, accountWallet.account.privateKey));
           this.storage.set( 'wallet', wallets );
         }
         this.router.navigate(['/detailwallet']);

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Web3 from 'web3';
+import Web3 from 'helios-web3';
 import * as Utils from 'web3-utils';
 import {formatters} from 'web3-core-helpers';
 import { HlsUtils } from '../utils/hls-utils';
@@ -20,7 +20,7 @@ export class HeliosServiceService {
     'wss://masternode1.heliosprotocol.io:30304'
   ];
 
-  private methods = {
+  /* private methods = {
     property: 'hls',
     methods: [
       {
@@ -65,7 +65,7 @@ export class HeliosServiceService {
         inputFormatter: [formatters.inputTransactionFormatter, null]
       }
     ]
-  };
+  }; */
 
   constructor() {
   }
@@ -79,7 +79,7 @@ export class HeliosServiceService {
       for (const node of this.availableNodes) {
           console.log(`Connecting to node ${node}`);
           this.web3 = new Web3(new Web3.providers.WebsocketProvider(node));
-          this.web3.extend(this.methods);
+          //this.web3.extend(this.methods);
           // console.log(this.web3);
           try {
             const listen = await this.web3.eth.net.isListening();
@@ -115,7 +115,7 @@ export class HeliosServiceService {
     try {
       console.log('accountsCreate');
       if (await this.isConnected()) {
-        const preAccount = await this.web3.eth.accounts.create();
+        const preAccount = await this.web3.hls.accounts.create();
         const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
         const account = new Account(preAccount, encrypt);
         console.log(account);
@@ -131,7 +131,7 @@ export class HeliosServiceService {
     try {
       console.log('privateKeyToAccount');
       if (await this.isConnected()) {
-        const account = await this.web3.eth.accounts.privateKeyToAccount(privateKey);
+        const account = await this.web3.hls.accounts.privateKeyToAccount(privateKey);
         console.log(account);
         // const encrypt = await this.web3.eth.accounts.encrypt(account.privateKey, '123');
         // console.log(JSON.stringify(encrypt));
@@ -147,7 +147,7 @@ export class HeliosServiceService {
     try {
       console.log('jsonAccount');
       if (await this.isConnected()) {
-        const account = this.web3.eth.accounts.decrypt(JSON.parse(jsonAccount), password);
+        const account = this.web3.hls.accounts.decrypt(JSON.parse(jsonAccount), password);
         // const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
         // const account = new Account(preAccount, encrypt);
         console.log(account);
@@ -246,7 +246,7 @@ export class HeliosServiceService {
                 for (const receiveTransactions of newBlock.receiveTransactions) {
                     const tx = receiveTransactions;
                     let description;
-                    if (tx.isRefund.substring('2') !== '0') {
+                    if (tx.isRefund) {
                         description = 'Refund transaction';
                     } else {
                         description = 'Receive transaction';
@@ -299,10 +299,11 @@ export class HeliosServiceService {
     }
   }
 
-  async sendTransaction(tx) {
+  async sendTransaction(tx, privateKey) {
     try {
       console.log('sendTransaction');
       if (await this.isConnected()) {
+        await this.web3.hls.accounts.wallet.add(privateKey);
         const transaction = await this.web3.hls.sendTransaction(tx);
         //const transaction = await this.web3.eth.personal.sendTransaction(tx);
         console.log(transaction);
@@ -310,7 +311,7 @@ export class HeliosServiceService {
       }
     } catch (error) {
       console.log(error);
-      throw new Error('Failed to get balance');
+      throw new Error('Failed sendTransaction');
     }
   }
 

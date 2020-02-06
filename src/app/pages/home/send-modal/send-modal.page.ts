@@ -50,13 +50,14 @@ export class SendModalPage implements OnInit {
         this.gasPrice = await this.heliosService.getGasPrice();
         const helios: any = await this.coingeckoService.getCoin(this.HELIOS_ID).toPromise();
         for (const wallet of wallets) {
-          const balance = await this.heliosService.getBalance(wallet);
+          const balance = await this.heliosService.getBalance(wallet.address);
           this.currentPrice = helios.market_data.current_price.usd;
           const usd = Number(balance) * Number(this.currentPrice);
           this.wallets.push({
-            address: wallet ,
+            address: wallet.address ,
             balance ,
-            usd
+            usd ,
+            privateKey: wallet.privateKey
           });
         }
         await loading.dismiss();
@@ -83,7 +84,8 @@ export class SendModalPage implements OnInit {
       gas: 21000,
       gasPrice: this.heliosService.toWei(String(this.gasPrice))
     };
-    await this.heliosService.sendTransaction(transaction);
+    await this.heliosService.sendTransaction(transaction,
+      this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
   }
 
   dismiss() {

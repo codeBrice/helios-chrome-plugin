@@ -35,7 +35,7 @@ export class TransactionPage implements OnInit {
       this.fromTx = 0;
       this.toTx = 10;
       for (const wallet of wallets) {
-          const tx = await this.heliosService.getAllTransactions( wallet , startDate , endDate, this.fromTx, this.toTx);
+          const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
           this.transactions = tx.map( data => {
             data.timestamp = moment.unix(data.timestamp);
             return data;
@@ -69,7 +69,7 @@ export class TransactionPage implements OnInit {
     this.toTx = this.toTx + 10;
     this.storage.get('wallet').then(async (wallets) => {
       for (const wallet of wallets) {
-          const tx = await this.heliosService.getAllTransactions( wallet , startDate , endDate, this.fromTx, this.toTx);
+          const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
           this.transactions = this.transactions.concat(tx.map( data => {
             data.timestamp = moment.unix(data.timestamp);
             return data;

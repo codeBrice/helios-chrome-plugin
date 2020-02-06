@@ -65,10 +65,10 @@ export class HomePage implements OnInit {
         this.balance = 0;
         (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
         for (const wallet of wallets) {
-          const balance = await this.heliosService.getBalance(wallet);
+          const balance = await this.heliosService.getBalance(wallet.address);
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           this.wallets.push({
-            address: wallet ,
+            address: wallet.address ,
             balance ,
             usd
           });
