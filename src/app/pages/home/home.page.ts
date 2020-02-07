@@ -123,7 +123,7 @@ export class HomePage implements OnInit {
         text: 'Share',
         icon: 'share',
         handler: () => {
-            this.socialSharing.share('Optional title', 'Optional message', wallet.address);
+          this.socialSharing.share(`Helios Wallet: ${wallet.address}`);
         }
       }, {
         text: 'Cancel',

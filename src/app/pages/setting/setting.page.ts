@@ -31,10 +31,13 @@ export class SettingPage implements OnInit {
   }
 
   share() {
-    this.socialSharing.share('Optional title', 'Optional message', 'http://www.myurl.com');
+    this.socialSharing.share('Helios Wallet Mobile: ', null, null, 'https://heliosprotocol.io/');
   }
 
   help() {
     window.open('https://heliosprotocol.io/', '_system');
+  }
+  terms() {
+    window.open('https://heliosprotocol.io/terms_of_service.php', '_system');
   }
 }
