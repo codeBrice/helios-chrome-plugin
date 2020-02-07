@@ -30,11 +30,15 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(async () => {
-      this.platform.pause.subscribe(() => {
+      /* this.platform.pause.subscribe(() => {
         console.log('****UserdashboardPage PAUSED****');
-      });
+      }); */
       this.platform.resume.subscribe(() => {
         this.isCorrect = false;
+        if (sessionStorage.getItem( 'camera') === 'true') {
+          this.isCorrect = true;
+          sessionStorage.clear();
+        }
         console.log('****UserdashboardPage RESUMED****');
         this.storage.get('wallet').then(async (wallet) => {
           if (wallet != null) {

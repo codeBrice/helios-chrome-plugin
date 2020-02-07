@@ -15,6 +15,7 @@ import { HttpClientModule } from '@angular/common/http';
 //modal
 import { LockscreenModule } from 'src/plugins/lockscreen/lockscreen.module';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -31,6 +32,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
     SplashScreen,
     Clipboard,
     BarcodeScanner,
+    SocialSharing,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

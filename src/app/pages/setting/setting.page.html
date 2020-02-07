@@ -22,16 +22,29 @@
       <ion-icon color="helios" name="contact" slot="start"></ion-icon>
       <ion-label color="light">Contacts</ion-label>
     </ion-item>
-    <ion-item color="dark" lines="full">
+    <ion-item color="dark" lines="full" (click)="share()">
       <ion-icon color="helios" name="share" slot="start"></ion-icon>
       <ion-label color="light">Share app</ion-label>
     </ion-item>
     <ion-list-header color="dark">
       <ion-label color="light">Other</ion-label>
     </ion-list-header>
-    <ion-item color="dark" lines="full">
+    <ion-item color="dark" lines="full" (click)="help()">
       <ion-icon color="helios" name="help-circle-outline" slot="start"></ion-icon>
       <ion-label color="light">Help</ion-label>
     </ion-item>
   </ion-list>
+  <br>
+  <ion-grid style="text-align: -webkit-center !important;">
+    <ion-row>
+      <ion-col>
+        <ion-img src="../../../assets/images/helios_logo.png" style="width: 80px; height: 80px;"></ion-img>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <p class="copyright text-white"><a href="terms_of_service.php" style="text-decoration: none;color: #ffff;">Terms of use</a><br>© Copyright 2020<br>Helios Blockchain Technologies LTD.</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

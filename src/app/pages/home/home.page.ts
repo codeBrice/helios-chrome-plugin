@@ -7,7 +7,7 @@ import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { SendModalPage } from './send-modal/send-modal.page';
 import { ReceiveModalPage } from './receive-modal/receive-modal.page';
-
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -23,7 +23,8 @@ export class HomePage implements OnInit {
     private coingeckoService: CoingeckoService,
     public actionSheetController: ActionSheetController,
     public alertController: AlertController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private socialSharing: SocialSharing
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -122,7 +123,7 @@ export class HomePage implements OnInit {
         text: 'Share',
         icon: 'share',
         handler: () => {
-          console.log('Share clicked');
+            this.socialSharing.share('Optional title', 'Optional message', wallet.address);
         }
       }, {
         text: 'Cancel',

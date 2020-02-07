@@ -112,6 +112,7 @@ export class SendModalPage implements OnInit {
   }
 
   scanQr() {
+    sessionStorage.setItem( 'camera', 'true' );
     this.barcodeScanner.scan().then(barcodeData => {
       console.log('Barcode data', barcodeData);
       this.sendForm.controls.toAddress.setValue(barcodeData.text || '');
