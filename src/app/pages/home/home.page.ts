@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
-import { LoadingController } from '@ionic/angular';
-import { ActivatedRoute, Router } from '@angular/router';
+import { LoadingController, ActionSheetController, AlertController, ModalController } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
-import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
-
-const CORRECT_PASSCODE = '1234';
+import { SendModalPage } from './send-modal/send-modal.page';
+import { ReceiveModalPage } from './receive-modal/receive-modal.page';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -20,7 +20,11 @@ export class HomePage implements OnInit {
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController,
     private route: ActivatedRoute,
-    private coingeckoService: CoingeckoService
+    private coingeckoService: CoingeckoService,
+    public actionSheetController: ActionSheetController,
+    public alertController: AlertController,
+    private modalController: ModalController,
+    private socialSharing: SocialSharing
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -63,10 +67,10 @@ export class HomePage implements OnInit {
         this.balance = 0;
         (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
         for (const wallet of wallets) {
-          const balance = await this.heliosService.getBalance(wallet);
+          const balance = await this.heliosService.getBalance(wallet.address);
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           this.wallets.push({
-            adress: wallet ,
+            address: wallet.address ,
             balance ,
             usd
           });
@@ -85,5 +89,65 @@ export class HomePage implements OnInit {
       event.target.complete();
       this.inicialize();
     }, 2000);
+  }
+
+  async presentActionSheet(index: number, wallet) {
+    console.log('presentActionSheet', index , wallet);
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Account Options',
+      buttons: [{
+        text: 'Delete',
+        role: 'destructive',
+        icon: 'trash',
+        handler: async () => {
+          const alert = await this.alertController.create({
+            header: 'Are you sure?',
+            message: `Delete Wallet <strong>${wallet.address}?</strong>`,
+            buttons: [
+              {
+                text: 'Cancel',
+                role: 'cancel',
+                cssClass: 'secondary',
+              }, {
+                text: 'Okay',
+                handler: () => {
+                  this.wallets.splice(index, 1);
+                  this.storage.set( 'wallet', this.wallets );
+                }
+              }
+            ]
+          });
+          await alert.present();
+        }
+      }, {
+        text: 'Share',
+        icon: 'share',
+        handler: () => {
+            this.socialSharing.share('Optional title', 'Optional message', wallet.address);
+        }
+      }, {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel',
+        handler: () => {
+          console.log('Cancel clicked');
+        }
+      }]
+    });
+    await actionSheet.present();
+  }
+
+  async presentModalSend() {
+    const modal = await this.modalController.create({
+      component: SendModalPage,
+    });
+    return await modal.present();
+  }
+
+  async presentModalReceive() {
+    const modal = await this.modalController.create({
+      component: ReceiveModalPage,
+    });
+    return await modal.present();
   }
 }

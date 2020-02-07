@@ -1,12 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
 import { HomePage } from './home.page';
-
+import { SendModalPage } from './send-modal/send-modal.page';
+import { QRCodeModule } from 'angularx-qrcode';
+import { ReceiveModalPage } from './receive-modal/receive-modal.page';
+import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatPipe.module';
 const routes: Routes = [
   {
     path: '',
@@ -19,8 +22,12 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    ReactiveFormsModule,
+    QRCodeModule,
+    WalletFormatPipeModule
   ],
-  declarations: [HomePage]
+  declarations: [HomePage , SendModalPage, ReceiveModalPage],
+  entryComponents: [SendModalPage, ReceiveModalPage]
 })
 export class HomePageModule {}

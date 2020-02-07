@@ -5,6 +5,7 @@ import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
+import { Wallet } from 'src/app/entities/wallet';
 
 @Component({
   selector: 'app-import',
@@ -68,21 +69,21 @@ export class ImportPage implements OnInit {
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
             if ( wallets === null) {
-              const walletArray = [privateKey.address];
+              const walletArray = [new Wallet(privateKey.address, privateKey.privateKey)];
               this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, privateKey.address);
-              wallets.push(privateKey.address);
+              wallets.push(new Wallet(privateKey.address, privateKey.privateKey));
               this.storage.set( 'wallet', wallets );
             }
           } else {
             const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
             if ( wallets === null) {
-            const walletArray = [keystore.address];
+            const walletArray = [new Wallet(keystore.address, keystore.privateKey)];
             this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, keystore.address);
-              wallets.push(keystore.address);
+              wallets.push(new Wallet(keystore.address, keystore.privateKey));
               this.storage.set( 'wallet', wallets );
             }
           }
@@ -118,12 +119,12 @@ export class ImportPage implements OnInit {
   /**
    * Nots repeat
    * @param wallets 
-   * @param adress 
+   * @param address 
    * @returns  
    */
-  notRepeat(wallets, adress) {
+  notRepeat(wallets, address) {
     for (const wallet of wallets) {
-      if (wallet === adress) {
+      if (wallet.address === address) {
         throw new Error('Wallet Repeated');
       }
     }

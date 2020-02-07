@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { SecurityModalPage } from '../security-modal/security-modal.page';
+import { ContactsModalPage } from './contacts-modal/contacts-modal.page';
+import { SecurityModalPage } from './security-modal/security-modal.page';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 
 @Component({
   selector: 'app-setting',
@@ -9,7 +11,7 @@ import { SecurityModalPage } from '../security-modal/security-modal.page';
 })
 export class SettingPage implements OnInit {
 
-  constructor(private modalController: ModalController) { }
+  constructor(private modalController: ModalController, private socialSharing: SocialSharing) { }
 
   ngOnInit() {
   }
@@ -19,5 +21,20 @@ export class SettingPage implements OnInit {
         component: SecurityModalPage,
       });
       return await modal.present();
+  }
+
+  async presentModalContacts() {
+    const modal = await this.modalController.create({
+      component: ContactsModalPage,
+    });
+    return await modal.present();
+  }
+
+  share() {
+    this.socialSharing.share('Optional title', 'Optional message', 'http://www.myurl.com');
+  }
+
+  help() {
+    window.open('https://heliosprotocol.io/', '_system');
   }
 }

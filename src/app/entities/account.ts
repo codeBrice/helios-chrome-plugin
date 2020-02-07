@@ -1,3 +1,5 @@
+import { Wallet } from './wallet';
+
 export class Account {
 
     constructor(account, encrypt) {
@@ -6,6 +8,6 @@ export class Account {
 
     }
 
-    account: any;
+    account: Wallet;
     encrypt: any;
 }
