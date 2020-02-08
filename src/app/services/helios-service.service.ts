@@ -304,7 +304,7 @@ export class HeliosServiceService {
       console.log('sendTransaction');
       if (await this.isConnected()) {
         await this.web3.hls.accounts.wallet.add(privateKey);
-        const transaction = await this.web3.hls.sendTransaction(tx);
+        const transaction = await this.web3.hls.sendTransactions([tx]);
         console.log(transaction);
         return transaction;
       }
@@ -314,6 +314,25 @@ export class HeliosServiceService {
     }
   }
 
+  async getReceivableTransactions(address, privateKey) {
+    try {
+      console.log('getReceivableTransactions');
+      if (await this.isConnected()) {
+        const receivableTxs = await this.web3.hls.getReceivableTransactions(address);
+        console.log(receivableTxs);
+        if (receivableTxs.length > 0) {
+          await this.web3.hls.accounts.wallet.add(privateKey);
+          const sendRewardBlock = await this.web3.hls.sendRewardBlock(address);
+          console.log(sendRewardBlock);
+          return true;
+        }
+        return false;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed Receivable Transactions');
+    }
+  }
 
   /**
    * Determines whether connected is node
@@ -354,6 +373,20 @@ export class HeliosServiceService {
   toWei(value: string) {
     try {
         return this.web3.utils.toWei(value, 'Gwei');
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed toWei');
+    }
+  }
+
+  /**
+   * To weiEther
+   * @param value 
+   * @returns  
+   */
+  toWeiEther(value: string) {
+    try {
+        return this.web3.utils.toWei(value, 'ether');
     } catch (error) {
       console.log(error);
       throw new Error('Failed toWei');

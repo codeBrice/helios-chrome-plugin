@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
-import { LoadingController, ActionSheetController, AlertController, ModalController } from '@ionic/angular';
+import { LoadingController, ActionSheetController, AlertController, ModalController, ToastController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
@@ -24,7 +24,8 @@ export class HomePage implements OnInit {
     public actionSheetController: ActionSheetController,
     public alertController: AlertController,
     private modalController: ModalController,
-    private socialSharing: SocialSharing
+    private socialSharing: SocialSharing,
+    public toastController: ToastController
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -66,7 +67,24 @@ export class HomePage implements OnInit {
         this.wallets = [];
         this.balance = 0;
         (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
+        let receivable = false;
         for (const wallet of wallets) {
+
+          try {
+
+            const data = await this.heliosService.getReceivableTransactions(wallet.address, wallet.privateKey);
+
+            if (!receivable) {
+              receivable = data;
+            }
+
+          } catch (error) {
+            const toast = await this.toastController.create({
+              message: error,
+              duration: 2000
+            });
+            toast.present();
+          }
           const balance = await this.heliosService.getBalance(wallet.address);
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           this.wallets.push({
@@ -76,6 +94,15 @@ export class HomePage implements OnInit {
           });
           this.balance += usd;
         }
+
+        if (receivable) {
+          const toast = await this.toastController.create({
+            message: 'You have received new transactions!',
+            duration: 2000
+          });
+          toast.present();
+        }
+
         await loading.dismiss();
       }
       this.gasPrice = await this.heliosService.getGasPrice();
@@ -140,6 +167,11 @@ export class HomePage implements OnInit {
   async presentModalSend() {
     const modal = await this.modalController.create({
       component: SendModalPage,
+    });
+    modal.onDidDismiss().then(result => {
+      if (result.data) {
+        this.inicialize();
+      }
     });
     return await modal.present();
   }

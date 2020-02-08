@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, LoadingController } from '@ionic/angular';
+import { ModalController, LoadingController, ToastController } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { Storage } from '@ionic/storage';
 import { Contact } from 'src/app/entities/contact';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-send-modal',
   templateUrl: './send-modal.page.html',
@@ -16,7 +17,8 @@ export class SendModalPage implements OnInit {
   constructor(private modalController: ModalController, private formBuilder: FormBuilder,
               private storage: Storage, private loadingController: LoadingController,
               private coingeckoService: CoingeckoService, private heliosService: HeliosServiceService,
-              private barcodeScanner: BarcodeScanner) { }
+              public toastController: ToastController,
+              private barcodeScanner: BarcodeScanner, private router: Router) { }
 
   sendForm: FormGroup;
   contactsList: Contact[];
@@ -80,16 +82,44 @@ export class SendModalPage implements OnInit {
   }
 
   async send() {
-    const transaction = {
-      from: this.sendForm.value.from,
-      to: this.sendForm.value.toAddress,
-      value: this.heliosService.toWei((String(this.sendForm.value.amount))),
-      //value: this.sendForm.value.amount,
-      gas: 21000,
-      gasPrice: this.heliosService.toWei(String(this.gasPrice))
-    };
-    await this.heliosService.sendTransaction(transaction,
-      this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
+    let result = false;
+
+    const loading = await this.loadingController.create({
+      message: 'Please wait...',
+      translucent: true,
+      cssClass: 'custom-class custom-loading'
+    });
+    await loading.present();
+
+    try {
+
+      const transaction = {
+        from: this.sendForm.value.from,
+        to: this.sendForm.value.toAddress,
+        value: this.heliosService.toWeiEther((String(this.sendForm.value.amount))),
+        gas: 21000,
+        gasPrice: this.heliosService.toWei(String(this.gasPrice))
+      };
+      result = await this.heliosService.sendTransaction(transaction,
+        this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
+
+      const toast = await this.toastController.create({
+          message: 'Success transaction.',
+          duration: 2000
+      });
+      toast.present();
+
+    } catch (error) {
+      const toast = await this.toastController.create({
+        message: error,
+        duration: 2000
+      });
+      toast.present();
+    }
+
+    this.modalController.dismiss(result);
+
+    await loading.dismiss();
   }
 
   updateRequired() {
@@ -122,8 +152,6 @@ export class SendModalPage implements OnInit {
   }
 
   dismiss() {
-    this.modalController.dismiss({
-      dismissed: true
-    });
+    this.modalController.dismiss(false);
   }
 }
