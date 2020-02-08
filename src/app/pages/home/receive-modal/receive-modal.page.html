@@ -29,8 +29,8 @@
       </ion-row>
       
       <br>
-      <qrcode [qrdata]="receiveForm.value.address" [colorDark]="'#e6d46a'" [colorLight]="'#272727'"
-      [elementType]="elementType" [errorCorrectionLevel]="'M'" [width]="300"></qrcode>
+      <ngx-qrcode [qrc-element-type]="elementType" [qrc-value] = "receiveForm.value.address">
+      </ngx-qrcode>
       <br>
       <span>{{receiveForm.value.address}}</span>
     </ion-card-content>

@@ -3,3 +3,8 @@
     font-size: 20px;
     //font-family: Quicksand;
 }
+
+::ng-deep .qrcode > canvas {
+    width: 200px !important;
+    height: 200px !important;
+}

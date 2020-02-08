@@ -170,7 +170,7 @@ export class HeliosServiceService {
       console.log('getBalance');
       if (await this.isConnected()) {
         const hls = await this.web3.hls.getBalance(address);
-        const balance = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(hls))).toFixed(2);
+        const balance = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(hls)))).toFixed(2);
         console.log(balance);
         return balance;
       }
@@ -280,9 +280,9 @@ export class HeliosServiceService {
            }
         }
         output.map( data  => {
-          data.value = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(data.value))).toFixed(2);
-          data.balance = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(data.balance))).toFixed(2);
-          data.gasCost = parseFloat(this.web3.utils.fromWei(this.web3.utils.toBN(data.gasCost))).toFixed(2);
+          data.value = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(data.value)))).toFixed(2);
+          data.balance = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(data.balance)))).toFixed(2);
+          data.gasCost = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(data.gasCost)))).toFixed(2);
         });
         return output;
       }

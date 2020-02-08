@@ -74,7 +74,7 @@ export class HomePage implements OnInit {
 
             const data = await this.heliosService.getReceivableTransactions(wallet.address, wallet.privateKey);
 
-            if (!receivable) {
+            if (!receivable && data) {
               receivable = data;
             }
 
