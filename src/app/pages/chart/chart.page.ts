@@ -1,6 +1,6 @@
 import { Component, OnInit, } from '@angular/core';
 import { createChart, CrosshairMode } from 'lightweight-charts';
-import { Platform, LoadingController } from '@ionic/angular';
+import { Platform, LoadingController, ToastController } from '@ionic/angular';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import * as moment from 'moment';
 /* declare var TradingView: any; */
@@ -17,7 +17,8 @@ export class ChartPage implements OnInit {
   constructor(
     private loadingController: LoadingController,
     private platform: Platform,
-    private coingeckoService: CoingeckoService) {
+    private coingeckoService: CoingeckoService,
+    public toastController: ToastController) {
 
       platform.ready().then(async (readySource) => {
 
@@ -27,14 +28,14 @@ export class ChartPage implements OnInit {
         cssClass: 'custom-class custom-loading'
       });
       await loading.present();
-
-      this.helios = await this.coingeckoService.getMarketChart(this.HELIOS_ID).toPromise();
+      try {
+        this.helios = await this.coingeckoService.getMarketChart(this.HELIOS_ID).toPromise();
       // console.log(this.helios);
 
-      const priceChart = this.getPriceChart();
+        const priceChart = this.getPriceChart();
       // console.log(priceChart);
 
-      const chart = createChart(document.getElementById('chart'),
+        const chart = createChart(document.getElementById('chart'),
         { width: this.platform.width(),
           height: this.platform.height() - 130,
           crosshair: {
@@ -57,10 +58,10 @@ export class ChartPage implements OnInit {
             },
           },
         });
-      const lineSeries = chart.addCandlestickSeries();
+        const lineSeries = chart.addCandlestickSeries();
 
-      lineSeries.setData(priceChart);
-      lineSeries.applyOptions({
+        lineSeries.setData(priceChart);
+        lineSeries.applyOptions({
         priceFormat: {
           type: 'custom',
           formatter: (price) => {
@@ -68,9 +69,14 @@ export class ChartPage implements OnInit {
           },
         },
       });
-
+      } catch (error) {
+        const toast = await this.toastController.create({
+          message: error.message,
+          duration: 2000
+        });
+        toast.present();
+      }
       await loading.dismiss();
-
     });
   }
 

@@ -49,6 +49,12 @@ export class HomePage implements OnInit {
   inicialize() {
     this.today = moment();
     this.storage.get('wallet').then(async (wallets) => {
+      const loading = await this.loadingController.create({
+        message: 'Please wait...',
+        translucent: true,
+        cssClass: 'custom-class custom-loading'
+      });
+      await loading.present();
       if (wallets != null) {
 
         this.slideOpts = {
@@ -57,55 +63,70 @@ export class HomePage implements OnInit {
           speed: 400
         };
 
-        const loading = await this.loadingController.create({
-          message: 'Please wait...',
-          translucent: true,
-          cssClass: 'custom-class custom-loading'
-        });
-        await loading.present();
-        this.helios = await this.coingeckoService.getCoin(this.HELIOS_ID).toPromise();
-        this.wallets = [];
-        this.balance = 0;
-        (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
-        let receivable = false;
-        for (const wallet of wallets) {
+        try {
 
-          try {
-
-            const data = await this.heliosService.getReceivableTransactions(wallet.address, wallet.privateKey);
-
-            if (!receivable && data) {
-              receivable = data;
-            }
-
-          } catch (error) {
+          this.helios = await this.coingeckoService.getCoin(this.HELIOS_ID).toPromise();
+          this.wallets = [];
+          this.balance = 0;
+          (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
+          let receivable = false;
+          const walletPromises = [];
+          await this.heliosService.connectToFirstAvailableNode();
+          for (const wallet of wallets) {
+            walletPromises.push(new Promise(async (resolve, reject) => {
+              try {
+                try {
+                  const data = await this.heliosService.getReceivableTransactions(wallet.address, wallet.privateKey);
+                  if (!receivable && data) {
+                    receivable = data;
+                  }
+                } catch (error) {
+                  const toast = await this.toastController.create({
+                    message: error.message,
+                    duration: 2000
+                  });
+                  toast.present();
+                }
+                const balance = await this.heliosService.getBalance(wallet.address);
+                const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
+                this.wallets.push({
+                  address: wallet.address ,
+                  balance ,
+                  usd
+                });
+                this.balance += usd;
+                resolve();
+              } catch (error) {
+                reject();
+              }
+            }));
+          }
+          await Promise.all(walletPromises)
+          if (receivable) {
             const toast = await this.toastController.create({
-              message: error,
+              message: 'You have received new transactions!',
               duration: 2000
             });
             toast.present();
           }
-          const balance = await this.heliosService.getBalance(wallet.address);
-          const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
-          this.wallets.push({
-            address: wallet.address ,
-            balance ,
-            usd
-          });
-          this.balance += usd;
-        }
-
-        if (receivable) {
+        } catch (error) {
           const toast = await this.toastController.create({
-            message: 'You have received new transactions!',
+            message: error.message,
             duration: 2000
           });
           toast.present();
         }
-
-        await loading.dismiss();
       }
-      this.gasPrice = await this.heliosService.getGasPrice();
+      try {
+        this.gasPrice = await this.heliosService.getGasPrice();
+      } catch (error) {
+        const toast = await this.toastController.create({
+          message: error.message,
+          duration: 2000
+        });
+        toast.present();
+      }
+      await loading.dismiss();
     });
   }
 

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { HeliosServiceService } from '../../../services/helios-service.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
@@ -28,43 +28,51 @@ export class ImportPage implements OnInit {
     private alertController: AlertController,
     private router: Router,
     private storage: Storage,
-    private lockscreenService: LockscreenService
+    private lockscreenService: LockscreenService,
+    private loadingController: LoadingController,
+    public toastController: ToastController
   ) {  }
 
   ngOnInit() {
     this.importWallet = this.formBuilder.group({
-      'privateKey': new FormControl('', [Validators.required]),
-      'password': new FormControl('', [Validators.required, Validators.minLength(16)]),
-      'keystore': new FormControl('', [Validators.required])
+      privateKey: new FormControl('', [Validators.required]),
+      password: new FormControl('', [Validators.required, Validators.minLength(16)]),
+      keystore: new FormControl('', [Validators.required])
     });
   }
 
   changeRadio( value: string ) {
     this.privateKey = false;
     this.keystore = false;
-    if( value === 'privateKey' ) {
+    if ( value === 'privateKey' ) {
       this.privateKey = true;
-      this.importWallet.controls['keystore'].clearValidators();
-      this.importWallet.controls['keystore'].updateValueAndValidity();
-      this.importWallet.controls['password'].clearValidators();
-      this.importWallet.controls['password'].updateValueAndValidity();
+      this.importWallet.controls.keystore.clearValidators();
+      this.importWallet.controls.keystore.updateValueAndValidity();
+      this.importWallet.controls.password.clearValidators();
+      this.importWallet.controls.password.updateValueAndValidity();
 
-      this.importWallet.controls['privateKey'].setValidators([Validators.required]);
-      this.importWallet.controls['privateKey'].updateValueAndValidity();
+      this.importWallet.controls.privateKey.setValidators([Validators.required]);
+      this.importWallet.controls.privateKey.updateValueAndValidity();
     } else {
       this.keystore = true;
-      this.importWallet.controls['privateKey'].clearValidators();
-      this.importWallet.controls['privateKey'].updateValueAndValidity();
+      this.importWallet.controls.privateKey.clearValidators();
+      this.importWallet.controls.privateKey.updateValueAndValidity();
 
-      this.importWallet.controls['password'].setValidators([Validators.required, Validators.minLength(16)]);
-      this.importWallet.controls['password'].updateValueAndValidity();
-      this.importWallet.controls['keystore'].setValidators([Validators.required]);
-      this.importWallet.controls['keystore'].updateValueAndValidity();
+      this.importWallet.controls.password.setValidators([Validators.required, Validators.minLength(16)]);
+      this.importWallet.controls.password.updateValueAndValidity();
+      this.importWallet.controls.keystore.setValidators([Validators.required]);
+      this.importWallet.controls.keystore.updateValueAndValidity();
     }
   }
 
   async sendMethodImport() {
-      this.storage.get( 'wallet').then(async (wallets) => {
+    const loading = await this.loadingController.create({
+      message: 'Please wait...',
+      translucent: true,
+      cssClass: 'custom-class custom-loading'
+    });
+    await loading.present();
+    this.storage.get( 'wallet').then(async (wallets) => {
         try {
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
@@ -87,6 +95,7 @@ export class ImportPage implements OnInit {
               this.storage.set( 'wallet', wallets );
             }
           }
+          await loading.dismiss();
           const alert = await this.alertController.create({
             header: 'Success!',
             message: '<strong>Successfully imported wallet</strong>',
@@ -102,25 +111,20 @@ export class ImportPage implements OnInit {
           });
           await alert.present();
         } catch (error) {
-          const alert = await this.alertController.create({
-            header: 'Fail!',
-            message: `<strong>${error.message}</strong>`,
-            buttons: [
-            {
-                text: 'Continue'
-              }
-            ]
+          const toast = await this.toastController.create({
+            message: error.message,
+            duration: 2000
           });
-          await alert.present();
+          toast.present();
         }
       });
   }
 
   /**
    * Nots repeat
-   * @param wallets 
-   * @param address 
-   * @returns  
+   * @param wallets
+   * @param address
+   * @returns
    */
   notRepeat(wallets, address) {
     for (const wallet of wallets) {

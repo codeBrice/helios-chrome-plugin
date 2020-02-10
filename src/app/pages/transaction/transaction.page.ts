@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
-import { LoadingController, ModalController } from '@ionic/angular';
+import { LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { TransactionDetailModalPage } from './transaction-detail-modal/transaction-detail-modal.page';
 
 @Component({
@@ -19,10 +19,11 @@ export class TransactionPage implements OnInit {
     private storage: Storage,
     private loadingController: LoadingController,
     private modalController: ModalController,
+    public toastController: ToastController
     ) { }
 
   ngOnInit() {
-    const startDate = moment().utc().subtract(3, 'months').valueOf();
+    const startDate = moment().utc().subtract(12, 'months').valueOf();
     const endDate = moment().utc().valueOf();
 
     this.storage.get('wallet').then(async (wallets) => {
@@ -34,13 +35,33 @@ export class TransactionPage implements OnInit {
       await loading.present();
       this.fromTx = 0;
       this.toTx = 10;
-      for (const wallet of wallets) {
-          const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
-          this.transactions = tx.map( data => {
-            data.timestamp = moment.unix(data.timestamp);
-            return data;
-          });
-          console.log ( 'getTransactions', tx );
+      const transactionsPromises = [];
+      try {
+        await this.heliosService.connectToFirstAvailableNode();
+        for (const wallet of wallets) {
+          transactionsPromises.push(
+            new Promise(async (resolve, reject) => {
+              try {
+                const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
+                this.transactions = tx.map( data => {
+                  data.timestamp = moment.unix(data.timestamp);
+                  return data;
+                });
+                console.log ( 'getTransactions', tx );
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
+            }
+          ));
+        }
+        await Promise.all(transactionsPromises);
+      } catch (error) {
+        const toast = await this.toastController.create({
+          message: error.message,
+          duration: 2000
+        });
+        toast.present();
       }
       await loading.dismiss();
     });
@@ -63,20 +84,39 @@ export class TransactionPage implements OnInit {
   }
 
   loadTransaction( event ) {
-    const startDate = moment().utc().subtract(3, 'months').valueOf();
+    const startDate = moment().utc().subtract(12, 'months').valueOf();
     const endDate = moment().utc().valueOf();
     this.fromTx = this.fromTx + 11 ;
     this.toTx = this.toTx + 10;
     this.storage.get('wallet').then(async (wallets) => {
-      for (const wallet of wallets) {
-          const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
-          this.transactions = this.transactions.concat(tx.map( data => {
-            data.timestamp = moment.unix(data.timestamp);
-            return data;
+      const transactionsPromises = [];
+      try {
+        await this.heliosService.connectToFirstAvailableNode();
+        for (const wallet of wallets) {
+          transactionsPromises.push(
+            new Promise(async (resolve, reject) => {
+              try {
+                const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
+                this.transactions = this.transactions.concat(tx.map( data => {
+                  data.timestamp = moment.unix(data.timestamp);
+                  return data;
+                }));
+                console.log ( 'getTransactions', tx );
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
           }));
-          console.log ( 'getTransactions', this.transactions );
+        }
+        await Promise.all(transactionsPromises);
+        event.target.complete();
+      } catch (error) {
+        const toast = await this.toastController.create({
+          message: error.message,
+          duration: 2000
+        });
+        toast.present();
       }
-      event.target.complete();
     });
   }
 }

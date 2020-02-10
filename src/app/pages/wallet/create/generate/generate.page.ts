@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import { HeliosServiceService } from '../../../../services/helios-service.service';
 import { Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, ToastController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
 
@@ -20,7 +20,8 @@ export class GeneratePage implements OnInit {
    private heliosService: HeliosServiceService,
    private router: Router,
    private storage: Storage,
-   private loadingController: LoadingController
+   private loadingController: LoadingController,
+   public toastController: ToastController
   ) { }
 
   ngOnInit() {
@@ -29,7 +30,7 @@ export class GeneratePage implements OnInit {
     });
   }
 
-  async sendPassword(){
+  async sendPassword() {
       const loading = await this.loadingController.create({
         message: 'Creating wallet...',
         translucent: true,
@@ -43,14 +44,22 @@ export class GeneratePage implements OnInit {
       sessionStorage.setItem( 'keystore', JSON.stringify(accountWallet.encrypt) );
       // data storage for mobile
       this.storage.get( 'wallet').then(async (wallets) => {
-        if ( wallets === null) {
-          const walletArray = [new Wallet(accountWallet.account.address, accountWallet.account.privateKey)];
-          this.storage.set( 'wallet', walletArray );
-        } else {
-          wallets.push(new Wallet(accountWallet.account.address, accountWallet.account.privateKey));
-          this.storage.set( 'wallet', wallets );
+        try {
+          if ( wallets === null) {
+            const walletArray = [new Wallet(accountWallet.account.address, accountWallet.account.privateKey)];
+            this.storage.set( 'wallet', walletArray );
+          } else {
+            wallets.push(new Wallet(accountWallet.account.address, accountWallet.account.privateKey));
+            this.storage.set( 'wallet', wallets );
+          }
+          this.router.navigate(['/detailwallet']);
+        } catch (error) {
+            const toast = await this.toastController.create({
+              message: error.message,
+              duration: 2000
+            });
+            toast.present();
         }
-        this.router.navigate(['/detailwallet']);
         await loading.dismiss();
       });
   }

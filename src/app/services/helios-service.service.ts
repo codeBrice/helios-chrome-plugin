@@ -5,6 +5,7 @@ import {formatters} from 'web3-core-helpers';
 import { HlsUtils } from '../utils/hls-utils';
 import { Transaction } from '../entities/transaction';
 import { Account } from '../entities/account';
+import { promise } from 'protractor';
 
 @Injectable({
   providedIn: 'root'
@@ -76,24 +77,28 @@ export class HeliosServiceService {
    */
   async connectToFirstAvailableNode() {
     try {
-      for (const node of this.availableNodes) {
-          console.log(`Connecting to node ${node}`);
-          this.web3 = new Web3(new Web3.providers.WebsocketProvider(node));
-          //this.web3.extend(this.methods);
-          // console.log(this.web3);
-          try {
-            const listen = await this.web3.eth.net.isListening();
-            // await this.web3.eth.net.getPeerCount();
-            if (this.isConnected() && listen) {
-                console.log(`Successfully connected to ${node}`);
-                return true;
+      if (this.web3 && !(this.web3.currentProvider == null || !this.web3.currentProvider.connected)) {
+        return true;
+      } else {
+        for (const node of this.availableNodes) {
+            console.log(`Connecting to node ${node}`);
+            this.web3 = new Web3(new Web3.providers.WebsocketProvider(node));
+            //this.web3.extend(this.methods);
+            // console.log(this.web3);
+            try {
+              const listen = await this.web3.eth.net.isListening();
+              // await this.web3.eth.net.getPeerCount();
+              if (this.isConnected() && listen) {
+                  console.log(`Successfully connected to ${node}`);
+                  return true;
+              }
+            } catch ( error ) {
+              console.log(`Failed connected to ${node}`);
             }
-          } catch ( error ) {
-            console.log(`Failed connected to ${node}`);
-          }
-          // console.log( ' listening: ' + isListening.toString() + ' with ' + numPeers + ' peers');
+            // console.log( ' listening: ' + isListening.toString() + ' with ' + numPeers + ' peers');
+        }
+        throw new Error('Failed to connect to nodes');
       }
-      throw new Error('Failed to connect to nodes');
     } catch (error) {
       throw error;
     }
@@ -220,65 +225,74 @@ export class HeliosServiceService {
         }
         // console.log(startBlockNumber);
         const output = [];
+        const blocksPromise = [];
         for (let i = startBlockNumber; i >= endBlockNumber; i--) {
            // console.log('Getting all transactions at block number ' + i);
-           try {
-             const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
-             // console.log(newBlock);
-             if (newBlock.timestamp > startDate) {
-              continue;
-            }
-             if (newBlock.timestamp > endDate) {
-                break;
-            }
-             if (newBlock.transactions.length > 0) {
-                for (const transactionBlock of newBlock.transactions) {
-                    const tx = transactionBlock;
-                    output.push(new Transaction(newBlock.timestamp, 'Send transaction',
-                      formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.value).mul(this.web3.utils.toBN(-1))),
-                      formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
-                        .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
-                      tx.to, address, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-
-                }
-            }
-             if (newBlock.receiveTransactions.length > 0) {
-                for (const receiveTransactions of newBlock.receiveTransactions) {
-                    const tx = receiveTransactions;
-                    let description;
-                    if (tx.isRefund) {
-                        description = 'Refund transaction';
-                    } else {
-                        description = 'Receive transaction';
-                    }
-                    output.push(new Transaction(newBlock.timestamp, description,
-                      formatters.outputBigNumberFormatter(tx.value),
-                      formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
-                        .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
-                      address, tx.from, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-                }
-            }
-             if (parseFloat(newBlock.rewardBundle.rewardType1.amount.substring('2')) !== parseFloat('0')) {
-                output.push(new Transaction(newBlock.timestamp, 'Reward type 1',
-                formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount), 0, address, 'Coinbase',
-                formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-            }
-             if (parseFloat(newBlock.rewardBundle.rewardType2.amount.substring('2')) !== parseFloat('0')) {
-                output.push(new Transaction(newBlock.timestamp, 'Reward type 2',
-                formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount), 0, address, 'Coinbase',
-                formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-            }
-           } catch (error) {
-            console.log(error, {block: i , address});
+           blocksPromise.push(new Promise(async (resolve, reject) => {
             try {
-              if (JSON.parse(error.message.replace('Returned error: ', '')).error !== 'Value must be an instance of str or unicode') {
-                throw new Error('Failed to get block Transactions');
+              const newBlock = await this.web3.hls.getBlockByNumber(i, address, true);
+              // console.log(newBlock);
+              // comentado por que se creo en promesa
+              if (newBlock.timestamp > startDate) {
+               return;
               }
+              /* if (newBlock.timestamp > endDate) {
+                return;
+              } */
+              if (newBlock.transactions.length > 0) {
+                 for (const transactionBlock of newBlock.transactions) {
+                     const tx = transactionBlock;
+                     output.push(new Transaction(newBlock.timestamp, 'Send transaction',
+                       formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.value).mul(this.web3.utils.toBN(-1))),
+                       formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
+                         .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
+                       tx.to, address, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+                 }
+              }
+              if (newBlock.receiveTransactions.length > 0) {
+                 for (const receiveTransactions of newBlock.receiveTransactions) {
+                     const tx = receiveTransactions;
+                     let description;
+                     if (tx.isRefund) {
+                         description = 'Refund transaction';
+                     } else {
+                         description = 'Receive transaction';
+                     }
+                     output.push(new Transaction(newBlock.timestamp, description,
+                       formatters.outputBigNumberFormatter(tx.value),
+                       formatters.outputBigNumberFormatter(this.web3.utils.toBN(tx.gasUsed)
+                         .mul(this.web3.utils.toBN(tx.gasPrice)).mul(this.web3.utils.toBN(-1))),
+                       address, tx.from, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+                 }
+              }
+              if (parseFloat(newBlock.rewardBundle.rewardType1.amount.substring('2')) !== parseFloat('0')) {
+                if (formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount) > 0) {
+                  output.push(new Transaction(newBlock.timestamp, 'Reward type 1',
+                  formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount), 0, address, 'Coinbase',
+                  formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+                }
+              }
+              if (parseFloat(newBlock.rewardBundle.rewardType2.amount.substring('2')) !== parseFloat('0')) {
+               if (formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount) > 0) {
+                 output.push(new Transaction(newBlock.timestamp, 'Reward type 2',
+                 formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount), 0, address, 'Coinbase',
+                 formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
+               }
+              }
+              resolve();
             } catch (error) {
-              throw new Error('Failed to get block Transactions');
+             console.log(error, {block: i , address});
+             try {
+               if (JSON.parse(error.message.replace('Returned error: ', '')).error !== 'Value must be an instance of str or unicode') {
+                  reject(new Error('Failed to get block Transactions'));
+               }
+             } catch (error) {
+               reject(new Error('Failed to get block Transactions'));
+             }
             }
-           }
+           }));
         }
+        const promisesResult = await Promise.all(blocksPromise);
         output.map( data  => {
           data.value = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(data.value)))).toFixed(2);
           data.balance = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(data.balance)))).toFixed(2);
