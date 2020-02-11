@@ -34,6 +34,10 @@ $red-color: #f04141;
 $green-color-tx: #d4edda;
 $red-color-tx: #f8d7da;
 
+html {
+    background: black !important;
+}
+
 .button{
     margin-top: 0%;
 }
@@ -125,6 +129,17 @@ ion-alert {
     }
     .alert-button-inner {
         color: $yellow-color !important;
+    }
+
+    .alert-radio-label {
+        color : $white-color !important;
+    }
+
+    .alert-radio-inner {
+        background: $yellow-color !important;
+    }
+    [aria-checked=true] .alert-radio-icon {
+        border-color: $yellow-color !important;
     }
 }
 
