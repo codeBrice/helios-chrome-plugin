@@ -265,13 +265,6 @@ export class HeliosServiceService {
                        address, tx.from, formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
                  }
               }
-              if (parseFloat(newBlock.rewardBundle.rewardType1.amount.substring('2')) !== parseFloat('0')) {
-                if (formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount) > 0) {
-                  output.push(new Transaction(newBlock.timestamp, 'Reward type 1',
-                  formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType1.amount), 0, address, 'Coinbase',
-                  formatters.outputBigNumberFormatter(newBlock.accountBalance), newBlock.number));
-                }
-              }
               if (parseFloat(newBlock.rewardBundle.rewardType2.amount.substring('2')) !== parseFloat('0')) {
                if (formatters.outputBigNumberFormatter(newBlock.rewardBundle.rewardType2.amount) > 0) {
                  output.push(new Transaction(newBlock.timestamp, 'Reward type 2',
@@ -282,10 +275,7 @@ export class HeliosServiceService {
               resolve();
             } catch (error) {
              console.log(error, {block: i , address});
-             if (JSON.parse(error.message.replace('Returned error: ', '')).error === 'Value must be an instance of str or unicode') {
-                reject(new Error('Nodes have failures this moment'));
-             }
-             reject();
+             reject(error);
             }
            }));
         }
@@ -299,9 +289,6 @@ export class HeliosServiceService {
       }
     } catch (error) {
       console.log(error);
-      if (error.message === 'Nodes have failures this moment') {
-        throw new Error('Nodes have failures this moment');
-      }
       try {
         if (JSON.parse(error.message.replace('Returned error: ', '')).error === 'No canonical head set for this chain') {
           return [];

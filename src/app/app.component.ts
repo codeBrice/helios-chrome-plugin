@@ -32,7 +32,6 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(async () => {
-      this.heliosService.connectToFirstAvailableNode();
       /* this.platform.pause.subscribe(() => {
         console.log('****UserdashboardPage PAUSED****');
       }); */
@@ -73,7 +72,6 @@ export class AppComponent {
         } else {
           // redirect to dashboard
           this.router.navigate(['/tabs/home']);
-          this.splashScreen.hide();
         }
         await loading.dismiss();
       } else {
@@ -84,10 +82,11 @@ export class AppComponent {
           } else {
             this.router.navigate(['/tutorial']);
           }
-          this.splashScreen.hide();
           await loading.dismiss();
         });
       }
+      this.heliosService.connectToFirstAvailableNode();
+      this.splashScreen.hide();
     });
   }
 
