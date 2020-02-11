@@ -29,8 +29,10 @@
 $yellow-color: #e6d46a;
 $black-color: #272727;
 $white-color: #ffff;
-$green-color: #d4edda;
-$red-color: #f8d7da;
+$green-color: #10dc60;
+$red-color: #f04141;
+$green-color-tx: #d4edda;
+$red-color-tx: #f8d7da;
 
 .button{
     margin-top: 0%;
@@ -61,7 +63,13 @@ $red-color: #f8d7da;
 .text-red {
     color: $red-color !important;
 }
+.text-green-tx {
+    color: $green-color-tx !important;
+}
 
+.text-red-tx {
+    color: $red-color-tx !important;
+}
 .full-width {
     width: 100%;
 }
@@ -82,7 +90,7 @@ $red-color: #f8d7da;
 }
 
 ion-spinner {
-    color: $white-color;
+    color: $yellow-color !important;
 }
 
 // ACTION SHEET
@@ -103,4 +111,31 @@ ion-spinner {
 
 .action-sheet-icon.sc-ion-action-sheet-md {
     color: $yellow-color;
+}
+
+// ALERT
+
+ion-alert {
+    --background: #272727 !important;
+    .alert-title {
+        color : $white-color !important;
+    }
+    .alert-message {
+        color : $white-color !important;
+    }
+    .alert-button-inner {
+        color: $yellow-color !important;
+    }
+}
+
+// LOADING
+
+ion-loading {
+    .loading-wrapper {
+        background: $black-color !important;
+    }
+    .loading-content {
+        color : $white-color !important;
+    }
+    
 }

@@ -104,6 +104,7 @@ export class SendModalPage implements OnInit {
         this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
 
       const toast = await this.toastController.create({
+          cssClass: 'text-yellow',
           message: 'Success transaction.',
           duration: 2000
       });
@@ -111,6 +112,7 @@ export class SendModalPage implements OnInit {
 
     } catch (error) {
       const toast = await this.toastController.create({
+        cssClass: 'text-red',
         message: error.message,
         duration: 2000
       });

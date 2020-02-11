@@ -58,6 +58,7 @@ export class TransactionPage implements OnInit {
         await Promise.all(transactionsPromises);
       } catch (error) {
         const toast = await this.toastController.create({
+          cssClass: 'text-red',
           message: error.message,
           duration: 2000
         });
@@ -112,6 +113,7 @@ export class TransactionPage implements OnInit {
         event.target.complete();
       } catch (error) {
         const toast = await this.toastController.create({
+          cssClass: 'text-red',
           message: error.message,
           duration: 2000
         });

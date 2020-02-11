@@ -82,6 +82,7 @@ export class HomePage implements OnInit {
                   }
                 } catch (error) {
                   const toast = await this.toastController.create({
+                    cssClass: 'text-red',
                     message: error.message,
                     duration: 2000
                   });
@@ -104,6 +105,7 @@ export class HomePage implements OnInit {
           await Promise.all(walletPromises)
           if (receivable) {
             const toast = await this.toastController.create({
+              cssClass: 'text-yellow',
               message: 'You have received new transactions!',
               duration: 2000
             });
@@ -111,6 +113,7 @@ export class HomePage implements OnInit {
           }
         } catch (error) {
           const toast = await this.toastController.create({
+            cssClass: 'text-red',
             message: error.message,
             duration: 2000
           });
@@ -121,6 +124,7 @@ export class HomePage implements OnInit {
         this.gasPrice = await this.heliosService.getGasPrice();
       } catch (error) {
         const toast = await this.toastController.create({
+          cssClass: 'text-red',
           message: error.message,
           duration: 2000
         });

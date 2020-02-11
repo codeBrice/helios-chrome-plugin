@@ -112,6 +112,7 @@ export class ImportPage implements OnInit {
           await alert.present();
         } catch (error) {
           const toast = await this.toastController.create({
+            cssClass: 'text-red',
             message: error.message,
             duration: 2000
           });

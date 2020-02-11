@@ -38,6 +38,7 @@ export class ReceiveModalPage implements OnInit {
   async  copy( address: string)  {
     this.clipboard.copy( address );
     const toast = await this.toastController.create({
+      cssClass: 'text-yellow',
       message: 'Copied.',
       duration: 2000
     });

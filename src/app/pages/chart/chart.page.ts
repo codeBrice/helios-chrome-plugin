@@ -71,6 +71,7 @@ export class ChartPage implements OnInit {
       });
       } catch (error) {
         const toast = await this.toastController.create({
+          cssClass: 'text-red',
           message: error.message,
           duration: 2000
         });

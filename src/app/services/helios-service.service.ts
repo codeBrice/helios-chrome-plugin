@@ -83,7 +83,7 @@ export class HeliosServiceService {
         for (const node of this.availableNodes) {
             console.log(`Connecting to node ${node}`);
             this.web3 = new Web3(new Web3.providers.WebsocketProvider(node));
-            //this.web3.extend(this.methods);
+            // this.web3.extend(this.methods);
             // console.log(this.web3);
             try {
               const listen = await this.web3.eth.net.isListening();
@@ -282,13 +282,10 @@ export class HeliosServiceService {
               resolve();
             } catch (error) {
              console.log(error, {block: i , address});
-             try {
-               if (JSON.parse(error.message.replace('Returned error: ', '')).error !== 'Value must be an instance of str or unicode') {
-                  reject(new Error('Failed to get block Transactions'));
-               }
-             } catch (error) {
-               reject(new Error('Failed to get block Transactions'));
+             if (JSON.parse(error.message.replace('Returned error: ', '')).error === 'Value must be an instance of str or unicode') {
+                reject(new Error('Nodes have failures this moment'));
              }
+             reject();
             }
            }));
         }
@@ -302,6 +299,9 @@ export class HeliosServiceService {
       }
     } catch (error) {
       console.log(error);
+      if (error.message === 'Nodes have failures this moment') {
+        throw new Error('Nodes have failures this moment');
+      }
       try {
         if (JSON.parse(error.message.replace('Returned error: ', '')).error === 'No canonical head set for this chain') {
           return [];
@@ -381,8 +381,8 @@ export class HeliosServiceService {
 
   /**
    * To wei
-   * @param value 
-   * @returns  
+   * @param value
+   * @returns
    */
   toWei(value: string) {
     try {
@@ -395,8 +395,8 @@ export class HeliosServiceService {
 
   /**
    * To weiEther
-   * @param value 
-   * @returns  
+   * @param value
+   * @returns
    */
   toWeiEther(value: string) {
     try {

@@ -55,6 +55,7 @@ export class GeneratePage implements OnInit {
           this.router.navigate(['/detailwallet']);
         } catch (error) {
             const toast = await this.toastController.create({
+              cssClass: 'text-red',
               message: error.message,
               duration: 2000
             });

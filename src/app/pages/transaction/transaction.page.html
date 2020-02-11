@@ -23,8 +23,8 @@
             <ion-grid>
               <ion-row >
                 <ion-col size="5" class="ion-text-left"><span class="text-yellow" >{{ transaction.description | description }}</span></ion-col>
-                <ion-col size="7" *ngIf="transaction.description !== 'Send transaction'" class="ion-text-right"> <span class="text-green balance-font"> +{{ transaction.value | number:'1.0-2' }}<span class="balance-font text-yellow"> HLS </span> </span></ion-col>
-                <ion-col size="7" *ngIf="transaction.description === 'Send transaction'" class="ion-text-right"> <span class="text-red balance-font"> {{ transaction.value | number:'1.0-2' }} <span class="balance-font text-yellow"> HLS </span> </span></ion-col>
+                <ion-col size="7" *ngIf="transaction.description !== 'Send transaction'" class="ion-text-right"> <span class="text-green-tx balance-font"> +{{ transaction.value | number:'1.0-2' }}<span class="balance-font text-yellow"> HLS </span> </span></ion-col>
+                <ion-col size="7" *ngIf="transaction.description === 'Send transaction'" class="ion-text-right"> <span class="text-red-tx balance-font"> {{ transaction.value | number:'1.0-2' }} <span class="balance-font text-yellow"> HLS </span> </span></ion-col>
               </ion-row>
               <ion-row>
                 <ion-col size="1" class="ion-text-center">

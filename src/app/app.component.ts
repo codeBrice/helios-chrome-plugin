@@ -6,6 +6,7 @@ import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
+import { HeliosServiceService } from './services/helios-service.service';
 
 @Component({
   selector: 'app-root',
@@ -24,16 +25,19 @@ export class AppComponent {
     private router: Router,
     private loadingController: LoadingController,
     private lockscreenService: LockscreenService,
+    private heliosService: HeliosServiceService
   ) {
     this.initializeApp();
   }
 
   initializeApp() {
     this.platform.ready().then(async () => {
+      this.heliosService.connectToFirstAvailableNode();
       /* this.platform.pause.subscribe(() => {
         console.log('****UserdashboardPage PAUSED****');
       }); */
       this.platform.resume.subscribe(() => {
+        this.heliosService.connectToFirstAvailableNode();
         this.isCorrect = false;
         if (sessionStorage.getItem( 'camera') === 'true') {
           this.isCorrect = true;

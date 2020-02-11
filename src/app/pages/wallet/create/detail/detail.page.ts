@@ -40,6 +40,7 @@ export class DetailPage implements OnInit {
       this.clipboard.copy( sessionStorage.getItem('keystore') );
     }
     const toast = await this.toastController.create({
+      cssClass: 'text-yellow',
       message: 'Copied.',
       duration: 2000
     });
