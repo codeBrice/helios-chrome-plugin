@@ -1,36 +1,10 @@
-
-// Custom Theming for Angular Material
-// For more information: https://material.angular.io/guide/theming
-@import '~@angular/material/theming';
-// Plus imports for other components in your app.
-
-// Include the common styles for Angular Material. We include this here so that you only
-// have to load a single css file for Angular Material in your app.
-// Be sure that you only ever include this mixin once!
-@include mat-core();
-
-// Define the palettes for your theme using the Material Design palettes available in palette.scss
-// (imported above). For each palette, you can optionally specify a default, lighter, and darker
-// hue. Available color palettes: https://material.io/design/color/
-$app-primary: mat-palette($mat-indigo);
-$app-accent: mat-palette($mat-pink, A200, A100, A400);
-
-// The warn palette is optional (defaults to red).
-$app-warn: mat-palette($mat-red);
-
-// Create the theme object (a Sass map containing all of the palettes).
-$app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
-
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
-@include angular-material-theme($app-theme);
-
 // Ionic Variables and Theming. For more info, please see:
 // http://ionicframework.com/docs/theming/
 
 /** Ionic CSS Variables **/
 :root {
+
+
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;
@@ -80,7 +54,7 @@ $app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
   --ion-color-danger-tint: #f25454;
 
   /** dark **/
-  --ion-color-dark: #222428;
+  --ion-color-dark: #000;
   --ion-color-dark-rgb: 34, 34, 34;
   --ion-color-dark-contrast: #ffffff;
   --ion-color-dark-contrast-rgb: 255, 255, 255;
@@ -98,11 +72,46 @@ $app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
   /** light **/
   --ion-color-light: #f4f5f8;
   --ion-color-light-rgb: 244, 244, 244;
-  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast: #000;
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  
+  /** helios **/
+  --ion-color-helios: #e6d46a;
+  --ion-color-helios-rgb: 230, 212, 106;
+  --ion-color-helios-contrast: #000;
+  --ion-color-helios-contrast-rgb: 0, 0, 0;
+  --ion-color-helios-shade: #e0b500;
+  --ion-color-helios-tint: #ffd31a;
+
+  font-family: 'Quicksand', sans-serif;
+  --ion-default-font: "Montserrat", Helvetica, sans-serif;
+  --ion-font-family: "Montserrat", Helvetica, sans-serif;
+  --background: var(--ion-color-dark);
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.ion-color-helios {
+  --ion-color-base: var(--ion-color-helios);
+  --ion-color-base-rgb: var(--ion-color-helios-rgb);
+  --ion-color-contrast: var(--ion-color-helios-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-helios-contrast-rgb);
+  --ion-color-shade: var(--ion-color-helios-shade);
+  --ion-color-tint: var(--ion-color-helios-tint);
+}
+
+ion-header{
+  --background: var(--ion-color-dark);
+}
+
+body {
+  background: var(--ion-color-dark) !important;
+}
+
+ion-toggle {
+  --background: #e8e8e8;
+  /* --background-checked: red;
+  --handle-background: green;
+  --handle-background-checked: yellow; */
+}

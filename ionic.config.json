@@ -1,5 +1,7 @@
 {
   "name": "helios-wallet-mobile",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

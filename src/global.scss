@@ -24,3 +24,133 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+@import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
+
+$yellow-color: #e6d46a;
+$black-color: #272727;
+$white-color: #ffff;
+$green-color: #10dc60;
+$red-color: #f04141;
+$green-color-tx: #d4edda;
+$red-color-tx: #f8d7da;
+
+html {
+    background: black !important;
+}
+
+.button{
+    margin-top: 0%;
+}
+
+.yellow {
+    color: black !important;
+    background-color: $yellow-color !important;
+}
+
+.black {
+    color: $white-color !important;
+    background-color: $black-color !important;
+}
+
+.text-white {
+    color: $white-color !important;
+}
+
+.text-yellow {
+    color: $yellow-color !important;
+}
+
+.text-green {
+    color: $green-color !important;
+}
+
+.text-red {
+    color: $red-color !important;
+}
+.text-green-tx {
+    color: $green-color-tx !important;
+}
+
+.text-red-tx {
+    color: $red-color-tx !important;
+}
+.full-width {
+    width: 100%;
+}
+
+
+//REFRESHER
+
+.swiper-pagination-bullet-active {
+    background:  $yellow-color !important;
+}
+
+.item-has-focus.label-floating.sc-ion-label-md-h, .item-has-focus .label-floating.sc-ion-label-md-h, .item-has-focus.label-stacked.sc-ion-label-md-h, .item-has-focus .label-stacked.sc-ion-label-md-h {
+    color: var(--ion-color-hekios,#e6d46a);
+}
+
+.refresher-md .refresher-pulling-icon, .refresher-md .refresher-pulling-text, .refresher-md .refresher-refreshing-icon, .refresher-md .refresher-refreshing-text {
+    color: $white-color;
+}
+
+ion-spinner {
+    color: $yellow-color !important;
+}
+
+// ACTION SHEET
+
+.action-sheet-group.sc-ion-action-sheet-md {
+    background: $black-color;
+}
+.action-sheet-button.activated.sc-ion-action-sheet-md {
+    background: $black-color;
+}
+.action-sheet-title.sc-ion-action-sheet-md {
+    color: $white-color;
+}
+
+.action-sheet-button-inner.sc-ion-action-sheet-md {
+    color: $white-color;
+}
+
+.action-sheet-icon.sc-ion-action-sheet-md {
+    color: $yellow-color;
+}
+
+// ALERT
+
+ion-alert {
+    --background: #272727 !important;
+    .alert-title {
+        color : $white-color !important;
+    }
+    .alert-message {
+        color : $white-color !important;
+    }
+    .alert-button-inner {
+        color: $yellow-color !important;
+    }
+
+    .alert-radio-label {
+        color : $white-color !important;
+    }
+
+    .alert-radio-inner {
+        background: $yellow-color !important;
+    }
+    [aria-checked=true] .alert-radio-icon {
+        border-color: $yellow-color !important;
+    }
+}
+
+// LOADING
+
+ion-loading {
+    .loading-wrapper {
+        background: $black-color !important;
+    }
+    .loading-content {
+        color : $white-color !important;
+    }
+    
+}

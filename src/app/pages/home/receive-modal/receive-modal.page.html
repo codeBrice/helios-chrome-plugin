@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-item color="dark">
+      <ion-title color="light" class="ion-no-padding" > Receive </ion-title>
+      <ion-text color="helios" slot="end" (click)="dismiss()">Close</ion-text>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content color=dark>
+  <form [formGroup]="receiveForm">
+    <ion-item color="dark">
+      <ion-label>From</ion-label>
+    <ion-select placeholder="Select One" formControlName="address">
+      <ion-select-option *ngFor="let wallet of wallets" [value]="wallet.address">{{wallet.address | walletformat}}</ion-select-option>
+    </ion-select>
+    </ion-item>
+  </form>
+
+
+  <ion-card class="black" *ngIf="receiveForm.value.address">
+    <ion-card-content class="ion-text-center">
+      <ion-row>
+        <ion-col size="5">
+          <ion-icon style="font-size: 35px; float: right;" src="/assets/images/heliosSvg.svg"></ion-icon> 
+        </ion-col>
+        <ion-col size="6">
+          <span class="title" style="float: left;"> H e l i o s</span>
+        </ion-col>
+      </ion-row>
+      
+      <br>
+      <ngx-qrcode [qrc-element-type]="elementType" [qrc-value] = "receiveForm.value.address">
+      </ngx-qrcode>
+      <br>
+      <span>{{receiveForm.value.address}}</span>
+    </ion-card-content>
+  </ion-card>
+<ion-grid  *ngIf="receiveForm.value.address">
+  <ion-row>
+    <ion-col size="12">
+      <ion-button expand="block" color="helios" (click)="copy(receiveForm.value.address)" class="button">Copy</ion-button>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+</ion-content>

@@ -1,0 +1,89 @@
+<ion-header>
+    <ion-toolbar color=dark>
+        <ion-title class="ion-text-center">
+            Dashboard
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+<ion-content color=dark>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content pullingIcon="arrow-dropdown"
+        pullingText="Pull to refresh"
+        refreshingSpinner="circles"
+        refreshingText="Refreshing..."
+        class="black"> </ion-refresher-content>
+    </ion-refresher>
+    <!-- BALANCE -->
+    <ion-card class="black">
+        <ion-card-header>
+            <ion-row>
+                <ion-col>
+                    <ion-card-title class="title text-yellow"><span>Balance</span></ion-card-title>
+                    <ion-card-subtitle class="text-white"><span>Today, {{today | date:'d MMM' }}</span></ion-card-subtitle>
+                </ion-col>
+                <ion-col>
+                        <ion-icon class="text-white balance-logo" src="/assets/images/heliosSvg.svg"></ion-icon>
+                </ion-col>
+            </ion-row>
+        </ion-card-header>
+        <ion-card-content class="ion-text-center ion-no-padding">
+            <span class="title text-yellow">$ </span><span class="text-white balance">{{balance | number:'1.0-2'}} </span>
+            <ion-icon *ngIf="up" class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
+            <ion-icon *ngIf="!up" class="text-yellow" src="/assets/images/diagonal-arrow-down.svg"></ion-icon>
+            <br>
+            <span *ngIf="helios"><strong>{{helios.market_data.price_change_percentage_24h | number:'1.0-2'}}%</strong> in the last 24 hours / </span>
+            <span>Gas price: </span><span>{{gasPrice | number:'1.0-2'}}</span>
+        </ion-card-content>
+    </ion-card>
+    <!-- ACCOUNTS -->
+    <ion-row>
+        <ion-col size="10">
+            <ion-title class="title title-accounts text-yellow  ion-text-left ion-no-padding"><span>Accounts</span></ion-title>
+        </ion-col>
+        <ion-col size="2">
+            <ion-fab-button size="small" color="dark" class="fab" [routerLink]="['/add']">
+                <ion-icon name="add"></ion-icon>
+            </ion-fab-button>
+        </ion-col>
+        <ion-col size="12">
+            <ion-slides *ngIf="slideOpts" pager="true" [options]="slideOpts">
+                <ion-slide *ngFor ="let wallet of wallets;let i = index">
+                    <ion-card class="black full-width" (click)="presentActionSheet(i, wallet);">
+                        <ion-card-content>
+                            <ion-fab-button size="small" color="dark" class="fab">
+                                <ion-icon src="/assets/images/heliosSvg.svg"></ion-icon>
+                            </ion-fab-button>
+                            <br>
+                            <span class="balance-accounts">{{wallet.balance | number:'1.0-2'}}</span>
+                            <br>
+                            <span class="text-yellow">$ </span><span>{{wallet.usd | number:'1.0-2'}}</span>
+                        </ion-card-content>
+                    </ion-card>
+                </ion-slide>
+            </ion-slides>
+        </ion-col>
+        <!-- SEND -RECEIVE -->
+        <ion-col>
+            <ion-card class="black" (click)="presentModalSend()">
+                <ion-card-content class="ion-text-center">
+                    <ion-fab-button size="small" color="dark" class="fab">
+                        <ion-icon src="/assets/images/send.svg" class="text-yellow icon-send"></ion-icon>
+                    </ion-fab-button>
+                    <br>
+                    <span class="title">Send</span>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+        <ion-col>
+            <ion-card class="black" (click)="presentModalReceive()">
+                <ion-card-content class="ion-text-center">
+                    <ion-fab-button size="small" color="dark" class="fab">
+                        <ion-icon src="/assets/images/wallet.svg" class="text-yellow icon-send"></ion-icon>
+                    </ion-fab-button>
+                    <br>
+                    <span class="title">Receive</span>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+    </ion-row>
+</ion-content>

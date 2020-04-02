@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-item color="dark">
+      <ion-title color="light" class="ion-no-padding" > Transactions </ion-title>
+      <ion-icon color="helios" src="/assets/images/exchange.svg" slot="end"></ion-icon>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="dark">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content pullingIcon="arrow-dropdown"
+    pullingText="Pull to refresh"
+    refreshingSpinner="circles"
+    refreshingText="Refreshing..."
+    class="black"> </ion-refresher-content>
+  </ion-refresher>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="black" *ngFor ="let transaction of transactions" (click)="presentModal( transaction )">
+          <ion-card-content class="ion-no-padding">
+            <ion-grid>
+              <ion-row >
+                <ion-col size="5" class="ion-text-left"><span class="text-yellow" >{{ transaction.description | description }}</span></ion-col>
+                <ion-col size="7" *ngIf="transaction.description !== 'Send transaction'" class="ion-text-right"> <span class="text-green-tx balance-font"> +{{ transaction.value | number:'1.0-2' }}<span class="balance-font text-yellow"> HLS </span> </span></ion-col>
+                <ion-col size="7" *ngIf="transaction.description === 'Send transaction'" class="ion-text-right"> <span class="text-red-tx balance-font"> {{ transaction.value | number:'1.0-2' }} <span class="balance-font text-yellow"> HLS </span> </span></ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="1" class="ion-text-center">
+                  <ion-icon *ngIf="transaction.description !== 'Send transaction'" class="text-white balance-logo" src="/assets/images/receive-arrow.svg" color="helios"></ion-icon>
+                  <ion-icon *ngIf="transaction.description === 'Send transaction'" class="text-white balance-logo" src="/assets/images/send-arrow.svg" color="helios"></ion-icon>
+                </ion-col>
+                <ion-col class="ion-text-left">
+                  <span> {{ transaction.timestamp |  date:'d MMM y' }}</span>
+                </ion-col>
+                <ion-col class="ion-text-right">
+                  <span> {{ transaction.from | walletformat }}</span>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadTransaction($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="circles">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

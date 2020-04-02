@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar color="dark">
+      <ion-buttons slot="end" *ngIf="showSkip">
+          <ion-button color="helios" (click)="skipTutorial()">Skip</ion-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content  fullscreen class="ion-padding" no-bounce color='dark'>
+    <ion-slides pager="true" [options]="slideOpts">
+      <ion-slide *ngFor="let slide of slides">
+        <img [src]="slide.image" />
+        <h2 [innerHTML]="slide.title"></h2>
+        <p [innerHTML]="slide.description"></p>
+      </ion-slide>
+
+      <ion-slide>
+        <img src="/assets/images/slide-4.png"/>
+        <h2>Ready to Play?</h2>
+        <ion-button (click)="skipTutorial()" fill="clear">Continue <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+      </ion-slide>
+    </ion-slides>
+</ion-content>
