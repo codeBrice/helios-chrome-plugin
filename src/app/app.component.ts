@@ -35,8 +35,8 @@ export class AppComponent {
       /* this.platform.pause.subscribe(() => {
         console.log('****UserdashboardPage PAUSED****');
       }); */
-      this.platform.resume.subscribe(() => {
-        this.heliosService.connectToFirstAvailableNode();
+      this.platform.resume.subscribe(async () => {
+        await this.heliosService.connectToFirstAvailableNode();
         this.isCorrect = false;
         if (sessionStorage.getItem( 'camera') === 'true') {
           this.isCorrect = true;
@@ -65,6 +65,7 @@ export class AppComponent {
     // this.statusBar.styleDefault();
     // find wallet in device storage
     console.log('app component');
+    await this.heliosService.connectToFirstAvailableNode();
     this.storage.get('wallet').then(async (wallet) => {
       if (wallet != null) {
         if (!this.isCorrect) {
@@ -85,7 +86,6 @@ export class AppComponent {
           await loading.dismiss();
         });
       }
-      this.heliosService.connectToFirstAvailableNode();
       this.splashScreen.hide();
     });
   }

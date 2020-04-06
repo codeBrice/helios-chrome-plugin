@@ -26,7 +26,8 @@ export class GeneratePage implements OnInit {
 
   ngOnInit() {
     this.createWallet = this.formBuilder.group({
-      'password': new FormControl('', [Validators.required, Validators.minLength(16)])
+      'password': new FormControl('', [Validators.required, Validators.minLength(16)]),
+      'name': new FormControl('', [Validators.required])
     });
   }
 
@@ -46,10 +47,10 @@ export class GeneratePage implements OnInit {
       this.storage.get( 'wallet').then(async (wallets) => {
         try {
           if ( wallets === null) {
-            const walletArray = [new Wallet(accountWallet.account.address, accountWallet.account.privateKey)];
+            const walletArray = [new Wallet(accountWallet.account.address, accountWallet.account.privateKey, this.createWallet.value.name)];
             this.storage.set( 'wallet', walletArray );
           } else {
-            wallets.push(new Wallet(accountWallet.account.address, accountWallet.account.privateKey));
+            wallets.push(new Wallet(accountWallet.account.address, accountWallet.account.privateKey, this.createWallet.value.name));
             this.storage.set( 'wallet', wallets );
           }
           this.router.navigate(['/detailwallet']);

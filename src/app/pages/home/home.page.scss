@@ -51,3 +51,11 @@ ion-card-content {
 font-size: 35px;
     float: right;
 }
+
+.wallet-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 20px;
+    padding-right: 20px;
+}

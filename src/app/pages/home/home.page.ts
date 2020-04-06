@@ -92,8 +92,9 @@ export class HomePage implements OnInit {
                 const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
                 this.wallets.push({
                   address: wallet.address ,
-                  balance ,
-                  usd
+                  balance,
+                  usd,
+                  name: wallet.name
                 });
                 this.balance += usd;
                 resolve();

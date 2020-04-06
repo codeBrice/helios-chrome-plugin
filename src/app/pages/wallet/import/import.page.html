@@ -27,6 +27,12 @@
     </ion-radio-group>
     <br>
     <form [formGroup]="importWallet">
+
+      <ion-item color="dark">
+        <ion-label position="floating">Wallet Name</ion-label>
+        <ion-input type="text" formControlName="name"></ion-input>
+      </ion-item>
+
       <ion-item *ngIf="privateKey" color="dark">
         <ion-label position="floating">Private key</ion-label>
         <ion-input type="text" formControlName="privateKey"></ion-input>

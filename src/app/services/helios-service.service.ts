@@ -76,6 +76,7 @@ export class HeliosServiceService {
    * @returns  true : Successfully connected  or Error Failed to connect.
    */
   async connectToFirstAvailableNode() {
+    console.log(`connectToFirstAvailableNode`);
     try {
       if (this.web3 && !(this.web3.currentProvider == null || !this.web3.currentProvider.connected)) {
         return true;
@@ -88,7 +89,7 @@ export class HeliosServiceService {
             try {
               const listen = await this.web3.eth.net.isListening();
               // await this.web3.eth.net.getPeerCount();
-              if (this.isConnected() && listen) {
+              if (this.isConnected() || listen) {
                   console.log(`Successfully connected to ${node}`);
                   return true;
               }
