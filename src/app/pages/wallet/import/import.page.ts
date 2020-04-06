@@ -37,7 +37,8 @@ export class ImportPage implements OnInit {
     this.importWallet = this.formBuilder.group({
       privateKey: new FormControl('', [Validators.required]),
       password: new FormControl('', [Validators.required, Validators.minLength(16)]),
-      keystore: new FormControl('', [Validators.required])
+      keystore: new FormControl('', [Validators.required]),
+      name: new FormControl('', [Validators.required])
     });
   }
 
@@ -77,21 +78,21 @@ export class ImportPage implements OnInit {
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
             if ( wallets === null) {
-              const walletArray = [new Wallet(privateKey.address, privateKey.privateKey)];
+              const walletArray = [new Wallet(privateKey.address, privateKey.privateKey, this.importWallet.value.name)];
               this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, privateKey.address);
-              wallets.push(new Wallet(privateKey.address, privateKey.privateKey));
+              wallets.push(new Wallet(privateKey.address, privateKey.privateKey, this.importWallet.value.name));
               this.storage.set( 'wallet', wallets );
             }
           } else {
             const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
             if ( wallets === null) {
-            const walletArray = [new Wallet(keystore.address, keystore.privateKey)];
+            const walletArray = [new Wallet(keystore.address, keystore.privateKey, this.importWallet.value.name)];
             this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, keystore.address);
-              wallets.push(new Wallet(keystore.address, keystore.privateKey));
+              wallets.push(new Wallet(keystore.address, keystore.privateKey, this.importWallet.value.name));
               this.storage.set( 'wallet', wallets );
             }
           }
