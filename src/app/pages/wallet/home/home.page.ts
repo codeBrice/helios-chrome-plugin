@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -7,9 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomePage implements OnInit {
 
-  constructor() { }
+  loginForm: FormGroup;
+  constructor(private formBuilder: FormBuilder,) { }
 
   ngOnInit() {
+    this.loginForm = this.formBuilder.group({
+      username: new FormControl('', [Validators.required]),
+      password: new FormControl('', [Validators.required])
+    })
   }
 
 }

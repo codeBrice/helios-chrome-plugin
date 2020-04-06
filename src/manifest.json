@@ -1,10 +1,26 @@
-
 {
-    "name": "Great Extension",
-    "version": "1.0",
-    "description": "Build an Extension with Angular",
+    "name": "Helios Extension",
+    "description": "Wallet in your Browser",
+    "version": "0.0.1",
     "manifest_version": 2,
+    "permissions": [
+        "storage",
+        "activeTab",
+        "webRequest",
+        "notifications"
+    ],
+   
+    "icons": {
+        "64": "assets/icons/heliosLogo64.png"
+    },
     "browser_action": {
+        "default_icon": {
+            "32": "assets/icons/heliosLogo32.png",
+            "64": "assets/icons/heliosLogo64.png",
+            "128": "assets/icons/heliosLogo128.png"
+            
+          },
+        "default_title": "Helios",
         "default_popup": "index.html"
     }
 }
