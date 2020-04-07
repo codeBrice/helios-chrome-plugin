@@ -62,7 +62,8 @@ export class DetailPage implements OnInit {
           text: 'Yes',
           handler: () => {
             sessionStorage.clear();
-            this.showLockscreen();
+            //this.showLockscreen();
+            this.router.navigate(['/tabs/home']);
           }
         }
       ]

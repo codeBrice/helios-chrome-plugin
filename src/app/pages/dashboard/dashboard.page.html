@@ -49,7 +49,7 @@
             <ion-slides *ngIf="slideOpts" pager="true" [options]="slideOpts">
                 <ion-slide *ngFor ="let wallet of wallets;let i = index">
                     <ion-card class="black full-width" (click)="presentActionSheet(i, wallet);">
-                        <ion-card-content>
+                        <ion-card-content class="pointer">
                             <ion-fab-button size="small" color="dark" class="fab">
                                 <ion-icon src="/assets/images/heliosSvg.svg"></ion-icon>
                             </ion-fab-button>
@@ -66,7 +66,7 @@
         <!-- SEND -RECEIVE -->
         <ion-col>
             <ion-card class="black" (click)="presentModalSend()">
-                <ion-card-content class="ion-text-center">
+                <ion-card-content class="ion-text-center pointer">
                     <ion-fab-button size="small" color="dark" class="fab">
                         <ion-icon src="/assets/images/send.svg" class="text-yellow icon-send"></ion-icon>
                     </ion-fab-button>

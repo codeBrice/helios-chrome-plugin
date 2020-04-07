@@ -24,10 +24,10 @@ export class SecurityModalPage {
       use: new FormControl('')
     });
 
-    this.storage.get( 'passcode').then(storageData => {
+    /* this.storage.get( 'passcode').then(storageData => {
       this.config = storageData;
       this.configForm.controls.use.setValue(this.config.use);
-    });
+    }); */
   }
 
   dismiss() {
@@ -36,13 +36,13 @@ export class SecurityModalPage {
     });
   }
 
-  use() {
+ /*  use() {
     this.config.use = this.configForm.value.use;
     this.storage.set( 'passcode', this.config);
     if (this.config.use === true) {
       this.showLockscreen();
     }
-  }
+  } */
 
   showLockscreen() {
     this.dismiss();
