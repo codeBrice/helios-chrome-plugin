@@ -5,7 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { HomePage } from './home.page';
+import { DashboardPage } from './dashboard.page';
 import { SendModalPage } from './send-modal/send-modal.page';
 import { NgxQRCodeModule } from 'ngx-qrcode2';
 import { ReceiveModalPage } from './receive-modal/receive-modal.page';
@@ -13,7 +13,7 @@ import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatP
 const routes: Routes = [
   {
     path: '',
-    component: HomePage
+    component: DashboardPage
   }
 ];
 
@@ -27,7 +27,7 @@ const routes: Routes = [
     NgxQRCodeModule,
     WalletFormatPipeModule
   ],
-  declarations: [HomePage , SendModalPage, ReceiveModalPage],
+  declarations: [DashboardPage , SendModalPage, ReceiveModalPage],
   entryComponents: [SendModalPage, ReceiveModalPage]
 })
-export class HomePageModule {}
+export class DashboardPageModule {}
