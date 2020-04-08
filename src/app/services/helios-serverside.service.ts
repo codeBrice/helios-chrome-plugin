@@ -73,7 +73,7 @@ async renewSession() {
  */
 async getOnlineWallets(username, sessionHash) {
     console.log('Getting online wallets');
-    const query = {action: 'get_wallets', username, sessionHash};
+    const query = {action: 'get_wallets', username, session_hash: sessionHash};
     return await this.queryServer(query);
 }
 
@@ -143,14 +143,11 @@ async deleteOnlineWallet(id, name) {
  * Gets contacts
  * @returns  Object or boolean
  */
-async getContacts() {
+async getContacts(username, sessionHash) {
     console.log('Getting contacts');
     const session = this.loadSession();
-    if (!(session.sessionHash === undefined)) {
-      const query = {action: 'get_contacts', username: session.username, sessionHash: session.sessionHash};
-      return await this.queryServer(query);
-    }
-    return false;
+    const query = {action: 'get_contacts', username, session_hash: sessionHash};
+    return await this.queryServer(query);
 }
 
 /**

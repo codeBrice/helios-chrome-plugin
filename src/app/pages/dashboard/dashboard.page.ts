@@ -10,6 +10,7 @@ import { ReceiveModalPage } from './receive-modal/receive-modal.page';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { UserInfo } from 'src/app/entities/userInfo';
 import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
+import { ErrorServer } from 'src/app/entities/errorServer';
 @Component({
   selector: 'app-home',
   templateUrl: './dashboard.page.html',
@@ -55,7 +56,9 @@ export class DashboardPage implements OnInit {
     this.storage.get('userInfo').then(async (userInfo: UserInfo) => {
       if (userInfo) {
         try {
-         // const wallet  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
+          const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
+          const walletStorage = await this.storage.get('wallet');
+          this.notRepeat(walletsServer.keystores, walletStorage)
         } catch (error) {
           if (error.error === 2020) {
             this.storage.clear();
@@ -232,5 +235,22 @@ export class DashboardPage implements OnInit {
       component: ReceiveModalPage,
     });
     return await modal.present();
+  }
+
+  /**
+   * Nots repeat
+   * @param wallets
+   * @param address
+   * @returns
+   */
+  notRepeat(wallets, walletTwo) {
+    for (const wallet of wallets) {
+      const result = walletTwo.find( walletFind =>
+         walletFind.address.toUpperCase() === ('0x' + JSON.parse(wallet).address).toUpperCase() );
+      if (!result) {
+        throw new ErrorServer(2020, 'Not macth in wallets, Please log in again');
+      }
+    }
+    return true;
   }
 }
