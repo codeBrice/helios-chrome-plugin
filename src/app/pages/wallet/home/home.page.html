@@ -34,6 +34,21 @@
       <ion-button expand="block" color="helios" (click)="login()" class="button">Sign in</ion-button>
     </ion-col>
   </ion-row>
+
+  <ion-row class="label-section-center">
+    <ion-col class="ion-text-center">
+      <ion-label class="text-name-center" >
+        <h4>Don't have an account?</h4>
+</ion-label>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="label-section-center"  >
+    <ion-col class="ion-text-center" >
+      <ion-text class="text-name-center" color="helios" [routerLink]="['/create-accounts']" >Create a new account
+</ion-text>
+    </ion-col>
+  </ion-row>
  
   </form>
 </ion-content>

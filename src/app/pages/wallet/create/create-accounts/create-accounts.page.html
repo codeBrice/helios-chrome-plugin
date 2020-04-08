@@ -1,0 +1,67 @@
+
+
+<ion-content  color="dark">
+  <form [formGroup]="createAccountForm">
+  <ion-grid>
+    <ion-row style="margin-top: 25%;" class="ion-align-items-center">
+      <ion-col size="6" class="ion-align-self-center" offset="3">
+        <ion-img src="../../../assets/images/helios_protocol.png"></ion-img>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  
+	<ion-toolbar position="center" color="dark">
+    <!--Input Username-->
+    <ion-grid >
+      <ion-row class="ion-align-items-center">
+        <ion-col size="12">
+          <ion-item color="dark "class="login-fields">
+            <ion-label position="floating">Username</ion-label>
+            <ion-input type="text" required  formControlName="username"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <!--Input Email-->
+      <ion-row class="ion-align-items-center">
+        <ion-col size="12">
+          <ion-item color="dark "class="login-fields">
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" required  formControlName="email"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+<!--Input Password-->
+      <ion-row class="ion-align-items-center">
+        <ion-col size="12">
+          <ion-item color="dark "class="login-fields">
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" required  formControlName="password"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+<!--Input Repeat Password-->
+
+      <ion-row>
+        <ion-col size="12">
+          <ion-item color="dark">
+            <ion-label position="floating">Repeat password</ion-label>
+            <ion-input type="password" formControlName="repeatPassword"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+
+  <ion-row>
+    <ion-col size="6">
+      <ion-button expand="block" color="helios"  [routerLink]="['/homewallet']" class="button">Cancel</ion-button>
+    </ion-col>
+    <ion-col size="6">
+      <ion-button expand="block" color="helios"class="button">Submit</ion-button>
+    </ion-col>
+  </ion-row>
+ 
+  </form>
+</ion-content>
+
+
