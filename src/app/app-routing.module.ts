@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./pages/tabs/tabs.module').then(m => m.TabsPageModule)
+    loadChildren: () => import('./pages/wallet/home/home.module').then(m => m.HomePageModule)
   },
   {
     path: 'dashboard',
@@ -45,9 +45,14 @@ const routes: Routes = [
   {
     path: 'add',
     loadChildren: () => import('./pages/wallet/add/add.module').then(m => m.AddPageModule)
-  },  {
+  },
+  {
     path: 'create-accounts',
     loadChildren: () => import('./pages/wallet/create/create-accounts/create-accounts.module').then( m => m.CreateAccountsPageModule)
+  },
+  {
+    path: 'chart',
+    loadChildren: () => import('./pages/chart/chart.module').then( m => m.ChartPageModule)
   },
 
 ];

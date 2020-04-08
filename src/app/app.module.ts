@@ -13,7 +13,6 @@ import { IonicStorageModule } from '@ionic/storage';
 import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { HttpClientModule } from '@angular/common/http';
 //modal
-import { LockscreenModule } from 'src/plugins/lockscreen/lockscreen.module';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 @NgModule({
@@ -24,7 +23,6 @@ import { SocialSharing } from '@ionic-native/social-sharing/ngx';
     IonicModule.forRoot(),
     AppRoutingModule, IonicStorageModule.forRoot(),
     HttpClientModule,
-    LockscreenModule,
   ],
 
   providers: [

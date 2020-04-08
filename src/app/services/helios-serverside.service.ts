@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as superagent from 'superagent';
 import bcrypt from 'bcryptjs';
+import { ErrorServer } from '../entities/errorServer';
 
 
 @Injectable({
@@ -26,21 +27,6 @@ export class HeliosServersideService {
     this.queryResponseTimeout = 4000; // Time till server responds
     this.queryResponseDeadline = 8000; // Allowed time for page to load
   }
-
-saveSession(sessionHash, username) {
-    console.log('Saving session');
-    if (typeof window !== 'undefined' && this.useLocalStorage) {
-        window.localStorage.setItem('sessionHash', sessionHash);
-        if (!(username === undefined)) {
-            window.localStorage.setItem('username', username);
-        }
-    } else {
-        this.sessionHash = sessionHash;
-        if (!(username === undefined)) {
-            this.username = username;
-        }
-    }
-}
 
 loadSession() {
     if (typeof window !== 'undefined' && this.useLocalStorage) {
@@ -85,14 +71,10 @@ async renewSession() {
  * Gets online wallets
  * @returns  Object or boolean
  */
-async getOnlineWallets() {
+async getOnlineWallets(username, sessionHash) {
     console.log('Getting online wallets');
-    const session = this.loadSession();
-    if (!(session.sessionHash === undefined)) {
-      const query = {action: 'get_wallets', username: session.username, sessionHash: session.sessionHash};
-      return await this.queryServer(query);
-    }
-    return false;
+    const query = {action: 'get_wallets', username, sessionHash};
+    return await this.queryServer(query);
 }
 
 /**
@@ -322,6 +304,7 @@ async newUser(username, email, password, newWalletKeystore) {
  * @returns Object
  */
 async queryServer(query) {
+    console.log(query);
     return await superagent.get(this.serverUrl)
     .timeout({
         response: this.queryResponseTimeout,
@@ -337,22 +320,19 @@ async queryServer(query) {
         }
         console.log('Successful response from server');
         console.log(jsonResponse);
-        if ('sessionHash' in jsonResponse) {
-            this.saveSession(jsonResponse.sessionHash, null); // TODO sak revisa esto!!
-        }
         // check for invalid session
         if ('error' in jsonResponse) {
             if (jsonResponse.error === 2020) {
-                throw new Error('Your session has expired. Please log in again to continue.');
+                throw new ErrorServer(jsonResponse.error, 'Your session has expired. Please log in again to continue.');
             } else {
-                throw new Error(jsonResponse.error_description);
+                throw new ErrorServer(jsonResponse.error, jsonResponse.error_description);
             }
         }
         return jsonResponse;
 
     })
     .catch(err => {
-        throw new Error(err.message);
+        throw new ErrorServer(err.error, err.errorDescription);
     });
   }
 }
