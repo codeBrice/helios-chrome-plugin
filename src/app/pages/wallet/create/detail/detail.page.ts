@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { ToastController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
-import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 
 @Component({
   selector: 'app-detail',
@@ -23,7 +22,6 @@ export class DetailPage implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController,
     private router: Router,
-    private lockscreenService: LockscreenService
     ) { }
 
   ngOnInit() {
@@ -62,8 +60,7 @@ export class DetailPage implements OnInit {
           text: 'Yes',
           handler: () => {
             sessionStorage.clear();
-            //this.showLockscreen();
-            this.router.navigate(['/tabs/home']);
+            this.router.navigate(['/dashboard']);
           }
         }
       ]
@@ -72,22 +69,4 @@ export class DetailPage implements OnInit {
     await alert.present();
   }
 
-  showLockscreen() {
-      const options = {
-        passcode: null,
-        enableTouchIdFaceId: this.enableTouchIdFaceId,
-        newPasscode: true
-      };
-      this.lockscreenService.verify(options)
-        .then((response: any) => {
-          const { data } = response;
-          console.log('Response from lockscreen service: ', data);
-          if (data.type === 'dismiss') {
-            this.isCorrect = data.data;
-            this.router.navigate(['/tabs/home']);
-          } else {
-            this.isCorrect = false;
-          }
-        });
-  }
 }

@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
 import { LoadingController, ActionSheetController, AlertController, ModalController, ToastController } from '@ionic/angular';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { SendModalPage } from './send-modal/send-modal.page';
 import { ReceiveModalPage } from './receive-modal/receive-modal.page';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
+import { UserInfo } from 'src/app/entities/userInfo';
+import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
 @Component({
   selector: 'app-home',
   templateUrl: './dashboard.page.html',
@@ -20,12 +22,14 @@ export class DashboardPage implements OnInit {
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController,
     private route: ActivatedRoute,
+    private router: Router,
     private coingeckoService: CoingeckoService,
     public actionSheetController: ActionSheetController,
     public alertController: AlertController,
     private modalController: ModalController,
     private socialSharing: SocialSharing,
-    public toastController: ToastController
+    public toastController: ToastController,
+    private heliosServersideService: HeliosServersideService
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -48,70 +52,100 @@ export class DashboardPage implements OnInit {
 
   inicialize() {
     this.today = moment();
-    this.storage.get('wallet').then(async (wallets) => {
-      const loading = await this.loadingController.create({
-        message: 'Please wait...',
-        translucent: true,
-        cssClass: 'custom-class custom-loading'
-      });
-      await loading.present();
-      if (wallets != null) {
-
-        this.slideOpts = {
-          slidesPerView: wallets.length > 1 ? 2 : 1,
-          initialSlide: 0,
-          speed: 400
-        };
-
+    this.storage.get('userInfo').then(async (userInfo: UserInfo) => {
+      if (userInfo) {
         try {
-
-          this.helios = await this.coingeckoService.getCoin(this.HELIOS_ID).toPromise();
-          this.wallets = [];
-          this.balance = 0;
-          (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
-          let receivable = false;
-          const walletPromises = [];
-          await this.heliosService.connectToFirstAvailableNode();
-          for (const wallet of wallets) {
-            walletPromises.push(new Promise(async (resolve, reject) => {
-              try {
-                try {
-                  const data = await this.heliosService.getReceivableTransactions(wallet.address, wallet.privateKey);
-                  if (!receivable && data) {
-                    receivable = data;
-                  }
-                } catch (error) {
-                  const toast = await this.toastController.create({
-                    cssClass: 'text-red',
-                    message: error.message,
-                    duration: 2000
-                  });
-                  toast.present();
-                }
-                const balance = await this.heliosService.getBalance(wallet.address);
-                const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
-                this.wallets.push({
-                  address: wallet.address ,
-                  balance,
-                  usd,
-                  name: wallet.name
-                });
-                this.balance += usd;
-                resolve();
-              } catch (error) {
-                reject();
-              }
-            }));
+         // const wallet  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
+        } catch (error) {
+          if (error.error === 2020) {
+            this.storage.clear();
+            this.storage.set( 'tutorial', true );
+            this.router.navigate(['/homewallet']);
           }
-          await Promise.all(walletPromises)
-          if (receivable) {
+          const toast = await this.toastController.create({
+            cssClass: 'text-red',
+            message: error.errorDescription || error.message,
+            duration: 2000
+          });
+          toast.present();
+        }
+      }
+
+      this.storage.get('wallet').then(async (wallets) => {
+        const loading = await this.loadingController.create({
+          message: 'Please wait...',
+          translucent: true,
+          cssClass: 'custom-class custom-loading'
+        });
+        await loading.present();
+
+        if (wallets != null) {
+          this.slideOpts = {
+            slidesPerView: wallets.length > 1 ? 2 : 1,
+            initialSlide: 0,
+            speed: 400
+          };
+
+          try {
+
+            this.helios = await this.coingeckoService.getCoin(this.HELIOS_ID).toPromise();
+            this.wallets = [];
+            this.balance = 0;
+            (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
+            let receivable = false;
+            const walletPromises = [];
+            await this.heliosService.connectToFirstAvailableNode();
+            for (const wallet of wallets) {
+              walletPromises.push(new Promise(async (resolve, reject) => {
+                try {
+                  try {
+                    const data = await this.heliosService.getReceivableTransactions(wallet.address, wallet.privateKey);
+                    if (!receivable && data) {
+                      receivable = data;
+                    }
+                  } catch (error) {
+                    const toast = await this.toastController.create({
+                      cssClass: 'text-red',
+                      message: error.message,
+                      duration: 2000
+                    });
+                    toast.present();
+                  }
+                  const balance = await this.heliosService.getBalance(wallet.address);
+                  const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
+                  this.wallets.push({
+                    address: wallet.address ,
+                    balance,
+                    usd,
+                    name: wallet.name
+                  });
+                  this.balance += usd;
+                  resolve();
+                } catch (error) {
+                  reject();
+                }
+              }));
+            }
+            await Promise.all(walletPromises)
+            if (receivable) {
+              const toast = await this.toastController.create({
+                cssClass: 'text-yellow',
+                message: 'You have received new transactions!',
+                duration: 2000
+              });
+              toast.present();
+            }
+          } catch (error) {
             const toast = await this.toastController.create({
-              cssClass: 'text-yellow',
-              message: 'You have received new transactions!',
+              cssClass: 'text-red',
+              message: error.message,
               duration: 2000
             });
             toast.present();
           }
+        }
+        try {
+          this.gasPrice = await this.heliosService.getGasPrice();
         } catch (error) {
           const toast = await this.toastController.create({
             cssClass: 'text-red',
@@ -120,18 +154,9 @@ export class DashboardPage implements OnInit {
           });
           toast.present();
         }
-      }
-      try {
-        this.gasPrice = await this.heliosService.getGasPrice();
-      } catch (error) {
-        const toast = await this.toastController.create({
-          cssClass: 'text-red',
-          message: error.message,
-          duration: 2000
-        });
-        toast.present();
-      }
-      await loading.dismiss();
+        await loading.dismiss();
+      });
+
     });
   }
 

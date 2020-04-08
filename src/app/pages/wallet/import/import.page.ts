@@ -4,7 +4,6 @@ import { HeliosServiceService } from '../../../services/helios-service.service';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
-import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 import { Wallet } from 'src/app/entities/wallet';
 
 @Component({
@@ -28,7 +27,6 @@ export class ImportPage implements OnInit {
     private alertController: AlertController,
     private router: Router,
     private storage: Storage,
-    private lockscreenService: LockscreenService,
     private loadingController: LoadingController,
     public toastController: ToastController
   ) {  }
@@ -105,8 +103,7 @@ export class ImportPage implements OnInit {
                 text: 'Continue',
                 handler: () => {
                   sessionStorage.clear();
-                  //this.showLockscreen();
-                  this.router.navigate(['/tabs/home']);
+                  this.router.navigate(['/dashboard']);
                 }
               }
             ]
@@ -137,29 +134,4 @@ export class ImportPage implements OnInit {
     }
     return true;
   }
-
-  showLockscreen() {
-    this.storage.get( 'passcode').then(storageData => {
-      if (!storageData) {
-        const options = {
-          passcode: null,
-          enableTouchIdFaceId: this.enableTouchIdFaceId,
-          newPasscode: true
-        };
-        this.lockscreenService.verify(options)
-          .then((response: any) => {
-            const { data } = response;
-            console.log('Response from lockscreen service: ', data);
-            if (data.type === 'dismiss') {
-              this.isCorrect = data.data;
-              this.router.navigate(['/tabs/home']);
-            } else {
-              this.isCorrect = false;
-            }
-          });
-      } else {
-        this.router.navigate(['/tabs/home']);
-      }
-    });
-}
 }

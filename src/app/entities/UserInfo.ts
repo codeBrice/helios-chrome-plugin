@@ -2,16 +2,16 @@ import { KeyStore } from './KeyStore';
 
 export class UserInfo {
 
-    constructor(success, keystores, sessionHash, twoFaEnabled) {
-        this.success = success;
+    constructor(keystores, sessionHash, twoFaEnabled, userName) {
         this.keystores = keystores;
         this.sessionHash = sessionHash;
         this.twoFaEnabled = twoFaEnabled;
+        this.userName = userName;
     }
 
-    success: boolean;
     keystores: KeyStore[];
     sessionHash: string;
     twoFaEnabled: boolean;
+    userName: string;
 
 }

@@ -5,7 +5,6 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import { LockscreenService } from 'src/plugins/lockscreen/services/lockscreen.service';
 import { HeliosServiceService } from './services/helios-service.service';
 
 @Component({
@@ -15,8 +14,32 @@ import { HeliosServiceService } from './services/helios-service.service';
 })
 export class AppComponent {
 
-  isCorrect = true; //TODO false pin activate
+  isCorrect = false; //TODO false pin activate
   enableTouchIdFaceId = false;
+
+  public selectedIndex = 0;
+  public appPages = [
+    {
+      title: 'Dashboard',
+      url: '/dashboard',
+      icon: 'keypad'
+    },
+    {
+      title: 'Transaction',
+      url: '/transaction',
+      icon: '/assets/images/exchange.svg'
+    },
+    {
+      title: 'Chart',
+      url: '/chart',
+      icon: 'analytics'
+    },
+    {
+      title: 'Setting',
+      url: '/setting',
+      icon: '/assets/images/settings.svg'
+    }
+  ];
 
   constructor(
     private platform: Platform,
@@ -24,33 +47,12 @@ export class AppComponent {
     private storage: Storage,
     private router: Router,
     private loadingController: LoadingController,
-    private lockscreenService: LockscreenService,
-    private heliosService: HeliosServiceService
   ) {
     this.initializeApp();
   }
 
   initializeApp() {
     this.platform.ready().then(async () => {
-      /* this.platform.pause.subscribe(() => {
-        console.log('****UserdashboardPage PAUSED****');
-      }); */
-      /* this.platform.resume.subscribe(async () => {
-        await this.heliosService.connectToFirstAvailableNode();
-        this.isCorrect = false;
-        if (sessionStorage.getItem( 'camera') === 'true') {
-          this.isCorrect = true;
-          sessionStorage.clear();
-        }
-        console.log('****UserdashboardPage RESUMED****');
-        this.storage.get('wallet').then(async (wallet) => {
-          if (wallet != null) {
-            if (!this.isCorrect) {
-              this.showLockscreen();
-            }
-          }
-        });
-      }); */
       await this.loadWallets();
     });
   }
@@ -65,15 +67,9 @@ export class AppComponent {
     // this.statusBar.styleDefault();
     // find wallet in device storage
     console.log('app component');
-    await this.heliosService.connectToFirstAvailableNode();
     this.storage.get('wallet').then(async (wallet) => {
       if (wallet != null) {
-       /*  if (!this.isCorrect) {
-          this.showLockscreen();
-        } else { */
-          // redirect to dashboard
-          this.router.navigate(['/tabs/home']);
-        /* } */
+          this.router.navigate(['/dashboard']);
           await loading.dismiss();
       } else {
         this.storage.get('tutorial').then(async (val) => {
@@ -87,30 +83,6 @@ export class AppComponent {
         });
       }
       this.splashScreen.hide();
-    });
-  }
-
-  showLockscreen() {
-    this.storage.get( 'passcode').then(storageData => {
-      if (storageData.use) {
-        const options = {
-          passcode : storageData.passcode,
-          enableTouchIdFaceId: this.enableTouchIdFaceId,
-        };
-        this.lockscreenService.verify(options)
-          .then((response: any) => {
-            const { data } = response;
-            console.log('Response from lockscreen service: ', data);
-            if (data.type === 'dismiss') {
-              this.isCorrect = data.data;
-            } else {
-              this.isCorrect = false;
-            }
-          });
-      } else {
-        this.isCorrect = true;
-        this.router.navigate(['/tabs/home']);
-      }
     });
   }
 }
