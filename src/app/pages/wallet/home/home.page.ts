@@ -18,6 +18,7 @@ export class HomePage implements OnInit {
   loginForm: FormGroup;
   isCorrect = false;
   enableTouchIdFaceId = false;
+  wallets: {}[] = [];
 
   constructor(private formBuilder: FormBuilder,
               private heliosServersideService: HeliosServersideService,
@@ -44,17 +45,17 @@ export class HomePage implements OnInit {
     await loading.present();
     try {
       const result = await this.heliosServersideService.signIn(this.loginForm.value.username, this.loginForm.value.password, null);
-      const userInfo = new UserInfo(result.success, result.keystores, result.session_hash, result['2fa_enabled']);
+        const userInfo = new UserInfo(result.success, result.keystores, result.session_hash, result['2fa_enabled']);
       this.storage.set( 'userInfo', userInfo );
 
-      const wallets = [];
       for (const keystoreInfo of userInfo.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
-        wallets.push(new Wallet(keystore.address, keystore.privateKey, keystoreInfo.name));
+        this.wallets.push(new Wallet(keystore.address, keystore.privateKey, keystoreInfo.name));
       }
-      this.storage.set( 'wallet', wallets );
 
-      this.showLockscreen();
+      //this.showLockscreen();
+      this.storage.set( 'wallet', this.wallets );
+      this.router.navigate(['/tabs/home']);
     } catch (error) {
       const toast = await this.toastController.create({
           cssClass: 'text-red',
@@ -64,6 +65,13 @@ export class HomePage implements OnInit {
       toast.present();
     }
     await loading.dismiss();
+  }
+
+  offline() {
+    this.wallets = [];
+    //this.showLockscreen();
+    this.storage.set( 'wallet', this.wallets );
+    this.router.navigate(['/tabs/home']);
   }
 
   showLockscreen() {

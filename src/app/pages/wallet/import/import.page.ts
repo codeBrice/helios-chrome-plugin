@@ -105,7 +105,8 @@ export class ImportPage implements OnInit {
                 text: 'Continue',
                 handler: () => {
                   sessionStorage.clear();
-                  this.showLockscreen();
+                  //this.showLockscreen();
+                  this.router.navigate(['/tabs/home']);
                 }
               }
             ]

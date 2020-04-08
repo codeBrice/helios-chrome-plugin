@@ -10,10 +10,10 @@ import { ReceiveModalPage } from './receive-modal/receive-modal.page';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 @Component({
   selector: 'app-home',
-  templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
+  templateUrl: './dashboard.page.html',
+  styleUrls: ['./dashboard.page.scss'],
 })
-export class HomePage implements OnInit {
+export class DashboardPage implements OnInit {
 
   constructor(
     private storage: Storage,

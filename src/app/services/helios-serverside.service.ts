@@ -343,18 +343,16 @@ async queryServer(query) {
         // check for invalid session
         if ('error' in jsonResponse) {
             if (jsonResponse.error === 2020) {
-                /* if (typeof window.logout !== 'undefined' && typeof window.popup !== 'undefined') {
-                    console.log('Session expired');
-                    window.logout();
-                    window.popup('Your session has expired. Please log in again to continue.');
-                } */
+                throw new Error('Your session has expired. Please log in again to continue.');
+            } else {
+                throw new Error(jsonResponse.error_description);
             }
         }
         return jsonResponse;
 
     })
     .catch(err => {
-        throw new Error(`HTTP Request Error ${err.message}, ${ err.response}`);
+        throw new Error(err.message);
     });
   }
 }

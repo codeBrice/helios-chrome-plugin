@@ -15,7 +15,7 @@ import { HeliosServiceService } from './services/helios-service.service';
 })
 export class AppComponent {
 
-  isCorrect = false;
+  isCorrect = true; //TODO false pin activate
   enableTouchIdFaceId = false;
 
   constructor(
@@ -35,7 +35,7 @@ export class AppComponent {
       /* this.platform.pause.subscribe(() => {
         console.log('****UserdashboardPage PAUSED****');
       }); */
-      this.platform.resume.subscribe(async () => {
+      /* this.platform.resume.subscribe(async () => {
         await this.heliosService.connectToFirstAvailableNode();
         this.isCorrect = false;
         if (sessionStorage.getItem( 'camera') === 'true') {
@@ -50,7 +50,7 @@ export class AppComponent {
             }
           }
         });
-      });
+      }); */
       await this.loadWallets();
     });
   }
@@ -68,13 +68,13 @@ export class AppComponent {
     await this.heliosService.connectToFirstAvailableNode();
     this.storage.get('wallet').then(async (wallet) => {
       if (wallet != null) {
-        if (!this.isCorrect) {
+       /*  if (!this.isCorrect) {
           this.showLockscreen();
-        } else {
+        } else { */
           // redirect to dashboard
           this.router.navigate(['/tabs/home']);
-        }
-        await loading.dismiss();
+        /* } */
+          await loading.dismiss();
       } else {
         this.storage.get('tutorial').then(async (val) => {
           this.isCorrect = true;
