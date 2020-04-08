@@ -19,7 +19,7 @@ export class HeliosServersideService {
   username: any;
 
  constructor() {
-    this.serverUrl = 'http://heliosprotocol.io/wallet-serverside/';
+    this.serverUrl = 'https://heliosprotocol.io/wallet-serverside/';
     this.saltRounds = 11;
     this.superagent = superagent.agent();
     this.useLocalStorage = false;
