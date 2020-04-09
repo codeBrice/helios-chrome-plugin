@@ -5,7 +5,6 @@ import { Storage } from '@ionic/storage';
 import { Contact } from 'src/app/entities/contact';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
-import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { Router } from '@angular/router';
 import cryptoJs from 'crypto-js';
 @Component({
@@ -19,7 +18,7 @@ export class SendModalPage implements OnInit {
               private storage: Storage, private loadingController: LoadingController,
               private coingeckoService: CoingeckoService, private heliosService: HeliosServiceService,
               public toastController: ToastController,
-              private barcodeScanner: BarcodeScanner, private router: Router) { }
+              private router: Router) { }
 
   sendForm: FormGroup;
   contactsList: Contact[];
@@ -150,17 +149,7 @@ export class SendModalPage implements OnInit {
       }
     };
   }
-
-  scanQr() {
-    sessionStorage.setItem( 'camera', 'true' );
-    this.barcodeScanner.scan().then(barcodeData => {
-      console.log('Barcode data', barcodeData);
-      this.sendForm.controls.toAddress.setValue(barcodeData.text || '');
-     }).catch(err => {
-         console.log('Error', err);
-     });
-  }
-
+  
   dismiss() {
     this.modalController.dismiss(false);
   }

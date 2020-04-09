@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 import { FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Clipboard } from '@ionic-native/clipboard/ngx';
 
 @Component({
   selector: 'app-send-modal',
@@ -16,7 +15,7 @@ export class ReceiveModalPage implements OnInit {
   receiveForm: FormGroup;
 
   constructor(private modalController: ModalController, private formBuilder: FormBuilder,
-              private storage: Storage, private clipboard: Clipboard, public toastController: ToastController) { }
+              private storage: Storage, public toastController: ToastController) { }
 
   ngOnInit() {
 
@@ -36,7 +35,18 @@ export class ReceiveModalPage implements OnInit {
   }
 
   async  copy( address: string)  {
-    this.clipboard.copy( address );
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = address;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+
     const toast = await this.toastController.create({
       cssClass: 'text-yellow',
       message: 'Copied.',

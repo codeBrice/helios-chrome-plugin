@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
-import { Clipboard } from '@ionic-native/clipboard/ngx';
 import { ToastController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
 
@@ -18,7 +17,6 @@ export class DetailPage implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private clipboard: Clipboard,
     public toastController: ToastController,
     public alertController: AlertController,
     private router: Router,
@@ -32,11 +30,22 @@ export class DetailPage implements OnInit {
   }
 
   async  copy( formName: string)  {
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
     if ( formName === 'privateKey' ) {
-      this.clipboard.copy( sessionStorage.getItem('privateKey') );
+      selBox.value = sessionStorage.getItem('privateKey');
     } else {
-      this.clipboard.copy( sessionStorage.getItem('keystore') );
+      selBox.value = sessionStorage.getItem('keystore');
     }
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+
     const toast = await this.toastController.create({
       cssClass: 'text-yellow',
       message: 'Copied.',
