@@ -65,9 +65,7 @@ export class HomePage implements OnInit {
   }
 
   offline() {
-    this.wallets = [];
-    this.storage.set( 'wallet', this.wallets );
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/add']);
   }
 
 }
