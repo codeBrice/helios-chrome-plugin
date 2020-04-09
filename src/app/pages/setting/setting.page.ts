@@ -36,7 +36,7 @@ export class SettingPage implements OnInit {
   }
 
   share() {
-    this.socialSharing.share('Helios Wallet Mobile: ', null, null, 'https://heliosprotocol.io/');
+    window.open('https://chrome.google.com/webstore/search/helios?hl=es', '_system');
   }
 
   help() {
