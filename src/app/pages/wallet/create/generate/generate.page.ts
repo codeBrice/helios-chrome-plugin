@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { LoadingController, ToastController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
+import bcrypt from 'bcryptjs';
+import cryptoJs from 'crypto-js';
 
 @Component({
   selector: 'app-generate',
@@ -14,6 +16,7 @@ import { Wallet } from 'src/app/entities/wallet';
 export class GeneratePage implements OnInit {
 
   public createWallet: FormGroup;
+  saltRounds: number;
 
   constructor(
    private formBuilder: FormBuilder,
@@ -22,7 +25,9 @@ export class GeneratePage implements OnInit {
    private storage: Storage,
    private loadingController: LoadingController,
    public toastController: ToastController
-  ) { }
+  ) {
+    this.saltRounds = 11;
+  }
 
   ngOnInit() {
     this.createWallet = this.formBuilder.group({
@@ -46,11 +51,15 @@ export class GeneratePage implements OnInit {
       // data storage for mobile
       this.storage.get( 'wallet').then(async (wallets) => {
         try {
+          const hash = this.generateHash( this.createWallet.value.password );
+          this.storage.set( 'userInfoLocal', { sessionHash: hash } );
           if ( wallets === null) {
-            const walletArray = [new Wallet(accountWallet.account.address, accountWallet.account.privateKey, this.createWallet.value.name)];
+            const walletArray = [new Wallet(accountWallet.account.address,
+              cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name)];
             this.storage.set( 'wallet', walletArray );
           } else {
-            wallets.push(new Wallet(accountWallet.account.address, accountWallet.account.privateKey, this.createWallet.value.name));
+            wallets.push(new Wallet(accountWallet.account.address,
+               cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name));
             this.storage.set( 'wallet', wallets );
           }
           this.router.navigate(['/detailwallet']);
@@ -64,5 +73,11 @@ export class GeneratePage implements OnInit {
         }
         await loading.dismiss();
       });
+  }
+
+  generateHash( password: any ) {
+    const newSalt = bcrypt.genSaltSync(this.saltRounds);
+    const newPasswordHash = bcrypt.hashSync(password, newSalt);
+    return newPasswordHash;
   }
 }

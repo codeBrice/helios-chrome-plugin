@@ -104,7 +104,9 @@ export class DashboardPage implements OnInit {
                   const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfo.sessionHash);
                   data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 } else {
-                  data = await this.heliosService.getReceivableTransactions(wallet.address, wallet.privateKey);
+                  const userInfoLocal = await this.storage.get('userInfoLocal');
+                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfoLocal.sessionHash);
+                  data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 }
                 if (!receivable && data) {
                   receivable = data;

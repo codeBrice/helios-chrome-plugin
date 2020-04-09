@@ -5,6 +5,8 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
+import bcrypt from 'bcryptjs';
+import cryptoJs from 'crypto-js';
 
 @Component({
   selector: 'app-import',
@@ -17,9 +19,9 @@ export class ImportPage implements OnInit {
   keystore: boolean;
   importWallet: FormGroup;
   add: boolean;
-
   isCorrect = false;
   enableTouchIdFaceId = false;
+  saltRounds: number;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -29,7 +31,9 @@ export class ImportPage implements OnInit {
     private storage: Storage,
     private loadingController: LoadingController,
     public toastController: ToastController
-  ) {  }
+  ) { 
+    this.saltRounds = 11;
+   }
 
   ngOnInit() {
     this.importWallet = this.formBuilder.group({
@@ -47,18 +51,12 @@ export class ImportPage implements OnInit {
       this.privateKey = true;
       this.importWallet.controls.keystore.clearValidators();
       this.importWallet.controls.keystore.updateValueAndValidity();
-      this.importWallet.controls.password.clearValidators();
-      this.importWallet.controls.password.updateValueAndValidity();
-
       this.importWallet.controls.privateKey.setValidators([Validators.required]);
       this.importWallet.controls.privateKey.updateValueAndValidity();
     } else {
       this.keystore = true;
       this.importWallet.controls.privateKey.clearValidators();
       this.importWallet.controls.privateKey.updateValueAndValidity();
-
-      this.importWallet.controls.password.setValidators([Validators.required, Validators.minLength(16)]);
-      this.importWallet.controls.password.updateValueAndValidity();
       this.importWallet.controls.keystore.setValidators([Validators.required]);
       this.importWallet.controls.keystore.updateValueAndValidity();
     }
@@ -73,24 +71,30 @@ export class ImportPage implements OnInit {
     await loading.present();
     this.storage.get( 'wallet').then(async (wallets) => {
         try {
+          const hash = this.generateHash( this.importWallet.value.password );
+          this.storage.set( 'userInfoLocal', { sessionHash: hash } );
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
             if ( wallets === null) {
-              const walletArray = [new Wallet(privateKey.address, privateKey.privateKey, this.importWallet.value.name)];
+              const walletArray = [new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
+                this.importWallet.value.name)];
               this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, privateKey.address);
-              wallets.push(new Wallet(privateKey.address, privateKey.privateKey, this.importWallet.value.name));
+              wallets.push(new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
+               this.importWallet.value.name));
               this.storage.set( 'wallet', wallets );
             }
           } else {
             const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
             if ( wallets === null) {
-            const walletArray = [new Wallet(keystore.address, keystore.privateKey, this.importWallet.value.name)];
+            const walletArray = [new Wallet(keystore.address,
+              cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString() , this.importWallet.value.name)];
             this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, keystore.address);
-              wallets.push(new Wallet(keystore.address, keystore.privateKey, this.importWallet.value.name));
+              wallets.push(new Wallet(keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString(),
+               this.importWallet.value.name));
               this.storage.set( 'wallet', wallets );
             }
           }
@@ -133,5 +137,11 @@ export class ImportPage implements OnInit {
       }
     }
     return true;
+  }
+
+  generateHash( password: any ) {
+    const newSalt = bcrypt.genSaltSync(this.saltRounds);
+    const newPasswordHash = bcrypt.hashSync(password, newSalt);
+    return newPasswordHash;
   }
 }
