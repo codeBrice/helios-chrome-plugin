@@ -106,8 +106,10 @@ export class SendModalPage implements OnInit {
         const bytes  = cryptoJs.AES.decrypt(key, userInfo.sessionHash);
         result = await this.heliosService.sendTransaction(transaction, bytes.toString(cryptoJs.enc.Utf8));
       } else {
-        result = await this.heliosService.sendTransaction(transaction,
-          this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
+        const userInfoLocal = await this.storage.get('userInfoLocal');
+        const key = this.wallets.find(element => element.address === this.sendForm.value.from).privateKey;
+        const bytes  = cryptoJs.AES.decrypt(key, userInfoLocal.sessionHash);
+        result = await this.heliosService.sendTransaction(transaction, bytes.toString(cryptoJs.enc.Utf8));
       }
 
       const toast = await this.toastController.create({
