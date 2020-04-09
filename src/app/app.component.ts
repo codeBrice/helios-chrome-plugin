@@ -67,22 +67,20 @@ export class AppComponent {
     // this.statusBar.styleDefault();
     // find wallet in device storage
     console.log('app component');
-    this.storage.get('wallet').then(async (wallet) => {
-      if (wallet != null) {
-          this.router.navigate(['/dashboard']);
-          await loading.dismiss();
+    const wallet = await this.storage.get('wallet');
+    if (wallet != null) {
+        this.router.navigate(['/dashboard']);
+        await loading.dismiss();
+    } else {
+      const val = await this.storage.get('tutorial');
+      this.isCorrect = true;
+      if (val) {
+        this.router.navigate(['/homewallet']);
       } else {
-        this.storage.get('tutorial').then(async (val) => {
-          this.isCorrect = true;
-          if (val) {
-            this.router.navigate(['/homewallet']);
-          } else {
-            this.router.navigate(['/tutorial']);
-          }
-          await loading.dismiss();
-        });
+        this.router.navigate(['/tutorial']);
       }
-      this.splashScreen.hide();
-    });
+      await loading.dismiss();
+    }
+    this.splashScreen.hide();
   }
 }
