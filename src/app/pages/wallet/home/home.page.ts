@@ -7,6 +7,7 @@ import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
 import { Wallet } from 'src/app/entities/wallet';
+import cryptoJs from 'crypto-js';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -48,7 +49,9 @@ export class HomePage implements OnInit {
 
       for (const keystoreInfo of userInfo.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
-        this.wallets.push(new Wallet(keystore.address, keystore.privateKey, keystoreInfo.name));
+        this.wallets.push(new Wallet(
+          keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name)
+          );
       }
 
       this.storage.set( 'wallet', this.wallets );

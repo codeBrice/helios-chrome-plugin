@@ -161,7 +161,21 @@ export class HeliosServiceService {
       }
     } catch (error) {
       console.log(error);
-      throw new Error('Failed to import wallet for keyStore');
+      throw new Error('Wrong Password.');
+    }
+  }
+
+  async privateKeyToJson(privateKey: string, password: string) {
+    try {
+      console.log('jsonAccount');
+      if (await this.isConnected()) {
+        const encrypt = await this.web3.eth.accounts.encrypt(privateKey, password);
+        console.log(encrypt);
+        return encrypt;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed privateKey To Json');
     }
   }
 

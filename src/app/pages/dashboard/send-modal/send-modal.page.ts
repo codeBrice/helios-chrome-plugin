@@ -7,6 +7,7 @@ import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { Router } from '@angular/router';
+import cryptoJs from 'crypto-js';
 @Component({
   selector: 'app-send-modal',
   templateUrl: './send-modal.page.html',
@@ -100,8 +101,15 @@ export class SendModalPage implements OnInit {
         gas: 21000,
         gasPrice: this.heliosService.toWei(String(this.gasPrice))
       };
-      result = await this.heliosService.sendTransaction(transaction,
-        this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
+      const userInfo = await this.storage.get('userInfo');
+      if (userInfo) {
+        const key = this.wallets.find(element => element.address === this.sendForm.value.from).privateKey;
+        const bytes  = cryptoJs.AES.decrypt(key, userInfo.sessionHash);
+        result = await this.heliosService.sendTransaction(transaction, bytes.toString(cryptoJs.enc.Utf8));
+      } else {
+        result = await this.heliosService.sendTransaction(transaction,
+          this.wallets.find(element => element.address === this.sendForm.value.from).privateKey);
+      }
 
       const toast = await this.toastController.create({
           cssClass: 'text-yellow',

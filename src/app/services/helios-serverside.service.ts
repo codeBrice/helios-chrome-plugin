@@ -256,8 +256,7 @@ async deleteContact(id) {
 async signIn(username, password, tfaCode) {
     const query = {action: 'get_salt', username};
     const saltResponse = await this.queryServer(query);
-    const saltForVerification = saltResponse.salt;
-    const passwordHashForVerification = bcrypt.hashSync(password, saltForVerification);
+    const passwordHashForVerification = bcrypt.hashSync(password, saltResponse.salt);
 
     const newSalt = bcrypt.genSaltSync(this.saltRounds);
     const newPasswordHash = bcrypt.hashSync(password, newSalt);
