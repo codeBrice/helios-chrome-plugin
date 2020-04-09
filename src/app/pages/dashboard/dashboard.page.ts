@@ -7,7 +7,6 @@ import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { SendModalPage } from './send-modal/send-modal.page';
 import { ReceiveModalPage } from './receive-modal/receive-modal.page';
-import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { UserInfo } from 'src/app/entities/userInfo';
 import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
 import { ErrorServer } from 'src/app/entities/errorServer';
@@ -29,7 +28,6 @@ export class DashboardPage implements OnInit {
     public actionSheetController: ActionSheetController,
     public alertController: AlertController,
     private modalController: ModalController,
-    private socialSharing: SocialSharing,
     public toastController: ToastController,
     private heliosServersideService: HeliosServersideService
     ) {
@@ -182,8 +180,8 @@ export class DashboardPage implements OnInit {
         text: 'Delete',
         role: 'destructive',
         icon: 'trash',
-        handler: async () => {
-          const alert = await this.alertController.create({
+        handler: () => {
+          this.alertController.create({
             header: 'Are you sure?',
             message: `Delete Wallet <strong>${wallet.address}?</strong>`,
             buttons: [
@@ -199,22 +197,25 @@ export class DashboardPage implements OnInit {
                 }
               }
             ]
-          });
-          await alert.present();
+          }).then((val) => val.present());
         }
       }, {
-        text: 'Share',
+        text: 'Share Address',
         icon: 'share',
         handler: () => {
-          this.socialSharing.share(`Helios Wallet: ${wallet.address}`);
+          this.alertController.create({
+            header: 'Address Wallet',
+            message: `Address Wallet <strong>${wallet.address}</strong>`,
+            buttons: [{
+                text: 'Okay',
+              }
+            ]
+          }).then((val) => val.present());
         }
       }, {
         text: 'Cancel',
         icon: 'close',
-        role: 'cancel',
-        handler: () => {
-          console.log('Cancel clicked');
-        }
+        role: 'cancel'
       }]
     });
     await actionSheet.present();

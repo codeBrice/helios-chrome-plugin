@@ -140,6 +140,7 @@ ion-alert {
     }
     .alert-message {
         color : $white-color !important;
+        user-select: text;
     }
     .alert-button-inner {
         color: $yellow-color !important;

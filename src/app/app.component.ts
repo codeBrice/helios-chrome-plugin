@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
@@ -43,7 +42,6 @@ export class AppComponent {
 
   constructor(
     private platform: Platform,
-    private splashScreen: SplashScreen,
     private storage: Storage,
     private router: Router,
     private loadingController: LoadingController,
@@ -81,6 +79,5 @@ export class AppComponent {
       }
       await loading.dismiss();
     }
-    this.splashScreen.hide();
   }
 }

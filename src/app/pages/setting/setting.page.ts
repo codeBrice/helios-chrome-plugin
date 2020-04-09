@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { ContactsModalPage } from './contacts-modal/contacts-modal.page';
 import { SecurityModalPage } from './security-modal/security-modal.page';
-import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 @Component({
@@ -13,7 +12,6 @@ import { Router } from '@angular/router';
 export class SettingPage implements OnInit {
 
   constructor(private modalController: ModalController,
-              private socialSharing: SocialSharing,
               private storage: Storage,
               private router: Router,
               public alertController: AlertController) { }
@@ -36,7 +34,7 @@ export class SettingPage implements OnInit {
   }
 
   share() {
-    this.socialSharing.share('Helios Wallet Mobile: ', null, null, 'https://heliosprotocol.io/');
+    window.open('https://chrome.google.com/webstore/search/helios?hl=es', '_system');
   }
 
   help() {
