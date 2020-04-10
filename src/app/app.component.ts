@@ -75,7 +75,7 @@ export class AppComponent {
       if (val) {
         this.router.navigate(['/homewallet']);
       } else {
-        this.router.navigate(['/tutorial']);
+        this.router.navigate(['/homewallet']);
       }
       await loading.dismiss();
     }
