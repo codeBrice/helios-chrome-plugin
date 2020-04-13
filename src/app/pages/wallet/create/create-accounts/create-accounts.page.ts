@@ -22,19 +22,30 @@ export class CreateAccountsPage implements OnInit {
     private router: Router,
     private heliosService: HeliosServiceService,
     private toastController: ToastController,
-    private loadingController:LoadingController) { }
+    private loadingController: LoadingController) { }
 
   ngOnInit() {
-    //Falta agregar  que las contraseñas coincidan y chequear que el  metodo revise que el usuario no exista en base de datos
     this.createAccountForm = this.formBuilder.group({
       username: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(16)]),
       repeatPassword: new FormControl('', [Validators.required, Validators.minLength(16)])
-    }
+    },
+      { validator: this.matchingPasswords('password', 'repeatPassword') }
     );
   }
+  matchingPasswords(passwordKey: string, confirmPasswordKey: string) {
+    return (group: FormGroup): { [key: string]: any } => {
+      let password = group.controls[passwordKey];
+      let confirmPassword = group.controls[confirmPasswordKey];
 
+      if (password.value !== confirmPassword.value) {
+        return {
+          mismatchedPasswords: true
+        };
+      }
+    }
+  }
 
   async createNewAccount() {
     const loading = await this.loadingController.create({
@@ -49,14 +60,20 @@ export class CreateAccountsPage implements OnInit {
       const accountWallet = await this.heliosService.accountCreate(this.createAccountForm.value.password);
       const keystorage = accountWallet.encrypt;
       const result = await this.heliosServersideService.newUser(this.createAccountForm.value.username, this.createAccountForm.value.email, this.createAccountForm.value.password, keystorage)
-     if (result != null){
-      this.router.navigate(['/homewallet']);
-     }
-     
+      if (result != null) {
+        const toast = await this.toastController.create({
+          cssClass: 'text-green',
+          message:'Your account has been created successfully.',
+          duration: 2000
+        });
+        toast.present();
+        this.router.navigate(['/homewallet']);
+      }
+
     } catch (error) {
       const toast = await this.toastController.create({
         cssClass: 'text-red',
-        message:error.errorDescription || error.message,
+        message: error.errorDescription || error.message,
         duration: 2000
       });
       toast.present();
