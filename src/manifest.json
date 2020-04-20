@@ -7,9 +7,25 @@
         "storage",
         "activeTab",
         "webRequest",
-        "notifications"
+        "notifications",
+        "tabs"
     ],
-   
+    "content_scripts": [
+        {
+          "matches": [
+            "https://*/*",
+            "http://*/*"
+          ],
+          "js": ["./content.js"]
+        }
+      ],
+    "background" : {
+        "scripts" : ["./background.js"],
+        "persistent": false
+    },
+    "web_accessible_resources": [
+      "index.html"
+    ],
     "icons": {
         "64": "assets/icons/heliosLogo64.png"
     },
