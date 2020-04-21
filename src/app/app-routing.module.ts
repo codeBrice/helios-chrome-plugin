@@ -39,10 +39,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/wallet/create/generate/generate.module').then(m => m.GeneratePageModule)
   },
   {
-    path: 'tutorial',
-    loadChildren: () => import('./pages/tutorial/tutorial.module').then(m => m.TutorialPageModule)
-  },
-  {
     path: 'add',
     loadChildren: () => import('./pages/wallet/add/add.module').then(m => m.AddPageModule)
   },
@@ -53,7 +49,11 @@ const routes: Routes = [
   {
     path: 'chart',
     loadChildren: () => import('./pages/chart/chart.module').then( m => m.ChartPageModule)
-  },
+  },  {
+    path: 'confirm-access',
+    loadChildren: () => import('./pages/external/confirm-access/confirm-access.module').then( m => m.ConfirmAccessPageModule)
+  }
+
 
 ];
 @NgModule({

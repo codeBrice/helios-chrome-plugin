@@ -75,26 +75,28 @@ export class ImportPage implements OnInit {
           this.storage.set( 'userInfoLocal', { sessionHash: hash } );
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
+            const md5ToAvatar = cryptoJs.MD5(privateKey.address).toString();
             if ( wallets === null) {
               const walletArray = [new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
-                this.importWallet.value.name)];
+                this.importWallet.value.name, md5ToAvatar)];
               this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, privateKey.address);
               wallets.push(new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
-               this.importWallet.value.name));
+               this.importWallet.value.name, md5ToAvatar));
               this.storage.set( 'wallet', wallets );
             }
           } else {
             const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
+            const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
             if ( wallets === null) {
             const walletArray = [new Wallet(keystore.address,
-              cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString() , this.importWallet.value.name)];
+              cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString() , this.importWallet.value.name, md5ToAvatar)];
             this.storage.set( 'wallet', walletArray );
             } else {
               this.notRepeat(wallets, keystore.address);
               wallets.push(new Wallet(keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString(),
-               this.importWallet.value.name));
+               this.importWallet.value.name, md5ToAvatar));
               this.storage.set( 'wallet', wallets );
             }
           }

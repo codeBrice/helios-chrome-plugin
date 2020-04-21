@@ -21,7 +21,7 @@
       ],
     "background" : {
         "scripts" : ["./background.js"],
-        "persistent": false
+        "persistent": true
     },
     "web_accessible_resources": [
       "index.html"
