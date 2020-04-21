@@ -83,13 +83,11 @@ async getOnlineWallets(username, sessionHash) {
  * @param name string
  * @returns  Object
  */
-async addOnlineWallet(keystore, name) {
-    console.log('Adding online wallet');
-    const session = this.loadSession();
-    if (!(session.sessionHash === undefined)) {
+async addOnlineWallet(keystore, name,storageUser) {
+    if (!(storageUser.sessionHash === undefined)) {
       const query = {action: 'add_keystore',
-            username: session.username,
-            sessionHash: session.sessionHash,
+            username:  storageUser.userName,
+            session_hash: storageUser.sessionHash,
             keystore: JSON.stringify(keystore),
             wallet_name: name};
       return await this.queryServer(query);

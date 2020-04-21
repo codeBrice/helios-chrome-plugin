@@ -7,6 +7,8 @@ import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
 import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
+import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
+
 
 @Component({
   selector: 'app-generate',
@@ -24,7 +26,8 @@ export class GeneratePage implements OnInit {
    private router: Router,
    private storage: Storage,
    private loadingController: LoadingController,
-   public toastController: ToastController
+   public toastController: ToastController,
+   private heliosServersideService: HeliosServersideService
   ) {
     this.saltRounds = 11;
   }
@@ -43,15 +46,20 @@ export class GeneratePage implements OnInit {
         cssClass: 'custom-class custom-loading'
       });
       await loading.present();
-
+    
       const accountWallet =  await this.heliosService.accountCreate( this.createWallet.value.password );
+      const keystorage = accountWallet.encrypt;
+      const storageUser = await this.storage.get('userInfo');
+      if(storageUser){
+      await this.heliosServersideService.addOnlineWallet(keystorage, this.createWallet.value.name, storageUser);}
       sessionStorage.setItem( 'wallet', accountWallet.account.address );
       sessionStorage.setItem( 'privateKey', accountWallet.account.privateKey );
       sessionStorage.setItem( 'keystore', JSON.stringify(accountWallet.encrypt) );
       // data storage for mobile
       this.storage.get( 'wallet').then(async (wallets) => {
         try {
-          const hash = this.generateHash( this.createWallet.value.password );
+         // const hash = this.generateHash( this.createWallet.value.password );
+         const hash = storageUser.sessionHash;
           this.storage.set( 'userInfoLocal', { sessionHash: hash } );
           if ( wallets === null) {
             const walletArray = [new Wallet(accountWallet.account.address,
