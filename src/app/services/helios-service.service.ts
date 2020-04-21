@@ -408,4 +408,13 @@ export class HeliosServiceService {
       throw new Error('Failed toWei');
     }
   }
+
+  async defaultWallet ( address: string ){
+    try {
+      return this.web3.hls.defaultAccount = address ;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed set default wallet');
+    }
+  } 
 }

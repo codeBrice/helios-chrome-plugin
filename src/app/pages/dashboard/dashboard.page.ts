@@ -125,7 +125,8 @@ export class DashboardPage implements OnInit {
                 address: wallet.address ,
                 balance,
                 usd,
-                name: wallet.name
+                name: wallet.name,
+                avatar: wallet.avatar
               });
               this.balance += usd;
               resolve();
@@ -178,7 +179,44 @@ export class DashboardPage implements OnInit {
     console.log('presentActionSheet', index , wallet);
     const actionSheet = await this.actionSheetController.create({
       header: 'Account Options',
-      buttons: [{
+      buttons: [
+        {
+          text: 'Select account as default',
+          icon: 'checkmark-circle-outline',
+          handler: () => {
+            this.alertController.create({
+              header: 'Are you sure?',
+              message: `The address <strong>${wallet.address} to default ?</strong>`,
+              buttons: [
+                {
+                  text: 'Cancel',
+                  role: 'cancel',
+                  cssClass: 'secondary',
+                }, {
+                  text: 'Okay',
+                  handler: () => {
+                    this.heliosService.defaultWallet( wallet.address );
+                  }
+                }
+              ]
+            }).then((val) => val.present());
+          }
+        },
+        {
+        text: 'Share Address',
+        icon: 'share',
+        handler: () => {
+          this.alertController.create({
+            header: 'Address Wallet',
+            message: `Address Wallet <strong>${wallet.address}</strong>`,
+            buttons: [{
+                text: 'Okay',
+              }
+            ]
+          }).then((val) => val.present());
+        }
+      },
+      {
         text: 'Delete',
         role: 'destructive',
         icon: 'trash',
@@ -201,20 +239,8 @@ export class DashboardPage implements OnInit {
             ]
           }).then((val) => val.present());
         }
-      }, {
-        text: 'Share Address',
-        icon: 'share',
-        handler: () => {
-          this.alertController.create({
-            header: 'Address Wallet',
-            message: `Address Wallet <strong>${wallet.address}</strong>`,
-            buttons: [{
-                text: 'Okay',
-              }
-            ]
-          }).then((val) => val.present());
-        }
-      }, {
+      }, 
+      {
         text: 'Cancel',
         icon: 'close',
         role: 'cancel'
@@ -237,7 +263,7 @@ export class DashboardPage implements OnInit {
 
   async presentModalReceive() {
     const modal = await this.modalController.create({
-      component: ReceiveModalPage,
+      component: ReceiveModalPage
     });
     return await modal.present();
   }
@@ -258,4 +284,5 @@ export class DashboardPage implements OnInit {
     }
     return true;
   }
+
 }

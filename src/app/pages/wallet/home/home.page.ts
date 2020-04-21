@@ -49,8 +49,9 @@ export class HomePage implements OnInit {
 
       for (const keystoreInfo of userInfo.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
+        const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
         this.wallets.push(new Wallet(
-          keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name)
+          keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name, md5ToAvatar)
           );
       }
 

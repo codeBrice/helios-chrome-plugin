@@ -10,6 +10,8 @@ import { SendModalPage } from './send-modal/send-modal.page';
 import { NgxQRCodeModule } from 'ngx-qrcode2';
 import { ReceiveModalPage } from './receive-modal/receive-modal.page';
 import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatPipe.module';
+import { AvatarPipeModule } from '../../pipes/AvatarPipe/AvatarPipe.module';
+
 const routes: Routes = [
   {
     path: '',
@@ -25,7 +27,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     ReactiveFormsModule,
     NgxQRCodeModule,
-    WalletFormatPipeModule
+    WalletFormatPipeModule,
+    AvatarPipeModule
   ],
   declarations: [DashboardPage , SendModalPage, ReceiveModalPage],
   entryComponents: [SendModalPage, ReceiveModalPage]

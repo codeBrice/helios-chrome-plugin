@@ -54,12 +54,14 @@ export class GeneratePage implements OnInit {
           const hash = this.generateHash( this.createWallet.value.password );
           this.storage.set( 'userInfoLocal', { sessionHash: hash } );
           if ( wallets === null) {
+            const md5ToAvatar = cryptoJs.MD5(accountWallet.account.address).toString();
             const walletArray = [new Wallet(accountWallet.account.address,
-              cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name)];
+              cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name, md5ToAvatar)];
             this.storage.set( 'wallet', walletArray );
           } else {
+            const md5ToAvatar = cryptoJs.MD5(accountWallet.account.address).toString();
             wallets.push(new Wallet(accountWallet.account.address,
-               cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name));
+               cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name, md5ToAvatar));
             this.storage.set( 'wallet', wallets );
           }
           this.router.navigate(['/detailwallet']);

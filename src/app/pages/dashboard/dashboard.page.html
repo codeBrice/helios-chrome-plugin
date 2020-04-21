@@ -1,11 +1,14 @@
 <ion-header>
     <ion-toolbar color=dark>
-        <ion-buttons slot="start">
-            <ion-menu-button></ion-menu-button>
-        </ion-buttons>
-        <ion-title>
-            Dashboard
-        </ion-title>
+        <ion-item color=dark>
+            <ion-buttons slot="start">
+                <ion-menu-button></ion-menu-button>
+            </ion-buttons>
+            <ion-title>
+                Dashboard
+            </ion-title>
+            <ion-icon color="helios" name="keypad" slot="end"></ion-icon>
+        </ion-item>
     </ion-toolbar>
 </ion-header>
 <ion-content color=dark>
@@ -54,7 +57,7 @@
                     <ion-card class="black full-width" (click)="presentActionSheet(i, wallet);">
                         <ion-card-content class="pointer">
                             <ion-fab-button size="small" color="dark" class="fab">
-                                <ion-icon src="/assets/images/heliosSvg.svg"></ion-icon>
+                                <img [src]="wallet.avatar | avatarformat">
                             </ion-fab-button>
                             <br>
                             <div class='wallet-name'>{{wallet.name}}</div>
