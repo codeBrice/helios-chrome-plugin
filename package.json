@@ -11,7 +11,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build:script": "webpack --config webpack.dev.js"
+    "build:script": "webpack --config webpack.dev.js",
+    "chrome": "ionic build && webpack --config webpack.dev.js"
   },
   "private": true,
   "dependencies": {

@@ -71,6 +71,10 @@ export class HeliosServiceService {
   constructor() {
   }
 
+  availableNodesExport() {
+    return this.availableNodes;
+  }
+
   /**
    * Connects to first available node.
    * @returns  true : Successfully connected  or Error Failed to connect.
