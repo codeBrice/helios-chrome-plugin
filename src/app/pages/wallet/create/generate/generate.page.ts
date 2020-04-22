@@ -7,6 +7,8 @@ import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
 import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
+import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
+
 
 @Component({
   selector: 'app-generate',
@@ -17,6 +19,7 @@ export class GeneratePage implements OnInit {
 
   public createWallet: FormGroup;
   saltRounds: number;
+  hash: string;
 
   constructor(
    private formBuilder: FormBuilder,
@@ -24,7 +27,8 @@ export class GeneratePage implements OnInit {
    private router: Router,
    private storage: Storage,
    private loadingController: LoadingController,
-   public toastController: ToastController
+   public toastController: ToastController,
+   private heliosServersideService: HeliosServersideService
   ) {
     this.saltRounds = 11;
   }
@@ -44,37 +48,59 @@ export class GeneratePage implements OnInit {
       });
       await loading.present();
 
-      const accountWallet =  await this.heliosService.accountCreate( this.createWallet.value.password );
-      sessionStorage.setItem( 'wallet', accountWallet.account.address );
-      sessionStorage.setItem( 'privateKey', accountWallet.account.privateKey );
-      sessionStorage.setItem( 'keystore', JSON.stringify(accountWallet.encrypt) );
-      // data storage for mobile
-      this.storage.get( 'wallet').then(async (wallets) => {
-        try {
-          const hash = this.generateHash( this.createWallet.value.password );
-          this.storage.set( 'userInfoLocal', { sessionHash: hash } );
-          if ( wallets === null) {
-            const md5ToAvatar = cryptoJs.MD5(accountWallet.account.address).toString();
-            const walletArray = [new Wallet(accountWallet.account.address,
-              cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name, md5ToAvatar)];
-            this.storage.set( 'wallet', walletArray );
-          } else {
-            const md5ToAvatar = cryptoJs.MD5(accountWallet.account.address).toString();
-            wallets.push(new Wallet(accountWallet.account.address,
-               cryptoJs.AES.encrypt( accountWallet.account.privateKey, hash ).toString(), this.createWallet.value.name, md5ToAvatar));
-            this.storage.set( 'wallet', wallets );
-          }
-          this.router.navigate(['/detailwallet']);
-        } catch (error) {
-            const toast = await this.toastController.create({
-              cssClass: 'text-red',
-              message: error.message,
-              duration: 2000
-            });
-            toast.present();
+      try {
+
+        const accountWallet =  await this.heliosService.accountCreate( this.createWallet.value.password );
+        const keystorage = accountWallet.encrypt;
+        const storageUser = await this.storage.get('userInfo');
+
+        if (storageUser) {
+          await this.heliosServersideService.addOnlineWallet(keystorage, this.createWallet.value.name, storageUser);
+          this.hash = storageUser.sessionHash;
+        } else {
+          this.hash = this.generateHash( this.createWallet.value.password );
+          this.storage.set( 'userInfoLocal', { sessionHash: this.hash } );
         }
-        await loading.dismiss();
-      });
+
+        sessionStorage.setItem( 'wallet', accountWallet.account.address );
+        sessionStorage.setItem( 'privateKey', accountWallet.account.privateKey );
+        sessionStorage.setItem( 'keystore', JSON.stringify(accountWallet.encrypt) );
+        // data storage for mobile
+        this.storage.get( 'wallet').then(async (wallets) => {
+          try {
+            const md5ToAvatar = cryptoJs.MD5(accountWallet.account.address).toString();
+            if ( wallets === null) {
+              const walletArray = [new Wallet(accountWallet.account.address,
+                cryptoJs.AES.encrypt( accountWallet.account.privateKey, this.hash ).toString(), 
+                this.createWallet.value.name,
+                md5ToAvatar)];
+              this.storage.set( 'wallet', walletArray );
+            } else {
+              wallets.push(new Wallet(accountWallet.account.address,
+                 cryptoJs.AES.encrypt( accountWallet.account.privateKey, this.hash ).toString(), 
+                 this.createWallet.value.name,
+                 md5ToAvatar));
+              this.storage.set( 'wallet', wallets );
+            }
+            this.router.navigate(['/detailwallet']);
+          } catch (error) {
+              const toast = await this.toastController.create({
+                cssClass: 'text-red',
+                message: error.message,
+                duration: 2000
+              });
+              toast.present();
+          }
+          await loading.dismiss();
+        });
+      } catch (error) {
+        const toast = await this.toastController.create({
+          cssClass: 'text-red',
+          message: error.errorDescription || error.message,
+          duration: 2000
+        });
+        toast.present();
+      }
   }
 
   generateHash( password: any ) {
