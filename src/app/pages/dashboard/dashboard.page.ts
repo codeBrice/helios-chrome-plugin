@@ -11,6 +11,9 @@ import { UserInfo } from 'src/app/entities/userInfo';
 import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
 import { ErrorServer } from 'src/app/entities/errorServer';
 import cryptoJs from 'crypto-js';
+import { SecureStorage } from '../../utils/secure-storage';
+import { Wallet } from '../../entities/wallet';
+
 @Component({
   selector: 'app-home',
   templateUrl: './dashboard.page.html',
@@ -29,7 +32,8 @@ export class DashboardPage implements OnInit {
     public alertController: AlertController,
     private modalController: ModalController,
     public toastController: ToastController,
-    private heliosServersideService: HeliosServersideService
+    private heliosServersideService: HeliosServersideService,
+    private secureStorage: SecureStorage
     ) {
       route.params.subscribe(val => {
         this.inicialize();
@@ -43,7 +47,7 @@ export class DashboardPage implements OnInit {
   helios: any;
   up: boolean;
   slideOpts: any;
-
+  secret: string;
   private readonly HELIOS_ID = 'helios-protocol';
 
   ngOnInit() {
@@ -52,11 +56,16 @@ export class DashboardPage implements OnInit {
 
   async inicialize() {
     this.today = moment();
-    const userInfo = await this.storage.get('userInfo');
+    const displayInfo = await this.secureStorage.getDisplayInfo();
+    this.secret = cryptoJs.SHA256(JSON.stringify(displayInfo)).toString();
+    const userInfo = await this.secureStorage.getStorage(UserInfo.toString(), this.secret);
+    console.log( userInfo );
     if (userInfo) {
       try {
         const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
-        const walletStorage = await this.storage.get('wallet');
+        //const walletStorage = await this.storage.get('wallet');
+        const walletStorage = await this.secureStorage.getStorage( Wallet.toString(), this.secret );
+        
         this.notRepeat(walletsServer.keystores, walletStorage);
       } catch (error) {
         if (error.error === 2020) {
@@ -64,6 +73,7 @@ export class DashboardPage implements OnInit {
           this.storage.set( 'tutorial', true );
           this.router.navigate(['/homewallet']);
         }
+        console.log( error );
         const toast = await this.toastController.create({
           cssClass: 'text-red',
           message: error.errorDescription || error.message,
@@ -73,7 +83,8 @@ export class DashboardPage implements OnInit {
       }
     }
 
-    const wallets = await this.storage.get('wallet');
+    //const wallets = await this.storage.get('wallet');
+    const wallets = await this.secureStorage.getStorage( Wallet.toString(), this.secret );
     const loading = await this.loadingController.create({
           message: 'Please wait...',
           translucent: true,
@@ -233,7 +244,8 @@ export class DashboardPage implements OnInit {
                 text: 'Okay',
                 handler: () => {
                   this.wallets.splice(index, 1);
-                  this.storage.set( 'wallet', this.wallets );
+                  //this.storage.set( 'wallet', this.wallets );
+                  this.secureStorage.setStorage(Wallet.toString(), this.wallets, this.secret);
                 }
               }
             ]

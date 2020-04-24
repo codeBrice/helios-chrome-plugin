@@ -6,6 +6,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { GeneratePage } from './generate.page';
+import { SecureStorage } from '../../../../utils/secure-storage';
 
 const routes: Routes = [
   {
@@ -21,6 +22,9 @@ const routes: Routes = [
     ReactiveFormsModule,
     IonicModule,
     RouterModule.forChild(routes)
+  ],
+  providers: [
+    SecureStorage
   ],
   declarations: [GeneratePage]
 })

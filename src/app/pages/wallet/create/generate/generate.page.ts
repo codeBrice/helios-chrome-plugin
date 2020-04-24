@@ -8,7 +8,7 @@ import { Wallet } from 'src/app/entities/wallet';
 import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
 import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
-
+import { SecureStorage } from '../../../../utils/secure-storage';
 
 @Component({
   selector: 'app-generate',
@@ -18,7 +18,6 @@ import { HeliosServersideService } from 'src/app/services/helios-serverside.serv
 export class GeneratePage implements OnInit {
 
   public createWallet: FormGroup;
-  saltRounds: number;
   hash: string;
 
   constructor(
@@ -28,10 +27,9 @@ export class GeneratePage implements OnInit {
    private storage: Storage,
    private loadingController: LoadingController,
    public toastController: ToastController,
-   private heliosServersideService: HeliosServersideService
-  ) {
-    this.saltRounds = 11;
-  }
+   private heliosServersideService: HeliosServersideService,
+   private secureStorage: SecureStorage
+  ) {}
 
   ngOnInit() {
     this.createWallet = this.formBuilder.group({
@@ -58,7 +56,7 @@ export class GeneratePage implements OnInit {
           await this.heliosServersideService.addOnlineWallet(keystorage, this.createWallet.value.name, storageUser);
           this.hash = storageUser.sessionHash;
         } else {
-          this.hash = this.generateHash( this.createWallet.value.password );
+          this.hash = this.secureStorage.generateHash( this.createWallet.value.password );
           this.storage.set( 'userInfoLocal', { sessionHash: this.hash } );
         }
 
@@ -101,11 +99,5 @@ export class GeneratePage implements OnInit {
         });
         toast.present();
       }
-  }
-
-  generateHash( password: any ) {
-    const newSalt = bcrypt.genSaltSync(this.saltRounds);
-    const newPasswordHash = bcrypt.hashSync(password, newSalt);
-    return newPasswordHash;
   }
 }

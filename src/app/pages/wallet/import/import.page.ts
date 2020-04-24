@@ -7,6 +7,7 @@ import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
 import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
+import { SecureStorage } from '../../../utils/secure-storage';
 
 @Component({
   selector: 'app-import',
@@ -21,7 +22,6 @@ export class ImportPage implements OnInit {
   add: boolean;
   isCorrect = false;
   enableTouchIdFaceId = false;
-  saltRounds: number;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -30,10 +30,9 @@ export class ImportPage implements OnInit {
     private router: Router,
     private storage: Storage,
     private loadingController: LoadingController,
-    public toastController: ToastController
-  ) { 
-    this.saltRounds = 11;
-   }
+    public toastController: ToastController,
+    private secureStorage: SecureStorage
+  ) {}
 
   ngOnInit() {
     this.importWallet = this.formBuilder.group({
@@ -71,7 +70,7 @@ export class ImportPage implements OnInit {
     await loading.present();
     this.storage.get( 'wallet').then(async (wallets) => {
         try {
-          const hash = this.generateHash( this.importWallet.value.password );
+          const hash = this.secureStorage.generateHash( this.importWallet.value.password );
           this.storage.set( 'userInfoLocal', { sessionHash: hash } );
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
@@ -139,11 +138,5 @@ export class ImportPage implements OnInit {
       }
     }
     return true;
-  }
-
-  generateHash( password: any ) {
-    const newSalt = bcrypt.genSaltSync(this.saltRounds);
-    const newPasswordHash = bcrypt.hashSync(password, newSalt);
-    return newPasswordHash;
   }
 }

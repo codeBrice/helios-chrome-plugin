@@ -11,6 +11,7 @@ import { NgxQRCodeModule } from 'ngx-qrcode2';
 import { ReceiveModalPage } from './receive-modal/receive-modal.page';
 import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatPipe.module';
 import { AvatarPipeModule } from '../../pipes/AvatarPipe/AvatarPipe.module';
+import { SecureStorage } from '../../utils/secure-storage';
 
 const routes: Routes = [
   {
@@ -29,6 +30,9 @@ const routes: Routes = [
     NgxQRCodeModule,
     WalletFormatPipeModule,
     AvatarPipeModule
+  ],
+  providers: [
+    SecureStorage
   ],
   declarations: [DashboardPage , SendModalPage, ReceiveModalPage],
   entryComponents: [SendModalPage, ReceiveModalPage]
