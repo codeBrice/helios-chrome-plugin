@@ -58,6 +58,12 @@ export class DashboardPage implements OnInit {
         const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
         const walletStorage = await this.storage.get('wallet');
         this.notRepeat(walletsServer.keystores, walletStorage);
+
+        const result = await this.heliosServersideService.getContacts(
+          userInfo.userName,
+          userInfo.sessionHash
+        );
+        this.storage.set( 'contacts', result.contacts );
       } catch (error) {
         if (error.error === 2020) {
           this.storage.clear();
