@@ -56,21 +56,23 @@ export class DashboardPage implements OnInit {
 
   async inicialize() {
     this.today = moment();
-    const displayInfo = await this.secureStorage.getDisplayInfo();
-    this.secret = cryptoJs.SHA256(JSON.stringify(displayInfo)).toString();
-    const userInfo = await this.secureStorage.getStorage(UserInfo.toString(), this.secret);
-    console.log( userInfo );
+    const loading = await this.loadingController.create({
+      message: 'Please wait...',
+      translucent: true,
+      cssClass: 'custom-class custom-loading'
+    });
+    await loading.present();
+    this.secret = await this.secureStorage.getSecret();
+    const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
     if (userInfo) {
       try {
         const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
-        //const walletStorage = await this.storage.get('wallet');
-        const walletStorage = await this.secureStorage.getStorage( Wallet.toString(), this.secret );
+        const walletStorage = await this.secureStorage.getStorage( 'wallet', this.secret );
         
         this.notRepeat(walletsServer.keystores, walletStorage);
       } catch (error) {
         if (error.error === 2020) {
-          this.storage.clear();
-          this.storage.set( 'tutorial', true );
+          this.secureStorage.clearStorage();
           this.router.navigate(['/homewallet']);
         }
         console.log( error );
@@ -82,16 +84,7 @@ export class DashboardPage implements OnInit {
         toast.present();
       }
     }
-
-    //const wallets = await this.storage.get('wallet');
-    const wallets = await this.secureStorage.getStorage( Wallet.toString(), this.secret );
-    const loading = await this.loadingController.create({
-          message: 'Please wait...',
-          translucent: true,
-          cssClass: 'custom-class custom-loading'
-        });
-    await loading.present();
-
+    const wallets = await this.secureStorage.getStorage( 'wallet', this.secret );
     if (wallets != null) {
       this.slideOpts = {
         slidesPerView: wallets.length > 1 ? 2 : 1,
@@ -115,7 +108,7 @@ export class DashboardPage implements OnInit {
                   const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfo.sessionHash);
                   data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 } else {
-                  const userInfoLocal = await this.storage.get('userInfoLocal');
+                  const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', this.secret);
                   const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfoLocal.sessionHash);
                   data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 }
@@ -244,8 +237,7 @@ export class DashboardPage implements OnInit {
                 text: 'Okay',
                 handler: () => {
                   this.wallets.splice(index, 1);
-                  //this.storage.set( 'wallet', this.wallets );
-                  this.secureStorage.setStorage(Wallet.toString(), this.wallets, this.secret);
+                  this.secureStorage.setStorage('wallet', this.wallets, this.secret);
                 }
               }
             ]

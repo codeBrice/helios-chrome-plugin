@@ -9,6 +9,7 @@ import { SettingPage } from './setting.page';
 import { SecurityModalPage } from './security-modal/security-modal.page';
 import { ContactsModalPage } from './contacts-modal/contacts-modal.page';
 import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatPipe.module';
+import { SecureStorage } from '../../utils/secure-storage';
 
 const routes: Routes = [
   {
@@ -25,6 +26,9 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     ReactiveFormsModule,
     WalletFormatPipeModule
+  ],
+  providers: [
+    SecureStorage
   ],
   declarations: [SettingPage, SecurityModalPage, ContactsModalPage],
   entryComponents: [SecurityModalPage, ContactsModalPage]

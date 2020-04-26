@@ -5,6 +5,7 @@ import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { HeliosServiceService } from './services/helios-service.service';
+import { SecureStorage } from './utils/secure-storage';
 
 @Component({
   selector: 'app-root',
@@ -45,6 +46,7 @@ export class AppComponent {
     private storage: Storage,
     private router: Router,
     private loadingController: LoadingController,
+    private secureStorage: SecureStorage
   ) {
     this.initializeApp();
   }
@@ -65,18 +67,14 @@ export class AppComponent {
     // this.statusBar.styleDefault();
     // find wallet in device storage
     console.log('app component');
-    const wallet = await this.storage.get('wallet');
+    const secret = await this.secureStorage.getSecret();
+    const wallet = await this.secureStorage.getStorage( 'wallet', secret );
     if (wallet != null) {
         this.router.navigate(['/dashboard']);
         await loading.dismiss();
     } else {
-      const val = await this.storage.get('tutorial');
       this.isCorrect = true;
-      if (val) {
-        this.router.navigate(['/homewallet']);
-      } else {
-        this.router.navigate(['/homewallet']);
-      }
+      this.router.navigate(['/homewallet']);
       await loading.dismiss();
     }
   }

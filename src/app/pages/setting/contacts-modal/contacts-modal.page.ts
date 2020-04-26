@@ -4,6 +4,7 @@ import { Storage } from '@ionic/storage';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
 import { Contact } from 'src/app/entities/contact';
+import { SecureStorage } from '../../../utils/secure-storage';
 
 @Component({
   selector: 'app-contacts',
@@ -17,11 +18,13 @@ export class ContactsModalPage implements OnInit {
   contactsList: Contact[] = [];
   edit = false;
   index: number;
+  secret: string;
 
   constructor(private modalController: ModalController, private storage: Storage, public actionSheetController: ActionSheetController,
-              private formBuilder: FormBuilder, private heliosService: HeliosServiceService, public alertController: AlertController) { }
+              private formBuilder: FormBuilder, private heliosService: HeliosServiceService, public alertController: AlertController,
+              private secureStorage: SecureStorage) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.contactForm = this.formBuilder.group({
       name: new FormControl('', [Validators.required]),
       lastName: new FormControl('', [Validators.required]),
@@ -29,10 +32,13 @@ export class ContactsModalPage implements OnInit {
     }, {
       validator: [this.isAddress('address')]
     });
-
-    this.storage.get( 'contacts').then(contacts => {
-     this.contactsList = contacts || [];
-    });
+    this.secret = await this.secureStorage.getSecret();
+    const contacts = await this.secureStorage.getStorage('contacts', this.secret);
+    if ( contacts == null){
+      this.contactsList = [];
+    } else {
+      this.contactsList = contacts;
+    }
   }
 
   dismiss() {
@@ -46,7 +52,7 @@ export class ContactsModalPage implements OnInit {
     const lastName = this.contactForm.value.lastName;
     const address = this.contactForm.value.address;
     this.contactsList.push({name, lastName, address});
-    this.storage.set( 'contacts', this.contactsList );
+    this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
     this.add = false;
   }
 
@@ -56,7 +62,7 @@ export class ContactsModalPage implements OnInit {
       const lastName = this.contactForm.value.lastName;
       const address = this.contactForm.value.address;
       this.contactsList.push({name, lastName, address});
-      this.storage.set( 'contacts', this.contactsList );
+      this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
       this.edit = false;
   }
 
@@ -90,7 +96,7 @@ export class ContactsModalPage implements OnInit {
                 text: 'Okay',
                 handler: () => {
                   this.contactsList.splice(index, 1);
-                  this.storage.set( 'contacts', this.contactsList );
+                  this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
                 }
               }
             ]

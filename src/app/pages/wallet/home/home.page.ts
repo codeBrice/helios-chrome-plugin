@@ -46,13 +46,9 @@ export class HomePage implements OnInit {
     });
     await loading.present();
     try {
-      const displayInfo = await this.secureStorage.getDisplayInfo();
-      const secret = cryptoJs.SHA256(JSON.stringify(displayInfo)).toString();
-      console.log( 'Objetos display del home page', JSON.stringify(displayInfo));
-      console.log( ' secret del home page', secret )
+      const secret = await this.secureStorage.getSecret();
       const result = await this.heliosServersideService.signIn(this.loginForm.value.username, this.loginForm.value.password, null);
       const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.loginForm.value.username);
-      //this.storage.set( 'userInfo', userInfo );
 
       for (const keystoreInfo of result.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
@@ -61,9 +57,8 @@ export class HomePage implements OnInit {
           keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name, md5ToAvatar)
           );
       }
-      this.secureStorage.setStorage(UserInfo.toString(), userInfo, secret);
-      this.secureStorage.setStorage(Wallet.toString(), this.wallets, secret);
-      //this.storage.set( 'wallet', this.wallets );
+      this.secureStorage.setStorage('userInfo', userInfo, secret);
+      this.secureStorage.setStorage('wallet', this.wallets, secret);
       this.router.navigate(['/dashboard']);
     } catch (error) {
       const toast = await this.toastController.create({

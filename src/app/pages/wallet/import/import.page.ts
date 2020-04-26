@@ -68,22 +68,23 @@ export class ImportPage implements OnInit {
       cssClass: 'custom-class custom-loading'
     });
     await loading.present();
-    this.storage.get( 'wallet').then(async (wallets) => {
-        try {
+    try {
+          const secret = await this.secureStorage.getSecret();
+          const wallets = await this.secureStorage.getStorage('wallet', secret);
           const hash = this.secureStorage.generateHash( this.importWallet.value.password );
-          this.storage.set( 'userInfoLocal', { sessionHash: hash } );
+          this.secureStorage.setStorage('userInfoLocal', { sessionHash: hash }, secret);
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
             const md5ToAvatar = cryptoJs.MD5(privateKey.address).toString();
             if ( wallets === null) {
               const walletArray = [new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
                 this.importWallet.value.name, md5ToAvatar)];
-              this.storage.set( 'wallet', walletArray );
+              this.secureStorage.setStorage('wallet', walletArray, secret);
             } else {
               this.notRepeat(wallets, privateKey.address);
               wallets.push(new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
                this.importWallet.value.name, md5ToAvatar));
-              this.storage.set( 'wallet', wallets );
+              this.secureStorage.setStorage('wallet', wallets, secret);
             }
           } else {
             const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
@@ -91,12 +92,12 @@ export class ImportPage implements OnInit {
             if ( wallets === null) {
             const walletArray = [new Wallet(keystore.address,
               cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString() , this.importWallet.value.name, md5ToAvatar)];
-            this.storage.set( 'wallet', walletArray );
+            this.secureStorage.setStorage('wallet', walletArray, secret);
             } else {
               this.notRepeat(wallets, keystore.address);
               wallets.push(new Wallet(keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString(),
                this.importWallet.value.name, md5ToAvatar));
-              this.storage.set( 'wallet', wallets );
+              this.secureStorage.setStorage('wallet', wallets, secret);
             }
           }
           await loading.dismiss();
@@ -122,7 +123,6 @@ export class ImportPage implements OnInit {
           });
           toast.present();
         }
-      });
   }
 
   /**
