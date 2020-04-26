@@ -51,10 +51,10 @@ export class HomePage implements OnInit {
       console.log( 'Objetos display del home page', JSON.stringify(displayInfo));
       console.log( ' secret del home page', secret )
       const result = await this.heliosServersideService.signIn(this.loginForm.value.username, this.loginForm.value.password, null);
-      const userInfo = new UserInfo(result.keystores, result.session_hash, result['2fa_enabled'], this.loginForm.value.username);
+      const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.loginForm.value.username);
       //this.storage.set( 'userInfo', userInfo );
 
-      for (const keystoreInfo of userInfo.keystores) {
+      for (const keystoreInfo of result.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
         const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
         this.wallets.push(new Wallet(
