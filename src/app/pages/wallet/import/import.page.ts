@@ -98,7 +98,6 @@ export class ImportPage implements OnInit {
               this.storage.set( 'wallet', wallets );
             }
           }
-          await loading.dismiss();
           const alert = await this.alertController.create({
             header: 'Success!',
             message: '<strong>Successfully imported wallet</strong>',
@@ -122,6 +121,8 @@ export class ImportPage implements OnInit {
           toast.present();
         }
       });
+      await loading.dismiss();
+
   }
 
   /**
