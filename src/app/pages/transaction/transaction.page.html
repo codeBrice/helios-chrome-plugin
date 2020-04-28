@@ -9,7 +9,6 @@
     </ion-item>
   </ion-toolbar>
 </ion-header>
-
 <ion-content color="dark">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="arrow-dropdown"
@@ -21,7 +20,12 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-card class="black" *ngFor ="let transaction of transactions" (click)="presentModal( transaction )">
+        <ion-card class="black" *ngIf="transactions.length == 0">
+          <ion-card-content class="ion-text-center">
+            <ion-text class="text-white">You have no transactions in your wallets.</ion-text>
+          </ion-card-content>
+        </ion-card>
+        <ion-card class="black" *ngFor ="let transaction of transactions" (click)="presentModal( transaction )" style="cursor: pointer;">
           <ion-card-content class="ion-no-padding">
             <ion-grid>
               <ion-row >

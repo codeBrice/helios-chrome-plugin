@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
 import { Wallet } from 'src/app/entities/wallet';
 import cryptoJs from 'crypto-js';
+import { SecureStorage } from '../../../utils/secure-storage';
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -26,7 +28,8 @@ export class HomePage implements OnInit {
               public toastController: ToastController,
               private storage: Storage,
               private router: Router,
-              private heliosService: HeliosServiceService) { }
+              private heliosService: HeliosServiceService,
+              private secureStorage: SecureStorage) { }
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -43,19 +46,19 @@ export class HomePage implements OnInit {
     });
     await loading.present();
     try {
+      const secret = await this.secureStorage.getSecret();
       const result = await this.heliosServersideService.signIn(this.loginForm.value.username, this.loginForm.value.password, null);
-      const userInfo = new UserInfo(result.keystores, result.session_hash, result['2fa_enabled'], this.loginForm.value.username);
-      this.storage.set( 'userInfo', userInfo );
+      const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.loginForm.value.username);
 
-      for (const keystoreInfo of userInfo.keystores) {
+      for (const keystoreInfo of result.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
         const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
         this.wallets.push(new Wallet(
           keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name, md5ToAvatar)
           );
       }
-
-      this.storage.set( 'wallet', this.wallets );
+      this.secureStorage.setStorage('userInfo', userInfo, secret);
+      this.secureStorage.setStorage('wallet', this.wallets, secret);
       this.router.navigate(['/dashboard']);
     } catch (error) {
       const toast = await this.toastController.create({

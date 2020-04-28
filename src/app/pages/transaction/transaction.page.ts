@@ -4,6 +4,7 @@ import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
 import { LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { TransactionDetailModalPage } from './transaction-detail-modal/transaction-detail-modal.page';
+import { SecureStorage } from '../../utils/secure-storage';
 
 @Component({
   selector: 'app-transaction',
@@ -19,14 +20,16 @@ export class TransactionPage implements OnInit {
     private storage: Storage,
     private loadingController: LoadingController,
     private modalController: ModalController,
-    public toastController: ToastController
+    public toastController: ToastController,
+    private secureStorage: SecureStorage
     ) { }
 
-  ngOnInit() {
-    const startDate = moment().utc().subtract(12, 'months').valueOf();
-    const endDate = moment().utc().valueOf();
-
-    this.storage.get('wallet').then(async (wallets) => {
+  async ngOnInit() {
+    try {
+      const secret = await this.secureStorage.getSecret();
+      const wallets = await this.secureStorage.getStorage( 'wallet', secret );
+      const startDate = moment().utc().subtract(12, 'months').valueOf();
+      const endDate = moment().utc().valueOf();
       const loading = await this.loadingController.create({
         message: 'Please wait...',
         translucent: true,
@@ -37,35 +40,42 @@ export class TransactionPage implements OnInit {
       this.toTx = 10;
       const transactionsPromises = [];
       try {
-        await this.heliosService.connectToFirstAvailableNode();
-        for (const wallet of wallets) {
-          transactionsPromises.push(
-            new Promise(async (resolve, reject) => {
-              try {
-                const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
-                this.transactions = tx.map( data => {
-                  data.timestamp = moment.unix(data.timestamp);
-                  return data;
-                });
-                console.log ( 'getTransactions', tx );
-                resolve();
-              } catch (error) {
-                reject(error);
-              }
+      await this.heliosService.connectToFirstAvailableNode();
+      for (const wallet of wallets) {
+        transactionsPromises.push(
+          new Promise(async (resolve, reject) => {
+            try {
+              const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
+              this.transactions = tx.map( data => {
+                data.timestamp = moment.unix(data.timestamp);
+                return data;
+              });
+              console.log ( 'getTransactions', tx );
+              resolve();
+            } catch (error) {
+              reject(error);
             }
-          ));
-        }
-        await Promise.all(transactionsPromises);
-      } catch (error) {
-        const toast = await this.toastController.create({
-          cssClass: 'text-red',
-          message: error.message,
-          duration: 2000
-        });
-        toast.present();
+          }
+        ));
       }
+      await Promise.all(transactionsPromises);
+    } catch (error) {
+      const toast = await this.toastController.create({
+        cssClass: 'text-red',
+        message: error.message,
+        duration: 2000
+      });
+      toast.present();
+    }
       await loading.dismiss();
-    });
+    } catch (error) {
+      const toast = await this.toastController.create({
+        cssClass: 'text-red',
+        message: error.message,
+        duration: 2000
+      });
+      toast.present();
+    }
   }
 
   doRefresh(event) {
@@ -84,13 +94,15 @@ export class TransactionPage implements OnInit {
     return await modal.present();
   }
 
-  loadTransaction( event ) {
-    const startDate = moment().utc().subtract(12, 'months').valueOf();
-    const endDate = moment().utc().valueOf();
-    this.fromTx = this.fromTx + 11 ;
-    this.toTx = this.toTx + 10;
-    this.storage.get('wallet').then(async (wallets) => {
+  async loadTransaction( event ) {
+    try {
+      const startDate = moment().utc().subtract(12, 'months').valueOf();
+      const endDate = moment().utc().valueOf();
+      this.fromTx = this.fromTx + 11 ;
+      this.toTx = this.toTx + 10;
       const transactionsPromises = [];
+      const secret = await this.secureStorage.getSecret();
+      const wallets = await this.secureStorage.getStorage( 'wallet', secret );
       try {
         await this.heliosService.connectToFirstAvailableNode();
         for (const wallet of wallets) {
@@ -118,7 +130,15 @@ export class TransactionPage implements OnInit {
           duration: 2000
         });
         toast.present();
+        }
+    } catch (error) {
+      const toast = await this.toastController.create({
+        cssClass: 'text-red',
+        message: error.message,
+        duration: 2000
+      });
+      toast.present();
       }
-    });
+    }
+
   }
-}

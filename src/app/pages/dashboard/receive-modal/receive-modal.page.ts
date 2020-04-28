@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 import { FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SecureStorage } from '../../../utils/secure-storage';
 
 @Component({
   selector: 'app-send-modal',
@@ -15,17 +16,20 @@ export class ReceiveModalPage implements OnInit {
   receiveForm: FormGroup;
 
   constructor(private modalController: ModalController, private formBuilder: FormBuilder,
-              private storage: Storage, public toastController: ToastController) { }
+              private storage: Storage, public toastController: ToastController, private secureStorage: SecureStorage) { }
 
-  ngOnInit() {
+  async ngOnInit() {
 
     this.receiveForm = this.formBuilder.group({
       address: new FormControl(''),
     });
-
-    this.storage.get('wallet').then(async (wallets) => {
-      this.wallets = wallets || [];
-    });
+    const secret  = await this.secureStorage.getSecret();
+    const wallets = await this.secureStorage.getStorage( 'wallet' , secret );
+    if ( wallets == null ) {
+      this.wallets = []
+    } else {
+      this.wallets = wallets ;
+    }
   }
 
   dismiss() {

@@ -4,6 +4,8 @@ import { ContactsModalPage } from './contacts-modal/contacts-modal.page';
 import { SecurityModalPage } from './security-modal/security-modal.page';
 import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
+import { SecureStorage } from '../../utils/secure-storage';
+
 @Component({
   selector: 'app-setting',
   templateUrl: './setting.page.html',
@@ -14,7 +16,8 @@ export class SettingPage implements OnInit {
   constructor(private modalController: ModalController,
               private storage: Storage,
               private router: Router,
-              public alertController: AlertController) { }
+              public alertController: AlertController,
+              private secureStorage: SecureStorage) { }
 
   ngOnInit() {
   }
@@ -57,8 +60,7 @@ export class SettingPage implements OnInit {
         }, {
           text: 'Okay',
           handler: () => {
-            this.storage.clear();
-            this.storage.set( 'tutorial', true );
+            this.secureStorage.clearStorage();
             this.router.navigate(['/homewallet']);
           }
         }

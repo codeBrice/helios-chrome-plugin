@@ -7,6 +7,7 @@ import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
 import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
+import { SecureStorage } from '../../../utils/secure-storage';
 
 @Component({
   selector: 'app-import',
@@ -21,7 +22,6 @@ export class ImportPage implements OnInit {
   add: boolean;
   isCorrect = false;
   enableTouchIdFaceId = false;
-  saltRounds: number;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -30,10 +30,9 @@ export class ImportPage implements OnInit {
     private router: Router,
     private storage: Storage,
     private loadingController: LoadingController,
-    public toastController: ToastController
-  ) { 
-    this.saltRounds = 11;
-   }
+    public toastController: ToastController,
+    private secureStorage: SecureStorage
+  ) {}
 
   ngOnInit() {
     this.importWallet = this.formBuilder.group({
@@ -69,22 +68,23 @@ export class ImportPage implements OnInit {
       cssClass: 'custom-class custom-loading'
     });
     await loading.present();
-    this.storage.get( 'wallet').then(async (wallets) => {
-        try {
-          const hash = this.generateHash( this.importWallet.value.password );
-          this.storage.set( 'userInfoLocal', { sessionHash: hash } );
+    try {
+          const secret = await this.secureStorage.getSecret();
+          const wallets = await this.secureStorage.getStorage('wallet', secret);
+          const hash = this.secureStorage.generateHash( this.importWallet.value.password );
+          this.secureStorage.setStorage('userInfoLocal', { sessionHash: hash }, secret);
           if ( this.privateKey ) {
             const privateKey = await this.heliosService.privateKeyToAccount( this.importWallet.value.privateKey );
             const md5ToAvatar = cryptoJs.MD5(privateKey.address).toString();
             if ( wallets === null) {
               const walletArray = [new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
                 this.importWallet.value.name, md5ToAvatar)];
-              this.storage.set( 'wallet', walletArray );
+              this.secureStorage.setStorage('wallet', walletArray, secret);
             } else {
               this.notRepeat(wallets, privateKey.address);
               wallets.push(new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
                this.importWallet.value.name, md5ToAvatar));
-              this.storage.set( 'wallet', wallets );
+              this.secureStorage.setStorage('wallet', wallets, secret);
             }
           } else {
             const keystore = await this.heliosService.jsonToAccount( this.importWallet.value.keystore, this.importWallet.value.password );
@@ -92,12 +92,12 @@ export class ImportPage implements OnInit {
             if ( wallets === null) {
             const walletArray = [new Wallet(keystore.address,
               cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString() , this.importWallet.value.name, md5ToAvatar)];
-            this.storage.set( 'wallet', walletArray );
+            this.secureStorage.setStorage('wallet', walletArray, secret);
             } else {
               this.notRepeat(wallets, keystore.address);
               wallets.push(new Wallet(keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString(),
                this.importWallet.value.name, md5ToAvatar));
-              this.storage.set( 'wallet', wallets );
+              this.secureStorage.setStorage('wallet', wallets, secret);
             }
           }
           await loading.dismiss();
@@ -123,7 +123,6 @@ export class ImportPage implements OnInit {
           });
           toast.present();
         }
-      });
   }
 
   /**
@@ -139,11 +138,5 @@ export class ImportPage implements OnInit {
       }
     }
     return true;
-  }
-
-  generateHash( password: any ) {
-    const newSalt = bcrypt.genSaltSync(this.saltRounds);
-    const newPasswordHash = bcrypt.hashSync(password, newSalt);
-    return newPasswordHash;
   }
 }
