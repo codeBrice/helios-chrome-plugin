@@ -19,53 +19,14 @@ export class HeliosServersideService {
     sessionHash: any;
     username: any;
 
-    constructor() {
-        this.serverUrl = 'https://heliosprotocol.io/wallet-serverside/';
-        this.saltRounds = 11;
-        this.superagent = superagent.agent();
-        this.useLocalStorage = false;
-        this.queryResponseTimeout = 4000; // Time till server responds
-        this.queryResponseDeadline = 8000; // Allowed time for page to load
-    }
-
-    loadSession() {
-        if (typeof window !== 'undefined' && this.useLocalStorage) {
-            const sessionHash = window.localStorage.getItem('sessionHash');
-            const username = window.localStorage.getItem('username');
-            return { sessionHash, username };
-        } else {
-            return { sessionHash: this.sessionHash, username: this.username };
-        }
-    }
-
-    killSession() {
-        if (typeof window !== 'undefined') {
-            window.localStorage.removeItem('sessionHash');
-            window.localStorage.removeItem('username');
-        } else {
-            this.sessionHash = '';
-            this.username = '';
-        }
-    }
-
-    /**
-     * Renews session
-     * @returns  boolean
-     */
-    async renewSession() {
-        console.log('Renewing session');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = { action: 'renew_session', username: session.username, sessionHash: session.sessionHash };
-            const response = await this.queryServer(query);
-            if (response !== false && 'success' in response) {
-                return true;
-            } else {
-                this.killSession();
-            }
-        }
-        return false;
-    }
+ constructor() {
+    this.serverUrl = 'https://heliosprotocol.io/wallet-serverside/';
+    this.saltRounds = 11;
+    this.superagent = superagent.agent();
+    this.useLocalStorage = false;
+    this.queryResponseTimeout = 4000; // Time till server responds
+    this.queryResponseDeadline = 8000; // Allowed time for page to load
+  }
 
     /**
      * Gets online wallets
@@ -94,162 +55,129 @@ export class HeliosServersideService {
         return await this.queryServer(query);
     }
 
-    /**
-     * Renames online wallet
-     * @param walletId number
-     * @param previousWalletName string
-     * @param newWalletName string
-     * @returns  Object or boolean
-     */
-    async renameOnlineWallet(walletId, previousWalletName, newWalletName) {
-        console.log('Renaming online wallet');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = {
-                action: 'rename_keystore',
-                username: session.username,
-                sessionHash: session.sessionHash,
-                wallet_id: walletId,
-                previous_wallet_name: previousWalletName,
-                new_wallet_name: newWalletName
-            };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
+/**
+ * Renames online wallet
+ * @param walletId number
+ * @param previousWalletName string
+ * @param newWalletName string
+ * @returns  Object or boolean
+ */
+async renameOnlineWallet(walletId, previousWalletName, newWalletName, username, sessionHash) {
+    console.log('Renaming online wallet');
+    const query = {action: 'rename_keystore',
+            username,
+            session_hash: sessionHash,
+            wallet_id: walletId,
+            previous_wallet_name: previousWalletName,
+            new_wallet_name: newWalletName};
+    return await this.queryServer(query);
+}
 
-    /**
-     * Deletes online wallet
-     * @param id number
-     * @param name string
-     * @returns  Object or boolean
-     */
-    async deleteOnlineWallet(id, name) {
-        console.log('Deleting online wallet');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = {
-                action: 'delete_keystore',
-                username: session.username,
-                sessionHash: session.sessionHash,
-                wallet_id: id,
-                wallet_name: name
-            };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
+/**
+ * Deletes online wallet
+ * @param id number
+ * @param name string
+ * @returns  Object or boolean
+ */
+async deleteOnlineWallet(id, name, username, sessionHash) {
+    console.log('Deleting online wallet');
+    const query = {action: 'delete_keystore',
+        username: username,
+        session_hash: sessionHash,
+        wallet_id: id,
+        wallet_name: name};
+    return await this.queryServer(query);
+}
 
-    /**
-     * Gets contacts
-     * @returns  Object or boolean
-     */
-    async getContacts(username, sessionHash) {
-        console.log('Getting contacts');
-        const session = this.loadSession();
-        const query = { action: 'get_contacts', username, session_hash: sessionHash };
-        return await this.queryServer(query);
-    }
+/**
+ * Gets contacts
+ * @returns  Object or boolean
+ */
+async getContacts(username, sessionHash) {
+    console.log('Getting contacts');
+    const query = {action: 'get_contacts', username, session_hash: sessionHash};
+    return await this.queryServer(query);
+}
 
-    /**
-     * Gets new2 fasecret
-     * @returns  Object or boolean
-     */
-    async getNew2FASecret() {
-        console.log('Getting new 2FA secret');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = { action: 'get_new_2fa_secret', username: session.username, sessionHash: session.sessionHash };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
+/**
+ * Gets new2 fasecret
+ * @returns  Object or boolean
+ */
+async getNew2FASecret(username, sessionHash) {
+    console.log('Getting new 2FA secret');
+    const query = {action: 'get_new_2fa_secret', 
+    username,
+    session_hash: sessionHash};
+    return await this.queryServer(query);
+}
+/**
+ * Is2s faenabled
+ * @returns  Object or boolean
+ */
+async is2FAEnabled(username, sessionHash) {
+      const query = {action: 'is_2fa_enabled',
+      username,
+      session_hash: sessionHash};
+      return await this.queryServer(query);
+}
 
-    /**
-     * Is2s faenabled
-     * @returns  Object or boolean
-     */
-    async is2FAEnabled() {
-        console.log('Checking if 2FA enabled');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = { action: 'is_2fa_enabled', username: session.username, sessionHash: session.sessionHash };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
+/**
+ * Delete2s fasecret
+ * @returns  Object or boolean
+ */
+async delete2FASecret(username, sessionHash) {
+    console.log('Deleting 2FA secret');
+    const query = {action: 'delete_2fa_secret',
+    username,
+    session_hash: sessionHash};
+    return await this.queryServer(query);
+}
 
-    /**
-     * Delete2s fasecret
-     * @returns  Object or boolean
-     */
-    async delete2FASecret() {
-        console.log('Deleting 2FA secret');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = { action: 'delete_2fa_secret', username: session.username, sessionHash: session.sessionHash };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
+/**
+ * Save2s fasecret
+ * @param secret string
+ * @param code number
+ * @returns  Object or boolean
+ */
+async save2FASecret(secret, code, username, sessionHash) {
+    console.log('Saving 2FA secret');
+    const query = {action: 'save_new_2fa_secret',
+    secret,
+    code,
+    username, 
+    session_hash: sessionHash};
+    return await this.queryServer(query);
+}
 
-    /**
-     * Save2s fasecret
-     * @param secret string
-     * @param code number
-     * @returns  Object or boolean
-     */
-    async save2FASecret(secret, code) {
-        console.log('Saving 2FA secret');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = { action: 'save_new_2fa_secret', secret, code, username: session.username, sessionHash: session.sessionHash };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
+/**
+ * Adds contact
+ * @param contactName string
+ * @param contactAddress string
+ * @returns  Object or boolean
+ */
+async addContact(contactName, contactAddress , username, sessionHash) {
+    console.log('Adding contacts');
+    const query = {action: 'add_contact',
+            username,
+            session_hash: sessionHash,
+            contact_name: contactName,
+            contact_address: contactAddress};
+    return await this.queryServer(query);
+}
 
-    /**
-     * Adds contact
-     * @param contactName string
-     * @param contactAddress string
-     * @returns  Object or boolean
-     */
-    async addContact(contactName, contactAddress) {
-        console.log('Adding contacts');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = {
-                action: 'add_contact',
-                username: session.username,
-                sessionHash: session.sessionHash,
-                contact_name: contactName,
-                contact_address: contactAddress
-            };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
-
-    /**
-     * Deletes contact
-     * @param id number
-     * @returns  Object or boolean
-     */
-    async deleteContact(id) {
-        console.log('Deleting contact');
-        const session = this.loadSession();
-        if (!(session.sessionHash === undefined)) {
-            const query = {
-                action: 'delete_contact',
-                username: session.username,
-                sessionHash: session.sessionHash,
-                contact_id: id
-            };
-            return await this.queryServer(query);
-        }
-        return false;
-    }
+/**
+ * Deletes contact
+ * @param id number
+ * @returns  Object or boolean
+ */
+async deleteContact(id, username, sessionHash) {
+    console.log('Deleting contact');
+    const query = {action: 'delete_contact',
+        username,
+        session_hash: sessionHash,
+        contact_id: id};
+    return await this.queryServer(query);
+}
 
     /**
      * Signs in

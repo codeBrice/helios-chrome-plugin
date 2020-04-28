@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, ActionSheetController, AlertController } from '@ionic/angular';
+import { ModalController, ActionSheetController, AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
 import { Contact } from 'src/app/entities/contact';
+import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
+import { UserInfo } from 'src/app/entities/userInfo';
 import { SecureStorage } from '../../../utils/secure-storage';
 
 @Component({
@@ -19,26 +21,29 @@ export class ContactsModalPage implements OnInit {
   edit = false;
   index: number;
   secret: string;
+  id: number;
 
-  constructor(private modalController: ModalController, private storage: Storage, public actionSheetController: ActionSheetController,
-              private formBuilder: FormBuilder, private heliosService: HeliosServiceService, public alertController: AlertController,
+  constructor(private modalController: ModalController,
+              private storage: Storage,
+              public actionSheetController: ActionSheetController,
+              private formBuilder: FormBuilder,
+              private heliosService: HeliosServiceService,
+              private heliosServersideService: HeliosServersideService,
+              private loadingController: LoadingController,
+              public toastController: ToastController,
+              public alertController: AlertController,
               private secureStorage: SecureStorage) { }
 
   async ngOnInit() {
     this.contactForm = this.formBuilder.group({
       name: new FormControl('', [Validators.required]),
-      lastName: new FormControl('', [Validators.required]),
       address: new FormControl('', [Validators.required])
     }, {
       validator: [this.isAddress('address')]
     });
     this.secret = await this.secureStorage.getSecret();
     const contacts = await this.secureStorage.getStorage('contacts', this.secret);
-    if ( contacts == null){
-      this.contactsList = [];
-    } else {
-      this.contactsList = contacts;
-    }
+    this.contactsList = contacts || [];
   }
 
   dismiss() {
@@ -47,23 +52,99 @@ export class ContactsModalPage implements OnInit {
     });
   }
 
-  addContact() {
+  async addContact() {
+
+    const loading = await this.loadingController.create({
+      message: 'Please wait...',
+      translucent: true,
+      cssClass: 'custom-class custom-loading'
+    });
+    await loading.present();
+
     const name = this.contactForm.value.name;
-    const lastName = this.contactForm.value.lastName;
     const address = this.contactForm.value.address;
-    this.contactsList.push({name, lastName, address});
-    this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
+    try {
+
+      const userInfo: UserInfo = await this.storage.get('userInfo');
+      if (userInfo) {
+        await this.heliosServersideService.addContact(
+          this.contactForm.value.name,
+          this.contactForm.value.address,
+          userInfo.userName,
+          userInfo.sessionHash
+        );
+        const result = await this.heliosServersideService.getContacts(
+          userInfo.userName,
+          userInfo.sessionHash
+        );
+        this.contactsList = result.contacts;
+      } else {
+        this.contactsList.push({name, address});
+      }
+
+      this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
+
+    } catch (error) {
+      const toast = await this.toastController.create({
+        cssClass: 'text-red',
+        message: error.errorDescription || error.message,
+        duration: 2000
+      });
+      toast.present();
+    }
+    this.contactForm.reset();
     this.add = false;
+    await loading.dismiss();
+
   }
 
-  editContact() {
-      this.contactsList.splice(this.index, 1);
+  async editContact() {
+
+    const loading = await this.loadingController.create({
+      message: 'Please wait...',
+      translucent: true,
+      cssClass: 'custom-class custom-loading'
+    });
+    await loading.present();
+    try {
       const name = this.contactForm.value.name;
-      const lastName = this.contactForm.value.lastName;
       const address = this.contactForm.value.address;
-      this.contactsList.push({name, lastName, address});
-      this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
-      this.edit = false;
+      const userInfo: UserInfo = await this.storage.get('userInfo');
+      if (userInfo) {
+        await this.heliosServersideService.deleteContact(
+          this.id,
+          userInfo.userName,
+          userInfo.sessionHash
+        );
+        await this.heliosServersideService.addContact(
+          name,
+          address,
+          userInfo.userName,
+          userInfo.sessionHash
+        );
+        const result = await this.heliosServersideService.getContacts(
+          userInfo.userName,
+          userInfo.sessionHash
+        );
+        this.id = null;
+        this.contactForm.reset();
+        this.contactsList = result.contacts;
+      } else {
+        this.contactsList.splice(this.index, 1);
+        this.contactsList.push({name, address});
+      }
+    } catch (error) {
+      const toast = await this.toastController.create({
+        cssClass: 'text-red',
+        message: error.errorDescription || error.message,
+        duration: 2000
+      });
+      toast.present();
+    }
+
+    await loading.dismiss();
+    this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
+    this.edit = false;
   }
 
   async presentActionSheet(index: number, contact) {
@@ -75,16 +156,16 @@ export class ContactsModalPage implements OnInit {
         handler: () => {
           this.edit = true;
           this.index = index;
+          this.id = contact.id;
           this.contactForm.controls.name.setValue(contact.name);
-          this.contactForm.controls.lastName.setValue(contact.lastName);
           this.contactForm.controls.address.setValue(contact.address);
         }
       }, {
         text: 'Delete',
         role: 'destructive',
         icon: 'trash',
-        handler: async () => {
-          const alert = await this.alertController.create({
+        handler: () => {
+          this.alertController.create({
             header: 'Are you sure?',
             message: `Delete contact <strong>${contact.name}?</strong>`,
             buttons: [
@@ -96,26 +177,16 @@ export class ContactsModalPage implements OnInit {
                 text: 'Okay',
                 handler: () => {
                   this.contactsList.splice(index, 1);
-                  this.secureStorage.setStorage('contacts', this.contactsList , this.secret );
+                  this.storage.set( 'contacts', this.contactsList );
                 }
               }
             ]
-          });
-          await alert.present();
-        }
-      }, {
-        text: 'Share',
-        icon: 'share',
-        handler: () => {
-          console.log('Share clicked');
+          }).then((val) => val.present());
         }
       }, {
         text: 'Cancel',
         icon: 'close',
-        role: 'cancel',
-        handler: () => {
-          console.log('Cancel clicked');
-        }
+        role: 'cancel'
       }]
     });
     await actionSheet.present();

@@ -23,7 +23,7 @@
       <ion-label>To</ion-label>
     <ion-select placeholder="Select One" formControlName="to" (ionChange)="updateRequired()">
       <ion-select-option value="99">It is not a contact</ion-select-option>
-      <ion-select-option *ngFor="let contact of contactsList" [value]="contact.address">{{contact.name + ' ' + contact.lastName}}</ion-select-option>
+      <ion-select-option *ngFor="let contact of contactsList" [value]="contact.address">{{contact.name}}</ion-select-option>
     </ion-select>
     </ion-item>
     <ion-item color="dark" *ngIf="sendForm.value.to === '99'">

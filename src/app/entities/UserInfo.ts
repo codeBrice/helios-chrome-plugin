@@ -1,5 +1,3 @@
-import { KeyStore } from './KeyStore';
-
 export class UserInfo {
 
     constructor(sessionHash, twoFaEnabled, userName) {

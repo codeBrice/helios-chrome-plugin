@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
 import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
 import { SecureStorage } from '../../../../utils/secure-storage';
-import { UserInfo } from '../../../../entities/UserInfo';
+import { UserInfo } from '../../../../entities/userInfo';
 
 @Component({
   selector: 'app-generate',
@@ -34,11 +34,11 @@ export class GeneratePage implements OnInit {
 
   ngOnInit() {
 
-  
+
     this.createWallet = this.formBuilder.group({
-      'password': new FormControl('', [Validators.required, Validators.minLength(16)]),
-      'username': new FormControl('', [Validators.required]),
-      'name': new FormControl('', [Validators.required])
+      password: new FormControl('', [Validators.required, Validators.minLength(16)]),
+      username: new FormControl('', [Validators.required]),
+      name: new FormControl('', [Validators.required])
     });
 
   }
@@ -60,12 +60,27 @@ export class GeneratePage implements OnInit {
       const secret = await this.secureStorage.getSecret();
       console.log('secret en generate page', secret);
       const storageUser = await this.secureStorage.getStorage('userInfo', secret);
-      console.log( 'UserInfo en generate page', storageUser)
+      console.log( 'UserInfo en generate page', storageUser);
       if (storageUser) {
-        await this.heliosServersideService.signIn(this.createWallet.value.username, this.createWallet.value.password, null);
+        const result = await this.heliosServersideService.signIn(this.createWallet.value.username, this.createWallet.value.password, null);
+        const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.createWallet.value.username);
+        this.secureStorage.setStorage('userInfo', userInfo, secret);
         walletCreate = await createWallet();
         await this.heliosServersideService.addOnlineWallet(walletCreate.keystorage, this.createWallet.value.name, storageUser);
-        this.hash = storageUser.sessionHash;
+        this.hash = userInfo.sessionHash;
+
+        for (const keystoreInfo of result.keystores) {
+          const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, this.createWallet.value.password);
+          const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
+          this.wallets.push(new Wallet(
+            keystore.address,
+            cryptoJs.AES.encrypt(keystore.privateKey, result.session_hash).toString(),
+            keystoreInfo.name,
+            md5ToAvatar)
+          );
+        }
+        this.secureStorage.setStorage('wallet', this.wallets, secret);
+
       } else {
         this.hash = this.secureStorage.generateHash( this.createWallet.value.password );
         walletCreate = await createWallet();
@@ -82,13 +97,13 @@ export class GeneratePage implements OnInit {
             const md5ToAvatar = cryptoJs.MD5(walletCreate.accountWallet.account.address).toString();
             if ( wallets === null) {
               const walletArray = [new Wallet(walletCreate.accountWallet.account.address,
-                cryptoJs.AES.encrypt( walletCreate.accountWallet.account.privateKey, this.hash ).toString(), 
+                cryptoJs.AES.encrypt( walletCreate.accountWallet.account.privateKey, this.hash ).toString(),
                 this.createWallet.value.name,
                 md5ToAvatar)];
               this.secureStorage.setStorage('wallet', walletArray, secret);
             } else {
               wallets.push(new Wallet(walletCreate.accountWallet.account.address,
-                 cryptoJs.AES.encrypt( walletCreate.accountWallet.account.privateKey, this.hash ).toString(), 
+                 cryptoJs.AES.encrypt( walletCreate.accountWallet.account.privateKey, this.hash ).toString(),
                  this.createWallet.value.name,
                  md5ToAvatar));
               this.secureStorage.setStorage('wallet', wallets, secret);
