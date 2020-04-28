@@ -34,7 +34,7 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
       username: new FormControl('', [Validators.required]),
-      password: new FormControl('', [Validators.required])
+      password: new FormControl('', [Validators.required, Validators.minLength(16)],)
     });
   }
 

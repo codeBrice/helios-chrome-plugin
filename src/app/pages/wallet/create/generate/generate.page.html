@@ -14,7 +14,8 @@
     <ion-grid>
         <ion-row class="ion-align-items-center">
             <ion-col size="12">
-                <ion-label color="light">The password will be used to encrypt your wallet. Must contain at least 16 characters</ion-label>
+                <ion-label color="light">To create a new wallet, you must use the same username and password of this session.
+                </ion-label>
             </ion-col>
         </ion-row>
         <ion-row >
@@ -26,8 +27,16 @@
               </ion-item>  
 
               <ion-item color="dark">
+                <ion-label position="floating">Username</ion-label>
+                <ion-input type="text"   formControlName="username"></ion-input>
+              </ion-item>  
+
+              <ion-item color="dark">
                   <ion-label position="floating">Password</ion-label>
                   <ion-input type="password" formControlName="password"></ion-input>
+                  <ion-row   *ngIf="createWallet.controls['password'].errors && createWallet.controls['password'].dirty ">
+                    <p class="validator-error ion-text-center"  style=" color:red">Password must be at least 16 characters long.</p>
+                  </ion-row>
               </ion-item>  
             </ion-col>
         </ion-row >

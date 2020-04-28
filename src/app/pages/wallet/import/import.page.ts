@@ -100,7 +100,6 @@ export class ImportPage implements OnInit {
               this.secureStorage.setStorage('wallet', wallets, secret);
             }
           }
-          await loading.dismiss();
           const alert = await this.alertController.create({
             header: 'Success!',
             message: '<strong>Successfully imported wallet</strong>',
@@ -123,6 +122,8 @@ export class ImportPage implements OnInit {
           });
           toast.present();
         }
+    await loading.dismiss();
+
   }
 
   /**

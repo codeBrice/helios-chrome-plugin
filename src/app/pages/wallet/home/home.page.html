@@ -23,6 +23,10 @@
             <ion-item color="dark">
               <ion-label position="floating">Password</ion-label>
               <ion-input type="password" formControlName="password"></ion-input>
+              <ion-row *ngIf="loginForm.controls['password'].errors && loginForm.controls['password'].dirty ">
+                <p class="validator-error ion-text-center" style=" color:red">Password must be at least 16 characters
+                  long.</p>
+              </ion-row>
             </ion-item>
           </ion-col>
         </ion-row>
