@@ -188,15 +188,9 @@ export class ContactsModalPage implements OnInit {
                         userInfo.userName,
                         userInfo.sessionHash
                       );
-                      const result = await this.heliosServersideService.getContacts(
-                        userInfo.userName,
-                        userInfo.sessionHash
-                      );
-                      this.contactsList = result.contacts;
-                    } else {
-                      this.contactsList.splice(index, 1);
-                      this.storage.set( 'contacts', this.contactsList );
                     }
+                    this.contactsList.splice(index, 1);
+                    this.storage.set( 'contacts', this.contactsList );
                   } catch (error) {
                     const toast = await this.toastController.create({
                       cssClass: 'text-red',
