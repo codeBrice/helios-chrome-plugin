@@ -84,17 +84,14 @@ export class HeliosServersideService {
      * @returns  Object
      */
     async addOnlineWallet(keystore, name, storageUser) {
-        if (!(storageUser.sessionHash === undefined)) {
-            const query = {
-                action: 'add_keystore',
-                username: storageUser.userName,
-                session_hash: storageUser.sessionHash,
-                keystore: JSON.stringify(keystore),
-                wallet_name: name
-            };
-            return await this.queryServer(query);
-        }
-        return false;
+        const query = {
+            action: 'add_keystore',
+            username: storageUser.userName,
+            session_hash: storageUser.sessionHash,
+            keystore: JSON.stringify(keystore),
+            wallet_name: name
+        };
+        return await this.queryServer(query);
     }
 
     /**
@@ -341,7 +338,7 @@ export class HeliosServersideService {
             })
             .catch(err => {
 
-                if (err.error == undefined || err.errorDescription == undefined) {
+                if (err.error === undefined || err.errorDescription === undefined) {
                     throw new ErrorServer(err.errno, err.message);
 
                 } else {
