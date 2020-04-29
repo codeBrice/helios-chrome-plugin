@@ -48,13 +48,15 @@ export class HomePage implements OnInit {
     try {
       const secret = await this.secureStorage.getSecret();
       const result = await this.heliosServersideService.signIn(this.loginForm.value.username, this.loginForm.value.password, null);
+      console.log('result del logeo', result);
       const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.loginForm.value.username);
 
       for (const keystoreInfo of result.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
         const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
         this.wallets.push(new Wallet(
-          keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name, md5ToAvatar)
+          keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name,
+           md5ToAvatar, keystoreInfo.id)
           );
       }
       this.secureStorage.setStorage('userInfo', userInfo, secret);

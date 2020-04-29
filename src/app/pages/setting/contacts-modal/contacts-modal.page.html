@@ -2,11 +2,11 @@
   <ion-toolbar color="dark">
     <ion-item color="dark" *ngIf="!add && !edit">
       <ion-title color="light" class="ion-no-padding" > Contacts </ion-title>
-      <ion-text color="helios" slot="end" (click)="dismiss()">Close</ion-text>
+      <ion-text color="helios" slot="end" (click)="dismiss()" class="pointer">Close</ion-text>
     </ion-item>
     <ion-item color="dark" *ngIf="add || edit">
       <ion-title color="light" class="ion-no-padding" > Contacts </ion-title>
-      <ion-text color="helios" slot="end" (click)="add = false; edit = false">Close</ion-text>
+      <ion-text color="helios" slot="end" (click)="add = false; edit = false" class="pointer">Close</ion-text>
     </ion-item>
   </ion-toolbar>
 </ion-header>
