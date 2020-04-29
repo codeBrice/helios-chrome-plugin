@@ -78,12 +78,12 @@ export class ImportPage implements OnInit {
             const md5ToAvatar = cryptoJs.MD5(privateKey.address).toString();
             if ( wallets === null) {
               const walletArray = [new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
-                this.importWallet.value.name, md5ToAvatar)];
+                this.importWallet.value.name, md5ToAvatar, privateKey.id)];
               this.secureStorage.setStorage('wallet', walletArray, secret);
             } else {
               this.notRepeat(wallets, privateKey.address);
               wallets.push(new Wallet(privateKey.address, cryptoJs.AES.encrypt( privateKey.privateKey, hash ).toString(),
-               this.importWallet.value.name, md5ToAvatar));
+               this.importWallet.value.name, md5ToAvatar, privateKey.id));
               this.secureStorage.setStorage('wallet', wallets, secret);
             }
           } else {
@@ -91,12 +91,12 @@ export class ImportPage implements OnInit {
             const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
             if ( wallets === null) {
             const walletArray = [new Wallet(keystore.address,
-              cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString() , this.importWallet.value.name, md5ToAvatar)];
+              cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString() , this.importWallet.value.name, md5ToAvatar, keystore.id)];
             this.secureStorage.setStorage('wallet', walletArray, secret);
             } else {
               this.notRepeat(wallets, keystore.address);
               wallets.push(new Wallet(keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, hash ).toString(),
-               this.importWallet.value.name, md5ToAvatar));
+               this.importWallet.value.name, md5ToAvatar, keystore.id));
               this.secureStorage.setStorage('wallet', wallets, secret);
             }
           }

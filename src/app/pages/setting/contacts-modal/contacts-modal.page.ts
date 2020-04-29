@@ -65,9 +65,9 @@ export class ContactsModalPage implements OnInit {
     const address = this.contactForm.value.address;
     try {
 
-      const userInfo: UserInfo = await this.storage.get('userInfo');
+      const userInfo: UserInfo = await this.secureStorage.getStorage( 'userInfo', this.secret );
       if (userInfo) {
-        await this.heliosServersideService.addContact(
+        const addContact = await this.heliosServersideService.addContact(
           this.contactForm.value.name,
           this.contactForm.value.address,
           userInfo.userName,
@@ -109,7 +109,7 @@ export class ContactsModalPage implements OnInit {
     try {
       const name = this.contactForm.value.name;
       const address = this.contactForm.value.address;
-      const userInfo: UserInfo = await this.storage.get('userInfo');
+      const userInfo: UserInfo = await this.secureStorage.getStorage( 'userInfo', this.secret );
       if (userInfo) {
         await this.heliosServersideService.deleteContact(
           this.id,
@@ -177,7 +177,7 @@ export class ContactsModalPage implements OnInit {
                 text: 'Okay',
                 handler: () => {
                   this.contactsList.splice(index, 1);
-                  this.storage.set( 'contacts', this.contactsList );
+                  this.secureStorage.setStorage( 'contacts', this.contactsList, this.secret );
                 }
               }
             ]
