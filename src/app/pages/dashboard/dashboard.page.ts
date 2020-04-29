@@ -136,7 +136,8 @@ export class DashboardPage implements OnInit {
                 balance,
                 usd,
                 name: wallet.name,
-                avatar: wallet.avatar
+                avatar: wallet.avatar,
+                id: wallet.id
               });
               this.balance += usd;
               resolve();
@@ -186,7 +187,6 @@ export class DashboardPage implements OnInit {
   }
 
   async presentActionSheet(index: number, wallet) {
-    console.log('presentActionSheet', index , wallet);
     const actionSheet = await this.actionSheetController.create({
       header: 'Account Options',
       buttons: [
@@ -241,9 +241,37 @@ export class DashboardPage implements OnInit {
                 cssClass: 'secondary',
               }, {
                 text: 'Okay',
-                handler: () => {
+                handler: async ()  => {
+                  const loading = await this.loadingController.create({
+                    message: 'Deleting wallet...',
+                    translucent: true,
+                    cssClass: 'custom-class custom-loading'
+                  });
+                  await loading.present();
+                  try {
                   this.wallets.splice(index, 1);
+                  const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
+                  if ( userInfo ) {
+                    await this.heliosServersideService.deleteOnlineWallet( wallet.id, wallet.name, 
+                      userInfo.userName, userInfo.sessionHash );
+                  }
                   this.secureStorage.setStorage('wallet', this.wallets, this.secret);
+                  await loading.dismiss();
+                  const toast = await this.toastController.create({
+                    cssClass: 'text-yellow',
+                    message: 'The wallet was successfully deleted.',
+                    duration: 2000
+                  });
+                  toast.present();
+                } catch (error) {
+                  await loading.dismiss();
+                  const toast = await this.toastController.create({
+                    cssClass: 'text-red',
+                    message: error.errorDescription || error.message,
+                    duration: 2000
+                  });
+                  toast.present();
+                }
                 }
               }
             ]
