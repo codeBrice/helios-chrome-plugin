@@ -21,58 +21,7 @@ export class HeliosServiceService {
     'wss://masternode1.heliosprotocol.io:30304'
   ];
 
-  /* private methods = {
-    property: 'hls',
-    methods: [
-      {
-        name: 'getBalance',
-        call: 'hls_getBalance',
-        params: 2,
-        inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
-        outputFormatter: formatters.outputBigNumberFormatter
-      }, {
-        name: 'getBlockNumber',
-        call: 'hls_getBlockNumber',
-        params: 2,
-        inputFormatter: [formatters.inputAddressFormatter, HlsUtils.inputTimestampFormatter],
-        outputFormatter: Utils.hexToNumber
-      } , {
-        name: 'getBlockByNumber',
-        call: 'hls_getBlockByNumber',
-        params: 3,
-        inputFormatter: [(val) => val, (val) => val, (val) => !!val],
-        outputFormatter: formatters.outputBlockFormatter
-      } , {
-        name: 'getTransactionByHash',
-        call: 'hls_getTransactionByHash',
-        params: 1,
-        outputFormatter: formatters.outputTransactionFormatter
-      }, {
-        name: 'getTransactionReceipt',
-        call: 'hls_getTransactionReceipt',
-        params: 1,
-        outputFormatter: formatters.outputTransactionReceiptFormatter
-      },
-      {
-        name: 'getGasPrice',
-        call: 'hls_getGasPrice',
-        params: 0,
-        outputFormatter: Utils.hexToNumber
-      },
-      {
-        name: 'sendTransaction',
-        call: 'personal_sendTransaction',
-        params: 2,
-        inputFormatter: [formatters.inputTransactionFormatter, null]
-      }
-    ]
-  }; */
-
   constructor() {
-  }
-
-  availableNodesExport() {
-    return this.availableNodes;
   }
 
   /**

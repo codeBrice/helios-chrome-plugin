@@ -31,6 +31,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   console.log(request.type);
   if (request.type === 'access') {
     console.log(window.helios);
-    // web3.hls.defaultAccount = request.address ;
+    const node = document.head || document.documentElement;
+    const closeSpan = document.createElement('span');
+    closeSpan.setAttribute('id', 'hlsAd');
+    closeSpan.textContent = request.address;
+    node.appendChild(closeSpan);
   }
 });

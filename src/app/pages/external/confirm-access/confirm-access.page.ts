@@ -30,8 +30,7 @@ export class ConfirmAccessPage implements OnInit {
     // contentscript
     chrome.tabs.sendMessage(Number(this.queryParams.id) as number, {
       type: 'access',
-      availableNodes: this.heliosService.availableNodesExport(),
-      address: '123'
+      address: '0x610DA3BA540A9B316451DB1bD5950d37205be6ec'
     });
   }
 }

@@ -25,8 +25,8 @@ const enable = () => {
 const send = async (tx) => {
   try {
     console.log('sendTransaction');
-    if (await this.isConnected()) {
-      const transaction = await this.web3.hls.sendTransactions([tx]);
+    if (await isConnected()) {
+      const transaction = await helios.hls.sendTransactions([tx]);
       console.log(transaction);
       return transaction;
     }
@@ -34,6 +34,15 @@ const send = async (tx) => {
     console.log(error);
     throw new Error('Failed sendTransaction');
   }
+};
+
+const selectedAddress = () => {
+  console.log('selectedAddress');
+  const result = document.getElementById('hlsAd');
+  if (result) {
+    return result.innerText;
+  }
+  return null;
 };
 
 async function connectToFirstAvailableNode() {
@@ -51,7 +60,7 @@ async function connectToFirstAvailableNode() {
             // await helios.eth.net.getPeerCount();
             if (isConnected() || listen) {
                 console.log(`Successfully connected to ${node}`);
-                window.helios = { send, enable};
+                window.helios = { send, enable , selectedAddress};
                 return true;
             }
           } catch ( error ) {
