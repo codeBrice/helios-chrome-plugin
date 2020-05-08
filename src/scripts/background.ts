@@ -14,5 +14,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.type === 'access') {
         console.log('background confirm-access');
+        console.log(window.helios);
     }
   });

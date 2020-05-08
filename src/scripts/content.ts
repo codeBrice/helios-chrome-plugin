@@ -8,31 +8,24 @@
  * @see    {@link http://stackoverflow.com/questions/20499994/access-window-variable-from-content-script}
  */
 console.log('inject');
-function injectScript(file_path, tag) {
-    const node = document.head || document.documentElement
-    const script = document.createElement('script')
+function injectScript(filePath) {
+    const node = document.head || document.documentElement;
+    const script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
-    script.setAttribute('src', file_path);
+    script.setAttribute('src', filePath);
     node.appendChild(script);
 }
-injectScript(chrome.extension.getURL('web3.js'), 'body');
+injectScript(chrome.extension.getURL('web3.js'));
 
 
 
 console.log('content');
 
-window.onload = function() {
-  const button = document.createElement('button');
-  button.textContent = 'Helios Enable';
-  button.setAttribute('id', 'heliosMetask');
-  document.body.insertAdjacentElement('afterbegin', button);
-  button.addEventListener('click', () => {
-    chrome.runtime.sendMessage('', {
-      type: 'openInit'
-    });
+document.addEventListener('initHeliosApp', function(data) {
+  chrome.runtime.sendMessage('', {
+    type: 'openInit'
   });
-};
-
+});
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   console.log(request.type);

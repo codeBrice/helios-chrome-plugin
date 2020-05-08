@@ -49,7 +49,7 @@ export class AppComponent {
     private storage: Storage,
     private router: Router,
     private loadingController: LoadingController,
-    private secureStorage: SecureStorage
+    private secureStorage: SecureStorage,
     private activatedRoute: ActivatedRoute
   ) {
     /* this.activatedRoute.queryParams.subscribe( params => {

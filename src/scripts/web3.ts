@@ -15,6 +15,27 @@ const availableNodes: any[] = [
 let helios: any;
 console.log('web3');
 
+// methods in contentscript
+const enable = () => {
+  const event = document.createEvent('Event');
+  event.initEvent('initHeliosApp');
+  document.dispatchEvent(event);
+};
+
+const send = async (tx) => {
+  try {
+    console.log('sendTransaction');
+    if (await this.isConnected()) {
+      const transaction = await this.web3.hls.sendTransactions([tx]);
+      console.log(transaction);
+      return transaction;
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed sendTransaction');
+  }
+};
+
 async function connectToFirstAvailableNode() {
   console.log(`connectToFirstAvailableNode`);
   try {
@@ -24,14 +45,13 @@ async function connectToFirstAvailableNode() {
       for (const node of availableNodes) {
           console.log(`Connecting to node ${node}`);
           helios = new Web3(new Web3.providers.WebsocketProvider(node));
-          // helios.extend(this.methods);
           // console.log(helios);
           try {
             const listen = await helios.eth.net.isListening();
             // await helios.eth.net.getPeerCount();
             if (isConnected() || listen) {
                 console.log(`Successfully connected to ${node}`);
-                window.helios = helios;
+                window.helios = { send, enable};
                 return true;
             }
           } catch ( error ) {
