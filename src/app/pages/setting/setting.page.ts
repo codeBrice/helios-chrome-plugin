@@ -50,7 +50,7 @@ export class SettingPage implements OnInit {
 
   async loginOut() {
     const alert = await this.alertController.create({
-      header: 'Sign out',
+      header: 'Delete account',
       message: `<strong>Are you sure?</strong> all local wallet data will be lost.`,
       buttons: [
         {

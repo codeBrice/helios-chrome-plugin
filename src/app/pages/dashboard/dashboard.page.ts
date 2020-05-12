@@ -22,7 +22,6 @@ import { Wallet } from '../../entities/wallet';
 export class DashboardPage implements OnInit {
 
   constructor(
-    private storage: Storage,
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController,
     private route: ActivatedRoute,
@@ -51,7 +50,6 @@ export class DashboardPage implements OnInit {
   private readonly HELIOS_ID = 'helios-protocol';
 
   ngOnInit() {
-    // this.inicialize();
   }
 
   async inicialize() {
@@ -78,8 +76,7 @@ export class DashboardPage implements OnInit {
         this.secureStorage.setStorage('contacts', result.contacts, this.secret);
       } catch (error) {
         if (error.error === 2020) {
-          this.secureStorage.clearStorage();
-          this.router.navigate(['/homewallet']);
+          this.router.navigate(['/reload-singin']);
         }
         console.log( error );
         const toast = await this.toastController.create({
@@ -105,6 +102,22 @@ export class DashboardPage implements OnInit {
         let receivable = false;
         const walletPromises = [];
         await this.heliosService.connectToFirstAvailableNode();
+        let defaultWalletStorage = await this.secureStorage.getStorage('defaultWallet', this.secret);
+        if( defaultWalletStorage === null ){
+           const balance = await this.heliosService.getBalance(wallets[0].address);
+           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
+           const wallet = {
+            address: wallets[0].address ,
+            balance,
+            usd,
+            name: wallets[0].name,
+            avatar: wallets[0].avatar,
+            id: wallets[0].id,
+            default: true
+          };
+           this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
+           defaultWalletStorage = wallet;
+        }
         for (const wallet of wallets) {
           walletPromises.push(new Promise(async (resolve, reject) => {
             try {
@@ -137,7 +150,8 @@ export class DashboardPage implements OnInit {
                 usd,
                 name: wallet.name,
                 avatar: wallet.avatar,
-                id: wallet.id
+                id: wallet.id,
+                default: false
               });
               this.balance += usd;
               resolve();
@@ -146,7 +160,12 @@ export class DashboardPage implements OnInit {
             }
           }));
         }
-        await Promise.all(walletPromises)
+        await Promise.all(walletPromises);
+        this.wallets.map( data => {
+          if ( data.address === defaultWalletStorage.address ) {
+            data.default = true;
+          }
+        });
         if (receivable) {
           const toast = await this.toastController.create({
             cssClass: 'text-yellow',
@@ -204,8 +223,11 @@ export class DashboardPage implements OnInit {
                   cssClass: 'secondary',
                 }, {
                   text: 'Okay',
-                  handler: () => {
-                    this.heliosService.defaultWallet( wallet.address );
+                  handler: async () => {
+                    const secret = await this.secureStorage.getSecret();
+                    this.secureStorage.setStorage( 'defaultWallet', wallet , secret );
+                    this.inicialize();
+                    this.wallets = [];
                   }
                 }
               ]
@@ -252,8 +274,11 @@ export class DashboardPage implements OnInit {
                   this.wallets.splice(index, 1);
                   const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
                   if ( userInfo ) {
-                    await this.heliosServersideService.deleteOnlineWallet( wallet.id, wallet.name, 
+                    await this.heliosServersideService.deleteOnlineWallet( wallet.id, wallet.name,
                       userInfo.userName, userInfo.sessionHash );
+                  }
+                  if ( wallet.default ) {
+                    this.secureStorage.setStorage('defaultWallet', this.wallets[0], this.secret);
                   }
                   this.secureStorage.setStorage('wallet', this.wallets, this.secret);
                   await loading.dismiss();
@@ -263,6 +288,7 @@ export class DashboardPage implements OnInit {
                     duration: 2000
                   });
                   toast.present();
+                  this.inicialize();
                 } catch (error) {
                   await loading.dismiss();
                   const toast = await this.toastController.create({
