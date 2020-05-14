@@ -48,12 +48,14 @@ export class DashboardPage implements OnInit {
   slideOpts: any;
   secret: string;
   mainWallet: any[];
+  hash: any;
   private readonly HELIOS_ID = 'helios-protocol';
 
   ngOnInit() {
   }
 
   async inicialize() {
+    console.log('dashboard');
     this.today = moment();
     const loading = await this.loadingController.create({
       message: 'Please wait...',
@@ -65,7 +67,8 @@ export class DashboardPage implements OnInit {
     const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
     if (userInfo) {
       try {
-        const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
+        this.hash = userInfo.sessionHash;
+        const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, this.hash );
         const walletStorage = await this.secureStorage.getStorage( 'wallet', this.secret );
         this.notRepeat(walletsServer.keystores, walletStorage);
 
@@ -85,6 +88,9 @@ export class DashboardPage implements OnInit {
         });
         toast.present();
       }
+    } else {
+      const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', this.secret);
+      this.hash = userInfoLocal.sessionHash;
     }
     const wallets = await this.secureStorage.getStorage( 'wallet', this.secret );
     if (wallets != null) {
@@ -113,7 +119,8 @@ export class DashboardPage implements OnInit {
             name: wallets[0].name,
             avatar: wallets[0].avatar,
             id: wallets[0].id,
-            default: true
+            default: true,
+            privateKey: cryptoJs.AES.encrypt( wallets[0].privateKey, this.hash ).toString()
           };
           this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
           defaultWalletStorage = wallet;
@@ -125,17 +132,17 @@ export class DashboardPage implements OnInit {
               try {
                 let data = null;
                 if (userInfo) {
-                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfo.sessionHash);
+                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, this.hash);
                   data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 } else {
-                  const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', this.secret);
-                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfoLocal.sessionHash);
+                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, this.hash);
                   data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 }
                 if (!receivable && data) {
                   receivable = data;
                 }
               } catch (error) {
+                console.log('wallet que falla', wallet.address);
                 const toast = await this.toastController.create({
                   cssClass: 'text-red',
                   message: error.message,
@@ -152,7 +159,8 @@ export class DashboardPage implements OnInit {
                 name: wallet.name,
                 avatar: wallet.avatar,
                 id: wallet.id,
-                default: false
+                default: false,
+                privateKey: wallet.privateKey
               });
               this.balance += usd;
               resolve();

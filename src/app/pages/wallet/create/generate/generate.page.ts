@@ -65,6 +65,7 @@ export class GeneratePage implements OnInit {
         const resultSign = await this.heliosServersideService.signIn(this.createWallet.value.username,
           this.createWallet.value.password, null);
         const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.createWallet.value.username);
+        await this.secureStorage.setStorage( 'userInfo' , userInfo, secret );
         this.hash = userInfo.sessionHash;
         for (const keystoreInfo of resultSign.keystores) {
           const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, this.createWallet.value.password);
