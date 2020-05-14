@@ -67,7 +67,6 @@ export class DashboardPage implements OnInit {
       try {
         const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
         const walletStorage = await this.secureStorage.getStorage( 'wallet', this.secret );
-
         this.notRepeat(walletsServer.keystores, walletStorage);
 
         const result = await this.heliosServersideService.getContacts(
@@ -79,7 +78,6 @@ export class DashboardPage implements OnInit {
         if (error.error === 2020) {
           this.router.navigate(['/reload-singin']);
         }
-        console.log( error );
         const toast = await this.toastController.create({
           cssClass: 'text-red',
           message: error.errorDescription || error.message,
@@ -169,7 +167,7 @@ export class DashboardPage implements OnInit {
             data.default = true;
           }
         });
-        this.wallets = this.wallets.filter( wallet => wallet.address !== defaultWalletStorage.address);
+        this.wallets = this.wallets.filter( wallet => wallet.address !== defaultWalletStorage.address );
         if (receivable) {
           const toast = await this.toastController.create({
             cssClass: 'text-yellow',
@@ -201,8 +199,6 @@ export class DashboardPage implements OnInit {
   }
 
   doRefresh(event) {
-    console.log('Begin async operation');
-
     setTimeout(() => {
       event.target.complete();
       this.inicialize();
@@ -284,6 +280,7 @@ export class DashboardPage implements OnInit {
                   if ( wallet.default ) {
                     this.secureStorage.setStorage('defaultWallet', this.wallets[0], this.secret);
                   }
+                  this.wallets.push( this.mainWallet[0] );
                   this.secureStorage.setStorage('wallet', this.wallets, this.secret);
                   await loading.dismiss();
                   const toast = await this.toastController.create({
