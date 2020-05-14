@@ -47,6 +47,7 @@ export class DashboardPage implements OnInit {
   up: boolean;
   slideOpts: any;
   secret: string;
+  mainWallet: any[];
   private readonly HELIOS_ID = 'helios-protocol';
 
   ngOnInit() {
@@ -103,10 +104,11 @@ export class DashboardPage implements OnInit {
         const walletPromises = [];
         await this.heliosService.connectToFirstAvailableNode();
         let defaultWalletStorage = await this.secureStorage.getStorage('defaultWallet', this.secret);
-        if( defaultWalletStorage === null ){
-           const balance = await this.heliosService.getBalance(wallets[0].address);
-           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
-           const wallet = {
+        this.mainWallet = [];
+        if ( defaultWalletStorage === null ) {
+          const balance = await this.heliosService.getBalance(wallets[0].address);
+          const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
+          const wallet = {
             address: wallets[0].address ,
             balance,
             usd,
@@ -115,9 +117,10 @@ export class DashboardPage implements OnInit {
             id: wallets[0].id,
             default: true
           };
-           this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
-           defaultWalletStorage = wallet;
+          this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
+          defaultWalletStorage = wallet;
         }
+        this.mainWallet.push( defaultWalletStorage );
         for (const wallet of wallets) {
           walletPromises.push(new Promise(async (resolve, reject) => {
             try {
@@ -166,6 +169,7 @@ export class DashboardPage implements OnInit {
             data.default = true;
           }
         });
+        this.wallets = this.wallets.filter( wallet => wallet.address !== defaultWalletStorage.address);
         if (receivable) {
           const toast = await this.toastController.create({
             cssClass: 'text-yellow',
@@ -304,6 +308,33 @@ export class DashboardPage implements OnInit {
           }).then((val) => val.present());
         }
       }, 
+      {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel'
+      }]
+    });
+    await actionSheet.present();
+  }
+
+  async presentActionSheetDefault(wallet) {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Account Options',
+      buttons: [
+        {
+        text: 'Share Address',
+        icon: 'share',
+        handler: () => {
+          this.alertController.create({
+            header: 'Address Wallet',
+            message: `Address Wallet <strong>${wallet.address}</strong>`,
+            buttons: [{
+                text: 'Okay',
+              }
+            ]
+          }).then((val) => val.present());
+        }
+      },
       {
         text: 'Cancel',
         icon: 'close',
