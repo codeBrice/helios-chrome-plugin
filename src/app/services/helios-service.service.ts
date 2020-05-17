@@ -77,7 +77,7 @@ export class HeliosServiceService {
         const preAccount = await this.web3.hls.accounts.create();
         const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
         const account = new Account(preAccount, encrypt);
-        console.log(account);
+        //console.log(account);
         return account;
       }
     } catch (error) {
@@ -86,15 +86,19 @@ export class HeliosServiceService {
     }
   }
 
-  async privateKeyToAccount(privateKey: string) {
+  async privateKeyToAccount(privateKey: string, password:string) {
     try {
       console.log('privateKeyToAccount');
       if (await this.isConnected()) {
-        const account = await this.web3.hls.accounts.privateKeyToAccount(privateKey);
-        console.log(account);
-        // const encrypt = await this.web3.eth.accounts.encrypt(account.privateKey, '123');
-        // console.log(JSON.stringify(encrypt));
-        return account;
+        if(password === null){
+          const account = await this.web3.hls.accounts.privateKeyToAccount(privateKey);
+          console.log(account);
+          return account;
+        }else{
+          let encrypt =  await this.web3.hls.accounts.encrypt(privateKey, password);
+          console.log(JSON.stringify(encrypt));
+          return encrypt;
+        }
       }
     } catch (error) {
       console.log(error);
@@ -104,12 +108,12 @@ export class HeliosServiceService {
 
   async jsonToAccount(jsonAccount: string, password: string) {
     try {
-      console.log('jsonAccount');
+      //console.log('jsonAccount');
       if (await this.isConnected()) {
         const account = this.web3.hls.accounts.decrypt(JSON.parse(jsonAccount), password);
         // const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
         // const account = new Account(preAccount, encrypt);
-        console.log(account);
+        //console.log(account);
         return account;
       }
     } catch (error) {
@@ -123,7 +127,7 @@ export class HeliosServiceService {
       console.log('jsonAccount');
       if (await this.isConnected()) {
         const encrypt = await this.web3.eth.accounts.encrypt(privateKey, password);
-        console.log(encrypt);
+        //console.log(encrypt);
         return encrypt;
       }
     } catch (error) {
@@ -144,7 +148,7 @@ export class HeliosServiceService {
       if (await this.isConnected()) {
         const hls = await this.web3.hls.getBalance(address);
         const balance = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(hls)))).toFixed(2);
-        console.log(balance);
+        //console.log(balance);
         return balance;
       }
     } catch (error) {

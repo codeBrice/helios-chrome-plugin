@@ -21,6 +21,9 @@ export class GeneratePage implements OnInit {
   public createWallet: FormGroup;
   hash: string;
   wallets: {}[] = [];
+  isLocal: boolean = false;
+  secret: any;
+  isReadOnly: boolean = false;
   constructor(
    private formBuilder: FormBuilder,
    private heliosService: HeliosServiceService,
@@ -32,15 +35,21 @@ export class GeneratePage implements OnInit {
    private secureStorage: SecureStorage
   ) {}
 
-  ngOnInit() {
-
-
+  async ngOnInit() {
     this.createWallet = this.formBuilder.group({
       password: new FormControl('', [Validators.required, Validators.minLength(16)]),
       username: new FormControl('', [Validators.required]),
       name: new FormControl('', [Validators.required])
     });
-
+    this.secret = await this.secureStorage.getSecret();
+    const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
+    if (userInfo == null) {
+    this.isLocal = true;
+    this.createWallet.get('username').disable();
+    } else {
+      this.isReadOnly = true;
+      this.createWallet.get('username').setValue( userInfo.userName );
+    }
   }
 
 
@@ -61,7 +70,7 @@ export class GeneratePage implements OnInit {
       if (storageUser) {
         const result = await this.heliosServersideService.signIn(this.createWallet.value.username, this.createWallet.value.password, null);
         walletCreate = await this.createAccountWallet();
-        await this.heliosServersideService.addOnlineWallet(walletCreate.keystorage, this.createWallet.value.name, storageUser);
+        await this.heliosServersideService.addOnlineWallet(walletCreate.keystorage, this.createWallet.value.name, storageUser, false);
         const resultSign = await this.heliosServersideService.signIn(this.createWallet.value.username,
           this.createWallet.value.password, null);
         const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.createWallet.value.username);
@@ -80,7 +89,12 @@ export class GeneratePage implements OnInit {
         }
         this.secureStorage.setStorage('wallet', this.wallets, secret);
       } else {
-        this.hash = this.secureStorage.generateHash( this.createWallet.value.password );
+        const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', secret );
+        if ( userInfoLocal == null ) {
+          this.hash = this.secureStorage.generateHash( this.createWallet.value.password );
+        } else {
+          this.hash = userInfoLocal.sessionHash;
+        }
         walletCreate = await this.createAccountWallet();
         this.secureStorage.setStorage('userInfoLocal', {sessionHash: this.hash}, secret);
 
@@ -104,7 +118,7 @@ export class GeneratePage implements OnInit {
         } catch (error) {
             const toast = await this.toastController.create({
               cssClass: 'text-red',
-              message: error.message,
+              message: error.errorDescription || error.message,
               duration: 2000
             });
             toast.present();
