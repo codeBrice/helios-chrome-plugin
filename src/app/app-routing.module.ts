@@ -57,7 +57,11 @@ const routes: Routes = [
   {
     path: 'reload-singin',
     loadChildren: () => import('./pages/reload-singin/reload-singin.module').then( m => m.ReloadSinginPageModule)
+  },  {
+    path: 'send-transaction',
+    loadChildren: () => import('./pages/external/send-transaction/send-transaction.module').then( m => m.SendTransactionPageModule)
   }
+
 
 
 ];
