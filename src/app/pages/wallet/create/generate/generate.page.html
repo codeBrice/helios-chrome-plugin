@@ -26,13 +26,13 @@
                 <ion-input type="text" formControlName="name"></ion-input>
               </ion-item>  
 
-              <ion-item color="dark">
-                <ion-label position="floating">Username</ion-label>
-                <ion-input type="text"   formControlName="username"></ion-input>
+              <ion-item color="dark" *ngIf="!isLocal">
+                <ion-label position="floating">Your account username</ion-label>
+                <ion-input type="text"   formControlName="username" [readonly]="isReadOnly"></ion-input>
               </ion-item>  
 
               <ion-item color="dark">
-                  <ion-label position="floating">Password</ion-label>
+                  <ion-label position="floating">Your account password</ion-label>
                   <ion-input type="password" formControlName="password"></ion-input>
                   <ion-row   *ngIf="createWallet.controls['password'].errors && createWallet.controls['password'].dirty ">
                     <p class="validator-error ion-text-center"  style=" color:red">Password must be at least 16 characters long.</p>

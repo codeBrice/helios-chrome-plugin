@@ -1,38 +1,35 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
+import { SecureStorage } from '../../utils/secure-storage';
 import { LoadingController, ToastController } from '@ionic/angular';
-import { UserInfo } from 'src/app/entities/userInfo';
-import { Storage } from '@ionic/storage';
-import { Router } from '@angular/router';
-import { HeliosServiceService } from 'src/app/services/helios-service.service';
-import { Wallet } from 'src/app/entities/wallet';
+import { HeliosServersideService } from '../../services/helios-serverside.service';
+import { HeliosServiceService } from '../../services/helios-service.service';
+import { UserInfo } from '../../entities/UserInfo';
 import cryptoJs from 'crypto-js';
-import { SecureStorage } from '../../../utils/secure-storage';
+import { Wallet } from '../../entities/wallet';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
+  selector: 'app-reload-singin',
+  templateUrl: './reload-singin.page.html',
+  styleUrls: ['./reload-singin.page.scss'],
 })
-export class HomePage implements OnInit {
+export class ReloadSinginPage implements OnInit {
 
-  loginForm: FormGroup;
-  isCorrect = false;
-  enableTouchIdFaceId = false;
+  reSignInForm: FormGroup;
   wallets: {}[] = [];
 
   constructor(private formBuilder: FormBuilder,
-              private heliosServersideService: HeliosServersideService,
+              private secureStorage: SecureStorage,
               private loadingController: LoadingController,
-              public toastController: ToastController,
-              private router: Router,
+              private toastController: ToastController,
+              private heliosServersideService: HeliosServersideService,
               private heliosService: HeliosServiceService,
-              private secureStorage: SecureStorage) { }
+              private router: Router
+              ) { }
 
   ngOnInit() {
-    this.loginForm = this.formBuilder.group({
-      username: new FormControl('', [Validators.required]),
+    this.reSignInForm = this.formBuilder.group({
       password: new FormControl('', [Validators.required, Validators.minLength(16)],)
     });
   }
@@ -46,19 +43,19 @@ export class HomePage implements OnInit {
     await loading.present();
     try {
       const secret = await this.secureStorage.getSecret();
-      const result = await this.heliosServersideService.signIn(this.loginForm.value.username, this.loginForm.value.password, null);
+      const userName = await this.secureStorage.getStorage('username' , secret );
+      const result = await this.heliosServersideService.signIn(userName, this.reSignInForm.value.password, null);
       console.log('result del logeo', result);
-      const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.loginForm.value.username);
+      const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], userName);
 
       for (const keystoreInfo of result.keystores) {
-        const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.loginForm.value.password );
+        const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.reSignInForm.value.password );
         const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
         this.wallets.push(new Wallet(
           keystore.address, cryptoJs.AES.encrypt( keystore.privateKey, result.session_hash).toString(), keystoreInfo.name,
            md5ToAvatar, keystoreInfo.id)
           );
       }
-      this.secureStorage.setStorage('username', this.loginForm.value.username, secret);
       this.secureStorage.setStorage('userInfo', userInfo, secret);
       this.secureStorage.setStorage('wallet', this.wallets, secret);
       this.router.navigate(['/dashboard']);
@@ -71,10 +68,6 @@ export class HomePage implements OnInit {
       toast.present();
     }
     await loading.dismiss();
-  }
-
-  offline() {
-    this.router.navigate(['/add']);
   }
 
 }

@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { ConfirmAccessPageRoutingModule } from './confirm-access-routing.module';
 
 import { ConfirmAccessPage } from './confirm-access.page';
+import { SecureStorage } from '../../../utils/secure-storage';
 
 @NgModule({
   imports: [
@@ -14,6 +15,9 @@ import { ConfirmAccessPage } from './confirm-access.page';
     FormsModule,
     IonicModule,
     ConfirmAccessPageRoutingModule
+  ],
+  providers: [
+    SecureStorage
   ],
   declarations: [ConfirmAccessPage]
 })

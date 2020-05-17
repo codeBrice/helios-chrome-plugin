@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { HeliosServiceService } from './services/helios-service.service';
 import { SecureStorage } from './utils/secure-storage';
@@ -16,6 +16,7 @@ export class AppComponent {
 
   isCorrect = false; //TODO false pin activate
   enableTouchIdFaceId = false;
+  confirmAccess = false;
 
   public selectedIndex = 0;
   public appPages = [
@@ -41,13 +42,21 @@ export class AppComponent {
     }
   ];
 
+  queryParams: Params;
+
   constructor(
     private platform: Platform,
     private storage: Storage,
     private router: Router,
     private loadingController: LoadingController,
-    private secureStorage: SecureStorage
+    private secureStorage: SecureStorage,
+    private activatedRoute: ActivatedRoute
   ) {
+    /* this.activatedRoute.queryParams.subscribe( params => {
+      console.log('aaaaa', params);
+      this.queryParams = params;
+    }); */
+    this.confirmAccess = window.location.href.includes('confirm-access');
     this.initializeApp();
   }
 
@@ -70,10 +79,11 @@ export class AppComponent {
     const secret = await this.secureStorage.getSecret();
     const wallet = await this.secureStorage.getStorage( 'wallet', secret );
     if (wallet != null) {
+      if (!this.confirmAccess) {
         this.router.navigate(['/dashboard']);
-        await loading.dismiss();
+      }
+      await loading.dismiss();
     } else {
-      this.isCorrect = true;
       this.router.navigate(['/homewallet']);
       await loading.dismiss();
     }

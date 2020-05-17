@@ -17,7 +17,9 @@
             "https://*/*",
             "http://*/*"
           ],
-          "js": ["./content.js"]
+          "js": ["./content.js"],
+          "run_at": "document_start",
+          "all_frames": true
         }
       ],
     "background" : {
@@ -25,7 +27,8 @@
         "persistent": true
     },
     "web_accessible_resources": [
-      "index.html"
+      "index.html",
+      "web3.js"
     ],
     "icons": {
         "64": "assets/icons/heliosLogo64.png"

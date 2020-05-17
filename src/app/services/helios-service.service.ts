@@ -21,53 +21,6 @@ export class HeliosServiceService {
     'wss://masternode1.heliosprotocol.io:30304'
   ];
 
-  /* private methods = {
-    property: 'hls',
-    methods: [
-      {
-        name: 'getBalance',
-        call: 'hls_getBalance',
-        params: 2,
-        inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
-        outputFormatter: formatters.outputBigNumberFormatter
-      }, {
-        name: 'getBlockNumber',
-        call: 'hls_getBlockNumber',
-        params: 2,
-        inputFormatter: [formatters.inputAddressFormatter, HlsUtils.inputTimestampFormatter],
-        outputFormatter: Utils.hexToNumber
-      } , {
-        name: 'getBlockByNumber',
-        call: 'hls_getBlockByNumber',
-        params: 3,
-        inputFormatter: [(val) => val, (val) => val, (val) => !!val],
-        outputFormatter: formatters.outputBlockFormatter
-      } , {
-        name: 'getTransactionByHash',
-        call: 'hls_getTransactionByHash',
-        params: 1,
-        outputFormatter: formatters.outputTransactionFormatter
-      }, {
-        name: 'getTransactionReceipt',
-        call: 'hls_getTransactionReceipt',
-        params: 1,
-        outputFormatter: formatters.outputTransactionReceiptFormatter
-      },
-      {
-        name: 'getGasPrice',
-        call: 'hls_getGasPrice',
-        params: 0,
-        outputFormatter: Utils.hexToNumber
-      },
-      {
-        name: 'sendTransaction',
-        call: 'personal_sendTransaction',
-        params: 2,
-        inputFormatter: [formatters.inputTransactionFormatter, null]
-      }
-    ]
-  }; */
-
   constructor() {
   }
 
@@ -124,7 +77,7 @@ export class HeliosServiceService {
         const preAccount = await this.web3.hls.accounts.create();
         const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
         const account = new Account(preAccount, encrypt);
-        console.log(account);
+        //console.log(account);
         return account;
       }
     } catch (error) {
@@ -133,15 +86,19 @@ export class HeliosServiceService {
     }
   }
 
-  async privateKeyToAccount(privateKey: string) {
+  async privateKeyToAccount(privateKey: string, password:string) {
     try {
       console.log('privateKeyToAccount');
       if (await this.isConnected()) {
-        const account = await this.web3.hls.accounts.privateKeyToAccount(privateKey);
-        console.log(account);
-        // const encrypt = await this.web3.eth.accounts.encrypt(account.privateKey, '123');
-        // console.log(JSON.stringify(encrypt));
-        return account;
+        if(password === null){
+          const account = await this.web3.hls.accounts.privateKeyToAccount(privateKey);
+          console.log(account);
+          return account;
+        }else{
+          let encrypt =  await this.web3.hls.accounts.encrypt(privateKey, password);
+          console.log(JSON.stringify(encrypt));
+          return encrypt;
+        }
       }
     } catch (error) {
       console.log(error);
@@ -151,12 +108,12 @@ export class HeliosServiceService {
 
   async jsonToAccount(jsonAccount: string, password: string) {
     try {
-      console.log('jsonAccount');
+      //console.log('jsonAccount');
       if (await this.isConnected()) {
         const account = this.web3.hls.accounts.decrypt(JSON.parse(jsonAccount), password);
         // const encrypt = await this.web3.eth.accounts.encrypt(preAccount.privateKey, password);
         // const account = new Account(preAccount, encrypt);
-        console.log(account);
+        //console.log(account);
         return account;
       }
     } catch (error) {
@@ -170,7 +127,7 @@ export class HeliosServiceService {
       console.log('jsonAccount');
       if (await this.isConnected()) {
         const encrypt = await this.web3.eth.accounts.encrypt(privateKey, password);
-        console.log(encrypt);
+        //console.log(encrypt);
         return encrypt;
       }
     } catch (error) {
@@ -191,7 +148,7 @@ export class HeliosServiceService {
       if (await this.isConnected()) {
         const hls = await this.web3.hls.getBalance(address);
         const balance = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(hls)))).toFixed(2);
-        console.log(balance);
+        //console.log(balance);
         return balance;
       }
     } catch (error) {

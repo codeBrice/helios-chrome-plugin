@@ -44,12 +44,12 @@ export class HeliosServersideService {
      * @param name string
      * @returns  Object
      */
-    async addOnlineWallet(keystore, name, storageUser) {
+    async addOnlineWallet(keystore, name, storageUser,importedWallet) {
         const query = {
             action: 'add_keystore',
             username: storageUser.userName,
             session_hash: storageUser.sessionHash,
-            keystore: JSON.stringify(keystore),
+            keystore: ( importedWallet ? keystore : JSON.stringify(keystore) ),
             wallet_name: name
         };
         return await this.queryServer(query);
@@ -265,7 +265,6 @@ async deleteContact(id, username, sessionHash) {
 
             })
             .catch(err => {
-
                 if (err.error === undefined || err.errorDescription === undefined) {
                     throw new ErrorServer(err.errno, err.message);
 

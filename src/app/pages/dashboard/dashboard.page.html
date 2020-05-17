@@ -21,7 +21,7 @@
     </ion-refresher>
     <!-- BALANCE -->
     <ion-card class="black">
-        <ion-card-header>
+        <ion-card-header class="ion-no-padding">
             <ion-row>
                 <ion-col>
                     <ion-card-title class="title text-yellow"><span>Balance</span></ion-card-title>
@@ -41,6 +41,25 @@
             <span>Gas price: </span><span>{{gasPrice | number:'1.0-2'}}</span>
         </ion-card-content>
     </ion-card>
+    <ion-row>
+        <ion-col size="12">
+            <ion-title class="title title-accounts text-yellow  ion-text-left ion-no-padding"><span>Main wallet</span></ion-title>
+        </ion-col>
+        <ion-col size="12">
+            <ion-card class="black" *ngFor ="let wallet of mainWallet">
+                <ion-card-content class="ion-text-center ion-no-padding pointer" (click)="presentActionSheetDefault(wallet)">
+                    <ion-fab-button size="small" color="dark" class="fab">
+                        <img [src]="wallet.avatar | avatarformat">
+                    </ion-fab-button>
+                    <br>
+                    <div class='wallet-name'>{{wallet.name}}</div>
+                    <span class="balance-accounts">{{wallet.balance | number:'1.0-2'}}</span>
+                    <br>
+                    <span class="text-yellow">$ </span><span>{{wallet.usd | number:'1.0-2'}}</span>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+    </ion-row>
     <!-- ACCOUNTS -->
     <ion-row>
         <ion-col size="10">

@@ -1,0 +1,40 @@
+<ion-content color="dark">
+  <form [formGroup]="reSignInForm">
+    <ion-grid>
+      <ion-row style="margin-top: 25%;" class="ion-align-items-center">
+        <ion-col size="6" class="ion-align-self-center" offset="3">
+          <ion-img src="../../../assets/images/helios_protocol.png"></ion-img>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-toolbar position="center" color="dark">
+      <ion-grid>
+        <ion-row class="label-section-center">
+          <ion-col class="ion-text-center ">
+            <ion-label color="light">Welcome back to the Helios Protocol extension wallet.</ion-label>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12">
+            <ion-item color="dark">
+              <ion-label position="floating">Password</ion-label>
+              <ion-input type="password" formControlName="password"></ion-input>
+              <ion-row *ngIf="reSignInForm.controls['password'].errors && reSignInForm.controls['password'].dirty ">
+                <p class="validator-error ion-text-center" style=" color:red">Password must be at least 16 characters
+                  long.</p>
+              </ion-row>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-toolbar>
+
+    <ion-row>
+      <ion-col size="12">
+        <ion-button expand="block" color="helios" (click)="login()" class="button">Sign in</ion-button>
+      </ion-col>
+    </ion-row>
+
+  </form>
+</ion-content>

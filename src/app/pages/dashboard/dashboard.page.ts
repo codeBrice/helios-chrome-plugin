@@ -22,7 +22,6 @@ import { Wallet } from '../../entities/wallet';
 export class DashboardPage implements OnInit {
 
   constructor(
-    private storage: Storage,
     private heliosService: HeliosServiceService,
     private loadingController: LoadingController,
     private route: ActivatedRoute,
@@ -48,13 +47,15 @@ export class DashboardPage implements OnInit {
   up: boolean;
   slideOpts: any;
   secret: string;
+  mainWallet: any[];
+  hash: any;
   private readonly HELIOS_ID = 'helios-protocol';
 
   ngOnInit() {
-    // this.inicialize();
   }
 
   async inicialize() {
+    console.log('dashboard');
     this.today = moment();
     const loading = await this.loadingController.create({
       message: 'Please wait...',
@@ -66,9 +67,9 @@ export class DashboardPage implements OnInit {
     const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
     if (userInfo) {
       try {
-        const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, userInfo.sessionHash);
+        this.hash = userInfo.sessionHash;
+        const walletsServer  = await this.heliosServersideService.getOnlineWallets(userInfo.userName, this.hash );
         const walletStorage = await this.secureStorage.getStorage( 'wallet', this.secret );
-
         this.notRepeat(walletsServer.keystores, walletStorage);
 
         const result = await this.heliosServersideService.getContacts(
@@ -78,10 +79,8 @@ export class DashboardPage implements OnInit {
         this.secureStorage.setStorage('contacts', result.contacts, this.secret);
       } catch (error) {
         if (error.error === 2020) {
-          this.secureStorage.clearStorage();
-          this.router.navigate(['/homewallet']);
+          this.router.navigate(['/reload-singin']);
         }
-        console.log( error );
         const toast = await this.toastController.create({
           cssClass: 'text-red',
           message: error.errorDescription || error.message,
@@ -89,6 +88,9 @@ export class DashboardPage implements OnInit {
         });
         toast.present();
       }
+    } else {
+      const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', this.secret);
+      this.hash = userInfoLocal.sessionHash;
     }
     const wallets = await this.secureStorage.getStorage( 'wallet', this.secret );
     if (wallets != null) {
@@ -105,23 +107,42 @@ export class DashboardPage implements OnInit {
         let receivable = false;
         const walletPromises = [];
         await this.heliosService.connectToFirstAvailableNode();
+        let defaultWalletStorage = await this.secureStorage.getStorage('defaultWallet', this.secret);
+        this.mainWallet = [];
+        if ( defaultWalletStorage === null ) {
+          const balance = await this.heliosService.getBalance(wallets[0].address);
+          const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
+          const wallet = {
+            address: wallets[0].address ,
+            balance,
+            usd,
+            name: wallets[0].name,
+            avatar: wallets[0].avatar,
+            id: wallets[0].id,
+            default: true,
+            privateKey: cryptoJs.AES.encrypt( wallets[0].privateKey, this.hash ).toString()
+          };
+          this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
+          defaultWalletStorage = wallet;
+        }
+        this.mainWallet.push( defaultWalletStorage );
         for (const wallet of wallets) {
           walletPromises.push(new Promise(async (resolve, reject) => {
             try {
               try {
                 let data = null;
                 if (userInfo) {
-                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfo.sessionHash);
+                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, this.hash);
                   data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 } else {
-                  const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', this.secret);
-                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, userInfoLocal.sessionHash);
+                  const bytes  = cryptoJs.AES.decrypt(wallet.privateKey, this.hash);
                   data = await this.heliosService.getReceivableTransactions(wallet.address, bytes.toString(cryptoJs.enc.Utf8));
                 }
                 if (!receivable && data) {
                   receivable = data;
                 }
               } catch (error) {
+                console.log('wallet que falla', wallet.address);
                 const toast = await this.toastController.create({
                   cssClass: 'text-red',
                   message: error.message,
@@ -137,7 +158,9 @@ export class DashboardPage implements OnInit {
                 usd,
                 name: wallet.name,
                 avatar: wallet.avatar,
-                id: wallet.id
+                id: wallet.id,
+                default: false,
+                privateKey: wallet.privateKey
               });
               this.balance += usd;
               resolve();
@@ -146,7 +169,13 @@ export class DashboardPage implements OnInit {
             }
           }));
         }
-        await Promise.all(walletPromises)
+        await Promise.all(walletPromises);
+        this.wallets.map( data => {
+          if ( data.address === defaultWalletStorage.address ) {
+            data.default = true;
+          }
+        });
+        this.wallets = this.wallets.filter( wallet => wallet.address !== defaultWalletStorage.address );
         if (receivable) {
           const toast = await this.toastController.create({
             cssClass: 'text-yellow',
@@ -178,8 +207,6 @@ export class DashboardPage implements OnInit {
   }
 
   doRefresh(event) {
-    console.log('Begin async operation');
-
     setTimeout(() => {
       event.target.complete();
       this.inicialize();
@@ -204,8 +231,11 @@ export class DashboardPage implements OnInit {
                   cssClass: 'secondary',
                 }, {
                   text: 'Okay',
-                  handler: () => {
-                    this.heliosService.defaultWallet( wallet.address );
+                  handler: async () => {
+                    const secret = await this.secureStorage.getSecret();
+                    this.secureStorage.setStorage( 'defaultWallet', wallet , secret );
+                    this.inicialize();
+                    this.wallets = [];
                   }
                 }
               ]
@@ -252,9 +282,13 @@ export class DashboardPage implements OnInit {
                   this.wallets.splice(index, 1);
                   const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
                   if ( userInfo ) {
-                    await this.heliosServersideService.deleteOnlineWallet( wallet.id, wallet.name, 
+                    await this.heliosServersideService.deleteOnlineWallet( wallet.id, wallet.name,
                       userInfo.userName, userInfo.sessionHash );
                   }
+                  if ( wallet.default ) {
+                    this.secureStorage.setStorage('defaultWallet', this.wallets[0], this.secret);
+                  }
+                  this.wallets.push( this.mainWallet[0] );
                   this.secureStorage.setStorage('wallet', this.wallets, this.secret);
                   await loading.dismiss();
                   const toast = await this.toastController.create({
@@ -263,6 +297,7 @@ export class DashboardPage implements OnInit {
                     duration: 2000
                   });
                   toast.present();
+                  this.inicialize();
                 } catch (error) {
                   await loading.dismiss();
                   const toast = await this.toastController.create({
@@ -278,6 +313,33 @@ export class DashboardPage implements OnInit {
           }).then((val) => val.present());
         }
       }, 
+      {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel'
+      }]
+    });
+    await actionSheet.present();
+  }
+
+  async presentActionSheetDefault(wallet) {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Account Options',
+      buttons: [
+        {
+        text: 'Share Address',
+        icon: 'share',
+        handler: () => {
+          this.alertController.create({
+            header: 'Address Wallet',
+            message: `Address Wallet <strong>${wallet.address}</strong>`,
+            buttons: [{
+                text: 'Okay',
+              }
+            ]
+          }).then((val) => val.present());
+        }
+      },
       {
         text: 'Cancel',
         icon: 'close',

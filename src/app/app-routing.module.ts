@@ -49,10 +49,19 @@ const routes: Routes = [
   {
     path: 'chart',
     loadChildren: () => import('./pages/chart/chart.module').then( m => m.ChartPageModule)
-  },  {
+  },
+  {
     path: 'confirm-access',
     loadChildren: () => import('./pages/external/confirm-access/confirm-access.module').then( m => m.ConfirmAccessPageModule)
+  },
+  {
+    path: 'reload-singin',
+    loadChildren: () => import('./pages/reload-singin/reload-singin.module').then( m => m.ReloadSinginPageModule)
+  },  {
+    path: 'send-transaction',
+    loadChildren: () => import('./pages/external/send-transaction/send-transaction.module').then( m => m.SendTransactionPageModule)
   }
+
 
 
 ];

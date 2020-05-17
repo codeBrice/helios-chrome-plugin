@@ -2,6 +2,7 @@ module.exports = {
     entry: {
       content: './src/scripts/content.ts',
       background: './src/scripts/background.ts',
+      web3: './src/scripts/web3.ts',
     },
     output: {
       filename: '[name].js',
