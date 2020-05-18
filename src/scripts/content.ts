@@ -42,4 +42,11 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     closeSpan.textContent = request.address;
     node.appendChild(closeSpan);
   }
+  if (request.type === 'statusTransaction') {
+    const node = document.head || document.documentElement;
+    const closeSpan = document.createElement('span');
+    closeSpan.setAttribute('id', 'hlsStatus');
+    closeSpan.textContent = request.status;
+    node.appendChild(closeSpan);
+  }
 });

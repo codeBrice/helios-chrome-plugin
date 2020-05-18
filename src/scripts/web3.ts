@@ -21,11 +21,34 @@ const enable = () => {
   document.dispatchEvent(event);
 };
 
-const send = async (tx) => {
+const send = (tx) => {
   const result = document.getElementById('hlsAd');
   if (result) {
     const event = new CustomEvent('sendHelios', {detail: tx});
     document.dispatchEvent(event);
+  } else {
+    console.error('Helios not Enable');
+  }
+};
+
+const sendAsync = async (tx) => {
+  const result = document.getElementById('hlsAd');
+  if (result) {
+    const event = new CustomEvent('sendHelios', {detail: tx});
+    document.dispatchEvent(event);
+
+    return await new Promise(resolve => {
+      const interval = setInterval(() => {
+        const hlsStatus = document.getElementById('hlsStatus');
+        if (hlsStatus) {
+            const status = hlsStatus.innerText;
+            hlsStatus.remove();
+            clearInterval(interval);
+            resolve((status === 'true'));
+        }
+      }, 5000);
+    });
+
   } else {
     console.error('Helios not Enable');
   }
@@ -54,7 +77,7 @@ async function connectToFirstAvailableNode() {
             // await helios.eth.net.getPeerCount();
             if (isConnected() || listen) {
                 console.log(`Successfully connected to ${node}`);
-                window.helios = { send, enable , selectedAddress};
+                window.helios = { send, sendAsync, enable , selectedAddress};
                 return true;
             }
           } catch ( error ) {

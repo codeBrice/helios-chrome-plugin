@@ -161,6 +161,12 @@ export class SendTransactionPage implements OnInit {
       });
       toast.present();
 
+      // contentscript
+      chrome.tabs.sendMessage(Number(this.chromeTab.id) as number, {
+        type: 'statusTransaction',
+        status: true
+      });
+
     } catch (error) {
       const toast = await this.toastController.create({
         cssClass: 'text-red',
