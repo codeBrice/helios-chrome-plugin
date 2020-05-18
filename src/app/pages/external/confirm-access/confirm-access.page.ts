@@ -28,13 +28,15 @@ export class ConfirmAccessPage implements OnInit {
     // background
     const secret = await this.secureStorage.getSecret();
     const defaultWallet = await this.secureStorage.getStorage('defaultWallet', secret );
-    chrome.runtime.sendMessage('', {
+    /* chrome.runtime.sendMessage('', {
       type: 'access'
-    });
+    }); */
     // contentscript
     chrome.tabs.sendMessage(Number(this.queryParams.id) as number, {
       type: 'access',
       address: defaultWallet.address
     });
+
+    window.close();
   }
 }

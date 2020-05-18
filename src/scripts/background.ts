@@ -12,8 +12,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             height: 550,
         });
     }
-    if (request.type === 'access') {
-        console.log('background confirm-access');
-        console.log(window.helios);
+    if (request.type === 'openSend') {
+        chrome.windows.create({
+            url: `index.html#/send-transaction?tx=${window.btoa(JSON.stringify(request.tx))}`,
+            type: 'popup',
+            width: 300,
+            height: 550,
+        });
     }
   });

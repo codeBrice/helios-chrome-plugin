@@ -3,7 +3,7 @@ import { ModalController, LoadingController, ToastController } from '@ionic/angu
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import cryptoJs from 'crypto-js';
 import { SecureStorage } from '../../../utils/secure-storage';
 
@@ -18,7 +18,12 @@ export class SendTransactionPage implements OnInit {
               private loadingController: LoadingController,
               private coingeckoService: CoingeckoService, private heliosService: HeliosServiceService,
               public toastController: ToastController,
-              private router: Router, private secureStorage: SecureStorage) { }
+              private router: Router, private secureStorage: SecureStorage,
+              private activatedRoute: ActivatedRoute) {
+                this.activatedRoute.queryParams.subscribe( params => {
+                  this.transaction = JSON.parse(window.atob(params.tx));
+                });
+               }
 
   sendForm: FormGroup;
   wallets: any;
@@ -28,16 +33,14 @@ export class SendTransactionPage implements OnInit {
   totalUsd = 0;
   secret: string;
   to: any[];
-  isInvalid: boolean = false;
+  isInvalid = false;
+  transaction: any;
   private readonly HELIOS_ID = 'helios-protocol';
-  //TODO CHANGE TO OBJECCT FROM CONTENT SCRIPT
-  transaction: any  = ({
-    from: '0x9f53847cc211147bF655d76e8bC7B211E9710e2c',
-    to: '0x07D62a36D35261AfEcF6cb89382D393a398edc1a',
-    value: 10000
-  });
 
   async ngOnInit() {
+
+    await this.heliosService.connectToFirstAvailableNode();
+
     this.sendForm = this.formBuilder.group({
       amount: new FormControl('', [Validators.required, Validators.min(1)]),
       currency: new FormControl('hls', [Validators.required]),
@@ -46,13 +49,14 @@ export class SendTransactionPage implements OnInit {
     }, {
       validator: [this.isAddress('toAddress')]
     });
+
     try {
-      this.sendForm.controls['amount'].setValue( this.transaction.value );
-      this.sendForm.controls['toAddress'].setValue( this.transaction.to );
-      this.sendForm.controls['from'].setValue( this.transaction.from );
+      this.sendForm.controls.amount.setValue(this.transaction.value);
+      this.sendForm.controls.toAddress.setValue(this.transaction.to);
+      this.sendForm.controls.from.setValue(this.transaction.from);
       this.to = [];
-      const balance = await this.heliosService.getBalance( this.transaction.from );
-      if ( balance < this.transaction.value ) {
+      const balance = await this.heliosService.getBalance(this.transaction.from);
+      if (balance < this.transaction.value) {
         this.isInvalid = true;
         const toast = await this.toastController.create({
           cssClass: 'text-red',
@@ -61,10 +65,10 @@ export class SendTransactionPage implements OnInit {
         });
         toast.present();
       }
-      this.to.push({ address: this.transaction.to , avatar: cryptoJs.MD5( this.transaction.to ).toString()});
+      this.to.push({ address: this.transaction.to, avatar: cryptoJs.MD5(this.transaction.to).toString() });
       this.secret = await this.secureStorage.getSecret();
       let wallets = await this.secureStorage.getStorage('wallet', this.secret);
-      wallets = wallets.filter( wallet => wallet.address === this.transaction.from );
+      wallets = wallets.filter(wallet => wallet.address === this.transaction.from);
       this.wallets = [];
       const loading = await this.loadingController.create({
         message: 'Please wait...',
@@ -97,6 +101,7 @@ export class SendTransactionPage implements OnInit {
       toast.present();
     }
   }
+
 
   updateTotals() {
     console.log( 'updateTotals');
