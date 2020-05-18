@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('background', request.type);
     if (request.type === 'openInit') {
         chrome.windows.create({
-            url: `index.html#/confirm-access?id=${sender.tab.id}`,
+            url: `index.html#/confirm-access?tab=${window.btoa(JSON.stringify(sender.tab))}`,
             type: 'popup',
             width: 300,
             height: 550,
@@ -14,7 +14,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.type === 'openSend') {
         chrome.windows.create({
-            url: `index.html#/send-transaction?tx=${window.btoa(JSON.stringify(request.tx))}`,
+            url: `index.html#/send-transaction?tx=${window.btoa(JSON.stringify(request.tx))}
+                    &tab=${window.btoa(JSON.stringify(sender.tab))}`,
             type: 'popup',
             width: 300,
             height: 550,

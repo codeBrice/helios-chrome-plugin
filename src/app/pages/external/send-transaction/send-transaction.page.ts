@@ -3,7 +3,7 @@ import { ModalController, LoadingController, ToastController } from '@ionic/angu
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { HeliosServiceService } from 'src/app/services/helios-service.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import cryptoJs from 'crypto-js';
 import { SecureStorage } from '../../../utils/secure-storage';
 
@@ -22,6 +22,7 @@ export class SendTransactionPage implements OnInit {
               private activatedRoute: ActivatedRoute) {
                 this.activatedRoute.queryParams.subscribe( params => {
                   this.transaction = JSON.parse(window.atob(params.tx));
+                  this.chromeTab = JSON.parse(window.atob(params.tab));
                 });
                }
 
@@ -35,22 +36,33 @@ export class SendTransactionPage implements OnInit {
   to: any[];
   isInvalid = false;
   transaction: any;
+  chromeTab: Params;
+  whiteList: {}[];
   private readonly HELIOS_ID = 'helios-protocol';
 
   async ngOnInit() {
 
-    await this.heliosService.connectToFirstAvailableNode();
-
-    this.sendForm = this.formBuilder.group({
-      amount: new FormControl('', [Validators.required, Validators.min(1)]),
-      currency: new FormControl('hls', [Validators.required]),
-      toAddress: new FormControl('', [Validators.required]),
-      from: new FormControl('', [Validators.required])
-    }, {
-      validator: [this.isAddress('toAddress')]
-    });
-
     try {
+
+      this.secret = await this.secureStorage.getSecret();
+      const whiteList = await this.secureStorage.getStorage('whiteList', this.secret);
+      this.whiteList = whiteList || [];
+
+      if (!this.whiteList.find(element => element === this.chromeTab.url.split('/')[2])) {
+        throw new Error(`${this.chromeTab.url.split('/')[2]} it is not a allowed site.`);
+      }
+
+      await this.heliosService.connectToFirstAvailableNode();
+
+      this.sendForm = this.formBuilder.group({
+        amount: new FormControl('', [Validators.required, Validators.min(1)]),
+        currency: new FormControl('hls', [Validators.required]),
+        toAddress: new FormControl('', [Validators.required]),
+        from: new FormControl('', [Validators.required])
+      }, {
+        validator: [this.isAddress('toAddress')]
+      });
+
       this.sendForm.controls.amount.setValue(this.transaction.value);
       this.sendForm.controls.toAddress.setValue(this.transaction.to);
       this.sendForm.controls.from.setValue(this.transaction.from);
@@ -66,7 +78,7 @@ export class SendTransactionPage implements OnInit {
         toast.present();
       }
       this.to.push({ address: this.transaction.to, avatar: cryptoJs.MD5(this.transaction.to).toString() });
-      this.secret = await this.secureStorage.getSecret();
+
       let wallets = await this.secureStorage.getStorage('wallet', this.secret);
       wallets = wallets.filter(wallet => wallet.address === this.transaction.from);
       this.wallets = [];
@@ -184,6 +196,10 @@ export class SendTransactionPage implements OnInit {
 
   dismiss() {
     this.modalController.dismiss(false);
+  }
+
+  reject() {
+    window.close();
   }
 
 }

@@ -10,33 +10,53 @@ import { SecureStorage } from '../../../utils/secure-storage';
 })
 export class ConfirmAccessPage implements OnInit {
 
-  queryParams: Params;
+  chromeTab: Params;
+  secret: string;
+  whiteList: {}[];
 
   constructor( private activatedRoute: ActivatedRoute,
                private heliosService: HeliosServiceService,
                private secureStorage: SecureStorage) {
     this.activatedRoute.queryParams.subscribe( params => {
-      this.queryParams = params;
+      this.chromeTab = JSON.parse(window.atob(params.tab));
     });
    }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.secret = await this.secureStorage.getSecret();
+    const whiteList = await this.secureStorage.getStorage('whiteList', this.secret);
+    this.whiteList = whiteList || [];
+    if (this.whiteList.find(element => element === this.chromeTab.url.split('/')[2])) {
+      const defaultWallet = await this.secureStorage.getStorage('defaultWallet', this.secret );
+      chrome.tabs.sendMessage(Number(this.chromeTab.id) as number, {
+        type: 'access',
+        address: defaultWallet.address
+      });
+      window.close();
+    }
   }
 
   async access() {
-    console.log('access' , this.queryParams);
+    console.log('access' , this.chromeTab);
     // background
-    const secret = await this.secureStorage.getSecret();
-    const defaultWallet = await this.secureStorage.getStorage('defaultWallet', secret );
+    const defaultWallet = await this.secureStorage.getStorage('defaultWallet', this.secret );
     /* chrome.runtime.sendMessage('', {
       type: 'access'
     }); */
+    // save page
+    this.whiteList.push(this.chromeTab.url.split('/')[2]);
+    this.secureStorage.setStorage('whiteList', this.whiteList , this.secret );
+
     // contentscript
-    chrome.tabs.sendMessage(Number(this.queryParams.id) as number, {
+    chrome.tabs.sendMessage(Number(this.chromeTab.id) as number, {
       type: 'access',
       address: defaultWallet.address
     });
 
+    window.close();
+  }
+
+  cancel() {
     window.close();
   }
 }
