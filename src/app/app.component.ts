@@ -16,7 +16,6 @@ export class AppComponent {
 
   isCorrect = false; //TODO false pin activate
   enableTouchIdFaceId = false;
-  confirmAccess = false;
 
   public selectedIndex = 0;
   public appPages = [
@@ -56,7 +55,6 @@ export class AppComponent {
       console.log('aaaaa', params);
       this.queryParams = params;
     }); */
-    this.confirmAccess = window.location.href.includes('confirm-access');
     this.initializeApp();
   }
 
@@ -79,7 +77,8 @@ export class AppComponent {
     const secret = await this.secureStorage.getSecret();
     const wallet = await this.secureStorage.getStorage( 'wallet', secret );
     if (wallet != null) {
-      if (!this.confirmAccess) {
+      if (!(window.location.href.includes('send-transaction') ||
+            window.location.href.includes('confirm-access'))) {
         this.router.navigate(['/dashboard']);
       }
       await loading.dismiss();

@@ -21,20 +21,32 @@ injectScript(chrome.extension.getURL('web3.js'));
 
 console.log('content');
 
-document.addEventListener('initHeliosApp', function(data) {
+document.addEventListener('initHeliosApp', (data) => {
   chrome.runtime.sendMessage('', {
     type: 'openInit'
   });
 });
 
+document.addEventListener('sendHelios', (data: CustomEvent) => {
+  chrome.runtime.sendMessage('', {
+    type: 'openSend',
+    tx: data.detail
+  });
+});
+
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  console.log(request.type);
   if (request.type === 'access') {
-    console.log(window.helios);
     const node = document.head || document.documentElement;
     const closeSpan = document.createElement('span');
     closeSpan.setAttribute('id', 'hlsAd');
     closeSpan.textContent = request.address;
+    node.appendChild(closeSpan);
+  }
+  if (request.type === 'statusTransaction') {
+    const node = document.head || document.documentElement;
+    const closeSpan = document.createElement('span');
+    closeSpan.setAttribute('id', 'hlsStatus');
+    closeSpan.textContent = request.status;
     node.appendChild(closeSpan);
   }
 });

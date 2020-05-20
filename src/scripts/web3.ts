@@ -17,27 +17,44 @@ console.log('web3');
 
 // methods in contentscript
 const enable = () => {
-  const event = document.createEvent('Event');
-  event.initEvent('initHeliosApp');
+  const event = new CustomEvent('initHeliosApp');
   document.dispatchEvent(event);
 };
 
-const send = async (tx) => {
-  try {
-    console.log('sendTransaction');
-    if (await isConnected()) {
-      const transaction = await helios.hls.sendTransactions([tx]);
-      console.log(transaction);
-      return transaction;
-    }
-  } catch (error) {
-    console.log(error);
-    throw new Error('Failed sendTransaction');
+const send = (tx) => {
+  const result = document.getElementById('hlsAd');
+  if (result) {
+    const event = new CustomEvent('sendHelios', {detail: tx});
+    document.dispatchEvent(event);
+  } else {
+    console.error('Helios not Enable');
+  }
+};
+
+const sendAsync = async (tx) => {
+  const result = document.getElementById('hlsAd');
+  if (result) {
+    const event = new CustomEvent('sendHelios', {detail: tx});
+    document.dispatchEvent(event);
+
+    return await new Promise(resolve => {
+      const interval = setInterval(() => {
+        const hlsStatus = document.getElementById('hlsStatus');
+        if (hlsStatus) {
+            const status = hlsStatus.innerText;
+            hlsStatus.remove();
+            clearInterval(interval);
+            resolve((status === 'true'));
+        }
+      }, 5000);
+    });
+
+  } else {
+    console.error('Helios not Enable');
   }
 };
 
 const selectedAddress = () => {
-  console.log('selectedAddress');
   const result = document.getElementById('hlsAd');
   if (result) {
     return result.innerText;
@@ -60,7 +77,7 @@ async function connectToFirstAvailableNode() {
             // await helios.eth.net.getPeerCount();
             if (isConnected() || listen) {
                 console.log(`Successfully connected to ${node}`);
-                window.helios = { send, enable , selectedAddress};
+                window.helios = { send, sendAsync, enable , selectedAddress};
                 return true;
             }
           } catch ( error ) {
