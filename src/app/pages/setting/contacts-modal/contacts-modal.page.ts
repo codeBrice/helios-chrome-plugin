@@ -175,9 +175,40 @@ export class ContactsModalPage implements OnInit {
                 cssClass: 'secondary',
               }, {
                 text: 'Okay',
-                handler: () => {
-                  this.contactsList.splice(index, 1);
-                  this.secureStorage.setStorage( 'contacts', this.contactsList, this.secret );
+                handler: async () => {
+                  const loading = await this.loadingController.create({
+                    message: 'Please wait...',
+                    translucent: true,
+                    cssClass: 'custom-class custom-loading'
+                  });
+                  await loading.present();
+                  try {
+                    const userInfo: UserInfo = await this.secureStorage.getStorage('userInfo', this.secret);
+                    if (userInfo) {
+                      await this.heliosServersideService.deleteContact(
+                        contact.id,
+                        userInfo.userName,
+                        userInfo.sessionHash
+                      );
+                      const result = await this.heliosServersideService.getContacts(
+                        userInfo.userName,
+                        userInfo.sessionHash
+                      );
+                      this.contactsList = result.contacts;
+                    } else {
+                      this.contactsList.splice(index, 1);
+                      this.secureStorage.setStorage( 'contacts', this.contactsList, this.secret );
+                    }
+                  } catch (error) {
+                    const toast = await this.toastController.create({
+                      cssClass: 'text-red',
+                      message: error.errorDescription || error.message,
+                      duration: 2000
+                    });
+                    toast.present();
+                  }
+
+                  await loading.dismiss();
                 }
               }
             ]

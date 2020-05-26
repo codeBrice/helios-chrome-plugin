@@ -15,7 +15,7 @@
   <div *ngIf="!add && !edit">
     <ion-item  class="pointer" color="dark" *ngFor="let contact of contactsList;let i = index" (click)='presentActionSheet(i, contact)'>
       <ion-avatar slot="start">
-        <img src="http://ui-avatars.com/api/?background=e6d46a&color=000000&name={{contact.name.replace(' ', '+')}}">
+        <img src="http://ui-avatars.com/api/?background=a0a0a0&color=fff&name={{contact.name.replace(' ', '+')}}">
       </ion-avatar>
       <ion-label>
         <h2>{{contact.name}}</h2>
