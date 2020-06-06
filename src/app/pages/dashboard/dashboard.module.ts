@@ -12,6 +12,8 @@ import { ReceiveModalPage } from './receive-modal/receive-modal.page';
 import { WalletFormatPipeModule } from 'src/app/pipes/WalletFormat/WalletFormatPipe.module';
 import { AvatarPipeModule } from '../../pipes/AvatarPipe/AvatarPipe.module';
 import { SecureStorage } from '../../utils/secure-storage';
+import { ExportPrivatekeyModalPage } from './export-privatekey-modal/export-privatekey-modal.page';
+
 
 const routes: Routes = [
   {
@@ -35,6 +37,6 @@ const routes: Routes = [
     SecureStorage
   ],
   declarations: [DashboardPage , SendModalPage, ReceiveModalPage],
-  entryComponents: [SendModalPage, ReceiveModalPage]
+  entryComponents: [SendModalPage, ReceiveModalPage,ExportPrivatekeyModalPage]
 })
 export class DashboardPageModule {}

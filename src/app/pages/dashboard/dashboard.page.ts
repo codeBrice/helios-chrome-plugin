@@ -13,6 +13,7 @@ import { ErrorServer } from 'src/app/entities/errorServer';
 import cryptoJs from 'crypto-js';
 import { SecureStorage } from '../../utils/secure-storage';
 import { Wallet } from '../../entities/wallet';
+import { ExportPrivatekeyModalPage } from './export-privatekey-modal/export-privatekey-modal.page';
 
 @Component({
   selector: 'app-home',
@@ -194,6 +195,7 @@ export class DashboardPage implements OnInit {
       }
     }
     try {
+
           this.gasPrice = await this.heliosService.getGasPrice();
         } catch (error) {
           const toast = await this.toastController.create({
@@ -339,6 +341,12 @@ export class DashboardPage implements OnInit {
             ]
           }).then((val) => val.present());
         }
+      },{
+        text: 'Export Private key',
+        icon: 'key',
+        handler: () => {
+         this.presentModalExportPrivateKey();
+        }
       },
       {
         text: 'Cancel',
@@ -364,6 +372,12 @@ export class DashboardPage implements OnInit {
   async presentModalReceive() {
     const modal = await this.modalController.create({
       component: ReceiveModalPage
+    });
+    return await modal.present();
+  }
+  async presentModalExportPrivateKey() {
+    const modal = await this.modalController.create({
+      component: ExportPrivatekeyModalPage
     });
     return await modal.present();
   }
