@@ -27,13 +27,14 @@
                     <ion-card-title class="title text-yellow"><span>Balance</span></ion-card-title>
                     <ion-card-subtitle class="text-white"><span>Today, {{today | date:'d MMM' }}</span></ion-card-subtitle>
                 </ion-col>
-                <ion-col>
+              <!--  <ion-col>
                         <ion-icon class="text-white balance-logo" src="/assets/images/heliosSvg.svg"></ion-icon>
-                </ion-col>
+                </ion-col>-->
             </ion-row>
         </ion-card-header>
-        <ion-card-content class="ion-text-center ion-no-padding">
-            <span class="title text-yellow">$ </span><span class="text-white balance">{{balance | number:'1.0-2'}} </span>
+        <ion-card-content  *ngFor ="let wallet of mainWallet" class="ion-text-center ion-no-padding">
+           <!-- <span class="title text-yellow">$ </span><span class="text-white balance">{{balance | number:'1.0-2'}} </span>-->
+           <ion-icon class="text-white balance-main-logo" src="/assets/images/heliosSvg.svg"></ion-icon><span class="balance-accounts"> {{wallet.balance | number:'1.0-2'}}</span>
             <ion-icon *ngIf="up" class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
             <ion-icon *ngIf="!up" class="text-yellow" src="/assets/images/diagonal-arrow-down.svg"></ion-icon>
             <br>
@@ -53,9 +54,9 @@
                     </ion-fab-button>
                     <br>
                     <div class='wallet-name'>{{wallet.name}}</div>
-                    <span class="balance-accounts">{{wallet.balance | number:'1.0-2'}}</span>
+                    <ion-icon class="text-white balance-second-logo" src="/assets/images/heliosSvg.svg" ></ion-icon> <span class="balance-accounts"> {{wallet.balance | number:'1.0-2'}}</span>
                     <br>
-                    <span class="text-yellow">$ </span><span>{{wallet.usd | number:'1.0-2'}}</span>
+                    <!--<span class="text-yellow">$ </span><span>{{wallet.usd | number:'1.0-2'}}</span>-->
                 </ion-card-content>
             </ion-card>
         </ion-col>
@@ -80,9 +81,9 @@
                             </ion-fab-button>
                             <br>
                             <div class='wallet-name'>{{wallet.name}}</div>
-                            <span class="balance-accounts">{{wallet.balance | number:'1.0-2'}}</span>
+                            <ion-icon class="text-white balance-second-logo" src="/assets/images/heliosSvg.svg" ></ion-icon> <span class="balance-accounts"> {{wallet.balance | number:'1.0-2'}}</span>
                             <br>
-                            <span class="text-yellow">$ </span><span>{{wallet.usd | number:'1.0-2'}}</span>
+                         <!--   <span class="text-yellow">$ </span><span>{{ wallet.usd | number:'1.0-2'}}</span>-->
                         </ion-card-content>
                     </ion-card>
                 </ion-slide>

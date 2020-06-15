@@ -3,6 +3,12 @@
     font-size: 20px;
     //font-family: Quicksand;
 }
+.title {
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    //font-family: Quicksand;
+}
 
 .title-accounts {
     padding-left: 20px;
@@ -51,7 +57,13 @@ ion-card-content {
 font-size: 35px;
     float: right;
 }
-
+.balance-main-logo {
+    font-size: 25px;
+        
+    }
+   .balance-second-logo{
+        font-size: 14px;          
+        }
 .wallet-name {
     white-space: nowrap;
     overflow: hidden;

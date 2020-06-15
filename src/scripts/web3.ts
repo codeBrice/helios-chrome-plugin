@@ -1,6 +1,7 @@
 import Web3 from 'helios-web3';
 
 
+
 declare global {
     interface Window { helios: any; }
 }
@@ -11,7 +12,6 @@ const availableNodes: any[] = [
     'wss://bootnode3.heliosprotocol.io:30304',
     'wss://masternode1.heliosprotocol.io:30304'
   ];
-
 let helios: any;
 console.log('web3');
 
@@ -30,6 +30,9 @@ const send = (tx) => {
     console.error('Helios not Enable');
   }
 };
+
+
+
 
 const sendAsync = async (tx) => {
   const result = document.getElementById('hlsAd');
@@ -77,7 +80,22 @@ async function connectToFirstAvailableNode() {
             // await helios.eth.net.getPeerCount();
             if (isConnected() || listen) {
                 console.log(`Successfully connected to ${node}`);
-                window.helios = { send, sendAsync, enable , selectedAddress};
+                window.helios = { send,
+                   sendAsync, 
+                   enable ,
+                   selectedAddress,
+                   getBalance,
+                   getProtocolVersion,
+                   getHistoricalGasPrice,
+                   getConnectedNodes,
+                   getApproximateHistoricalNetworkTPCCapability,
+                   getApproximateHistoricalTPC,
+                   getFaucet,
+                   getBlockByHash,
+                   getTransactionReceipt,
+                   getTransactionByHash,
+                   getReceivableTransactions
+                  };
                 return true;
             }
           } catch ( error ) {
@@ -104,5 +122,139 @@ async function isConnected() {
     throw error;
   }
 }
+
+  const getBalance = async (tx) =>  {
+  try {
+    console.log('balance')
+    //  const address=selectedAddress();
+     // if(address!=null){
+      return await helios.hls.getBalance(tx)|| helios.eth.getBalance(tx);
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get balance');
+  }
+};
+
+
+const getProtocolVersion = async () =>  {
+  try {
+    console.log('protocol Version')
+    if( await isConnected()){
+      return  await await helios.hls.getProtocolVersion() || helios.eth.getProtocolVersion();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get balance');
+  }
+};
+
+const getHistoricalGasPrice = async () =>  {
+  try {
+    console.log('getHistoricalGasPrice')
+    if( await isConnected()){
+      return await helios.hls.getHistoricalGasPrice() || helios.eth.getHistoricalGasPrice();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get historical gas price');
+  }
+};
+
+
+const getConnectedNodes = async () =>  {
+  try {
+    console.log('getConnectedNodes')
+    if( await isConnected()){
+      return await helios.hls.getConnectedNodes() || helios.eth.getConnectedNodes();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get connected nodes');
+  }
+};
+
+const getApproximateHistoricalNetworkTPCCapability = async () =>  {
+  try {
+    console.log('getApproximateHistoricalNetworkTPCCapability')
+    if( await isConnected()){
+      return await helios.hls.getApproximateHistoricalNetworkTPCCapability() || helios.eth.getApproximateHistoricalNetworkTPCCapability();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get Approximate Historical Network TPCCapability');
+  }
+};
+
+const getApproximateHistoricalTPC = async () =>  {
+  try {
+    console.log('getApproximateHistoricalTPC')
+    if( await isConnected()){
+      return await helios.hls.getApproximateHistoricalTPC() || helios.eth.getApproximateHistoricalTPC();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get Approximate Historical  TPC');
+  }
+};
+
+const getFaucet = async (tx) =>  {
+  try {
+    console.log('getFaucet')
+    if( await isConnected()){
+    //  const address=selectedAddress();
+     // if(address!=null){
+      return await helios.hls.getFaucet(tx)|| helios.eth.getFaucet(tx);
+    
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get faucet');
+  }
+};
+
+const getBlockByHash = async (tx) => {
+  try {
+    if (await this.isConnected()) {
+      return await helios.hls.getBlockByHash(tx)|| helios.eth.getBlockByHash(tx);
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get block by hash');
+  }
+};
+
+const getTransactionReceipt = async (tx) => {
+  try {
+    if (await this.isConnected()) {
+      return await helios.hls.getTransactionReceipt(tx) || helios.eth.getTransactionReceipt(tx);
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get transaction receipt');
+  }
+};
+
+
+const getTransactionByHash = async (tx) => {
+  try {
+    if (await this.isConnected()) {
+      return await helios.hls.getTransactionByHash(tx) || helios.eth.getTransactionByHash(tx);
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get transaction by hash');
+  }
+};
+
+const getReceivableTransactions = async (tx) => {
+  try {
+    if (await this.isConnected()) {
+      return await helios.hls.getReceivableTransactions(tx) || helios.eth.getReceivableTransactions(tx);
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get receivable transactions');
+  }
+};
 
 connectToFirstAvailableNode();
