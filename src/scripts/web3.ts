@@ -94,7 +94,8 @@ async function connectToFirstAvailableNode() {
                    getBlockByHash,
                    getTransactionReceipt,
                    getTransactionByHash,
-                   getReceivableTransactions
+                   getReceivableTransactions,
+                   sendRawBlock
                   };
                 return true;
             }
@@ -254,6 +255,18 @@ const getReceivableTransactions = async (tx) => {
   } catch (error) {
     console.log(error);
     throw new Error('Failed to get receivable transactions');
+  }
+};
+
+
+const sendRawBlock = async (tx) => {
+  try {
+    if (await this.isConnected()) {
+      return await helios.hls.sendRawBlock(tx) || helios.eth.sendRawBlock(tx);
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to send  raw block');
   }
 };
 
