@@ -95,7 +95,10 @@ async function connectToFirstAvailableNode() {
                    getTransactionReceipt,
                    getTransactionByHash,
                    getReceivableTransactions,
-                   sendRawBlock
+                   sendRawBlock,
+                   getGasPrice,
+                   ping
+
                   };
                 return true;
             }
@@ -146,6 +149,29 @@ const getProtocolVersion = async () =>  {
   } catch (error) {
     console.log(error);
     throw new Error('Failed to get balance');
+  }
+};
+const getGasPrice = async () =>  {
+  try {
+    console.log('get gas price')
+    if( await isConnected()){
+      return  await await helios.hls.getGasPrice() || helios.eth.getGasPrice();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get gas price');
+  }
+};
+
+const ping = async () =>  {
+  try {
+    console.log('get ping ')
+    if( await isConnected()){
+      return  await await helios.hls.ping() || helios.eth.ping();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get ping');
   }
 };
 
