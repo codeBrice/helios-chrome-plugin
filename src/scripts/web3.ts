@@ -94,7 +94,11 @@ async function connectToFirstAvailableNode() {
                    getBlockByHash,
                    getTransactionReceipt,
                    getTransactionByHash,
-                   getReceivableTransactions
+                   getReceivableTransactions,
+                   sendRawBlock,
+                   getGasPrice,
+                   ping
+
                   };
                 return true;
             }
@@ -145,6 +149,29 @@ const getProtocolVersion = async () =>  {
   } catch (error) {
     console.log(error);
     throw new Error('Failed to get balance');
+  }
+};
+const getGasPrice = async () =>  {
+  try {
+    console.log('get gas price')
+    if( await isConnected()){
+      return  await await helios.hls.getGasPrice() || helios.eth.getGasPrice();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get gas price');
+  }
+};
+
+const ping = async () =>  {
+  try {
+    console.log('get ping ')
+    if( await isConnected()){
+      return  await await helios.hls.ping() || helios.eth.ping();
+    } 
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to get ping');
   }
 };
 
@@ -254,6 +281,18 @@ const getReceivableTransactions = async (tx) => {
   } catch (error) {
     console.log(error);
     throw new Error('Failed to get receivable transactions');
+  }
+};
+
+
+const sendRawBlock = async (tx) => {
+  try {
+    if (await this.isConnected()) {
+      return await helios.hls.sendRawBlock(tx) || helios.eth.sendRawBlock(tx);
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to send  raw block');
   }
 };
 
