@@ -33,6 +33,24 @@ helios.sendAsync({
   })
 ~~~
 
+### Other functions that websites can call
+___
+* `helios.ping()`
+* `helios.getProtocolVersion()`
+* `helios.getBlockByHash(param)`
+* `helios.getGasPrice()`
+* `helios.getTransactionReceipt(param)`
+* `helios.getTransactionByHash()`
+* `helios.getBalance(param)`
+* `helios.getReceivableTransactions(param)`
+* `helios.getFaucet(param)`
+* `helios.getConnectedNodes()`
+* `helios.getHistoricalGasPrice()`
+* `helios.getApproximateHistoricalNetworkTPCCapability()`
+* `helios.getApproximateHistoricalTPC()`
+* `helios.sendRewardBlock(param)`  
+For more information on the methods, [read the web 3 documentation](https://web3js.readthedocs.io/en/v1.2.9/)
+
 ### Development
 ___
 `npm install`
