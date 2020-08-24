@@ -110,7 +110,7 @@ export class DashboardPage implements OnInit {
         await this.heliosService.connectToFirstAvailableNode();
         let defaultWalletStorage = await this.secureStorage.getStorage('defaultWallet', this.secret);
         this.mainWallet = [];
-       // if ( defaultWalletStorage === null ) {
+        if ( defaultWalletStorage === null ) {
           const balance = await this.heliosService.getBalance(wallets[0].address);
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           const wallet = {
@@ -125,7 +125,22 @@ export class DashboardPage implements OnInit {
           };
           this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
           defaultWalletStorage = wallet;
-        //}
+        } else {
+          const balance = await this.heliosService.getBalance( defaultWalletStorage.address );
+          const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
+          const wallet = {
+            address: defaultWalletStorage.address ,
+            balance,
+            usd,
+            name: defaultWalletStorage.name,
+            avatar: defaultWalletStorage.avatar,
+            id: defaultWalletStorage.id,
+            default: true,
+            privateKey: cryptoJs.AES.encrypt( defaultWalletStorage.privateKey, this.hash ).toString()
+          };
+          this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
+          defaultWalletStorage = wallet;
+        }
         this.mainWallet.push( defaultWalletStorage );
         for (const wallet of wallets) {
           walletPromises.push(new Promise(async (resolve, reject) => {
