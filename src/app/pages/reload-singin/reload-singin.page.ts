@@ -46,7 +46,7 @@ export class ReloadSinginPage implements OnInit {
       const userName = await this.secureStorage.getStorage('username' , secret );
       const result = await this.heliosServersideService.signIn(userName, this.reSignInForm.value.password, null);
       console.log('result del logeo', result);
-      const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], userName);
+      const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], userName, this.reSignInForm.value.password );
 
       for (const keystoreInfo of result.keystores) {
         const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.reSignInForm.value.password );

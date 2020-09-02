@@ -31,7 +31,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/wallet/home/home.module').then(m => m.HomePageModule)
   },
   {
-    path: 'detailwallet',
+    path: 'detailwallet/:wallet/:privateKey/:keystore',
     loadChildren: () => import('./pages/wallet/create/detail/detail.module').then(m => m.DetailPageModule)
   },
   {
@@ -66,8 +66,9 @@ const routes: Routes = [
   {
     path: 'export-privatekey-modal',
     loadChildren: () => import('./pages/dashboard/export-privatekey-modal/export-privatekey-modal.module').then( m => m.ExportPrivatekeyModalPageModule)
-  },  {
-    path: 'export-privatekey',
+  },
+  {
+    path: 'export-privatekey/:privatekey',
     loadChildren: () => import('./pages/wallet/export-privatekey/export-privatekey.module').then( m => m.ExportPrivatekeyPageModule)
   }
 

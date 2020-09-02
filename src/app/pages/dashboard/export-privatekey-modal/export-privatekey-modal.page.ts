@@ -20,14 +20,14 @@ export class ExportPrivatekeyModalPage implements OnInit {
   secret: any;
   wallets: {}[] = [];
   constructor(private formBuilder: FormBuilder,
-    private secureStorage: SecureStorage,
-    private modalController: ModalController,
-     private loadingController: LoadingController,
-     private heliosServersideService:HeliosServersideService,
-     private heliosService: HeliosServiceService,
-     public toastController: ToastController,
-     private router:Router,
-     private alertController:AlertController) { }
+              private secureStorage: SecureStorage,
+              private modalController: ModalController,
+              private loadingController: LoadingController,
+              private heliosServersideService:HeliosServersideService,
+              private heliosService: HeliosServiceService,
+              public toastController: ToastController,
+              private router:Router,
+              private alertController:AlertController) { }
 
  async  ngOnInit() {
     this.exportPrivateKey = this.formBuilder.group({
@@ -36,8 +36,8 @@ export class ExportPrivatekeyModalPage implements OnInit {
     });
     this.secret = await this.secureStorage.getSecret();
     const userInfo = await this.secureStorage.getStorage('userInfo', this.secret);
-      this.isReadOnly = true;
-      this.exportPrivateKey.get('username').setValue( userInfo.userName );
+    this.isReadOnly = true;
+    this.exportPrivateKey.get('username').setValue( userInfo.userName );
     }
   
 
@@ -50,13 +50,14 @@ export class ExportPrivatekeyModalPage implements OnInit {
     });
     await loading.present();
 
-   try{
+    try{
       const result = await this.heliosServersideService.signIn(this.exportPrivateKey.value.username,
         this.exportPrivateKey.value.password, null);
-        const secret = await this.secureStorage.getSecret();
-        const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.exportPrivateKey.value.username);
-        this.secureStorage.setStorage('userInfo', userInfo, secret);
-        for (const keystoreInfo of result.keystores) {
+      const secret = await this.secureStorage.getSecret();
+      const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.exportPrivateKey.value.username,
+        this.exportPrivateKey.value.password);
+      this.secureStorage.setStorage('userInfo', userInfo, secret);
+      for (const keystoreInfo of result.keystores) {
           const keystore = await this.heliosService.jsonToAccount( keystoreInfo.keystore, this.exportPrivateKey.value.password );
           const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
           this.wallets.push(new Wallet(
@@ -64,13 +65,12 @@ export class ExportPrivatekeyModalPage implements OnInit {
              md5ToAvatar, keystoreInfo.id)
             );
         }
-        this.secureStorage.setStorage('wallet', this.wallets, secret);
-        const defaultWallet= await this.secureStorage.getStorage('defaultWallet', this.secret);
-        if (defaultWallet !=null){
-      let privateKey='0x'+cryptoJs.AES.decrypt( defaultWallet.privateKey, result.session_hash ).toString()
-        sessionStorage.setItem( 'privateKey',  privateKey);
-        this.router.navigate(['/export-privatekey']);  }
-        else{
+      this.secureStorage.setStorage('wallet', this.wallets, secret);
+      const defaultWallet = await this.secureStorage.getStorage('defaultWallet', this.secret);
+      if (defaultWallet != null ) {
+      const privateKey = '0x' + cryptoJs.AES.decrypt( defaultWallet.privateKey, result.session_hash ).toString();
+      this.router.navigate(['/export-privatekey/'+privateKey]);
+      } else {
           const alert = await this.alertController.create({
             header: 'Confirm!',
             message: '<strong>Sorry for the inconvenience try again please.</strong>',
@@ -83,7 +83,6 @@ export class ExportPrivatekeyModalPage implements OnInit {
               }
             ]
           });
-      
           await alert.present();
         }
 
@@ -95,8 +94,8 @@ export class ExportPrivatekeyModalPage implements OnInit {
           });
         toast.present();
       }
-      await loading.dismiss();
-      this.dismiss();
+    await loading.dismiss();
+    this.dismiss();
     }
 
     dismiss() {

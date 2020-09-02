@@ -114,7 +114,7 @@ export class DashboardPage implements OnInit {
           const balance = await this.heliosService.getBalance(wallets[0].address);
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           const wallet = {
-            address: wallets[0].address ,
+            address: wallets[0].address,
             balance,
             usd,
             name: wallets[0].name,
@@ -123,9 +123,11 @@ export class DashboardPage implements OnInit {
             default: true,
             privateKey: cryptoJs.AES.encrypt( wallets[0].privateKey, this.hash ).toString()
           };
-          this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
+          this.secureStorage.setStorage( 'defaultWallet', wallet, this.secret );
           defaultWalletStorage = wallet;
         } else {
+          console.log( 'private key en dashboard', defaultWalletStorage.privateKey );
+          const privateKey = cryptoJs.AES.decrypt( defaultWalletStorage.privateKey, this.hash );
           const balance = await this.heliosService.getBalance( defaultWalletStorage.address );
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           const wallet = {
@@ -136,7 +138,7 @@ export class DashboardPage implements OnInit {
             avatar: defaultWalletStorage.avatar,
             id: defaultWalletStorage.id,
             default: true,
-            privateKey: cryptoJs.AES.encrypt( defaultWalletStorage.privateKey, this.hash ).toString()
+            privateKey: cryptoJs.AES.encrypt( privateKey , this.hash ).toString()
           };
           this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
           defaultWalletStorage = wallet;

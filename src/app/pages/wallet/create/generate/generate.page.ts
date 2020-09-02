@@ -73,7 +73,8 @@ export class GeneratePage implements OnInit {
         await this.heliosServersideService.addOnlineWallet(walletCreate.keystorage, this.createWallet.value.name, storageUser, false);
         const resultSign = await this.heliosServersideService.signIn(this.createWallet.value.username,
           this.createWallet.value.password, null);
-        const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.createWallet.value.username);
+        const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.createWallet.value.username,
+         this.createWallet.value.password);
         await this.secureStorage.setStorage( 'userInfo' , userInfo, secret );
         this.hash = userInfo.sessionHash;
         for (const keystoreInfo of resultSign.keystores) {
@@ -127,7 +128,8 @@ export class GeneratePage implements OnInit {
       sessionStorage.setItem( 'wallet', walletCreate.accountWallet.account.address );
       sessionStorage.setItem( 'privateKey', walletCreate.accountWallet.account.privateKey );
       sessionStorage.setItem( 'keystore', JSON.stringify(walletCreate.accountWallet.encrypt) );
-      this.router.navigate(['/detailwallet']);
+      this.router.navigate([`/detailwallet/${walletCreate.accountWallet.account.address}/
+      ${walletCreate.accountWallet.account.privateKey}/${JSON.stringify(walletCreate.accountWallet.encrypt)}`]);
       await loading.dismiss();
         // data storage for mobile
       } catch (error) {

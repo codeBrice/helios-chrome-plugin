@@ -5,7 +5,6 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
-import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
 import { SecureStorage } from '../../../utils/secure-storage';
 import { HeliosServersideService } from '../../../services/helios-serverside.service';
@@ -101,7 +100,8 @@ export class ImportPage implements OnInit {
       } else {
         const result = await this.heliosServersideService.signIn(this.importWallet.value.username,
           this.importWallet.value.password, null);
-        const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.importWallet.value.username);
+        const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.importWallet.value.username,
+        this.importWallet.value.password);
         this.secureStorage.setStorage('userInfo', userInfo, secret);
       }
       if (this.privateKey) {
@@ -112,7 +112,8 @@ export class ImportPage implements OnInit {
           await this.heliosServersideService.addOnlineWallet(privateKey, this.importWallet.value.name, result, this.importedWallet);
           const resultSign = await this.heliosServersideService.signIn(this.importWallet.value.username,
             this.importWallet.value.password, null);
-          const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.importWallet.value.username);
+          const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.importWallet.value.username,
+          this.importWallet.value.password);
           this.secureStorage.setStorage('userInfo', userInfo, secret);
           for (const keystoreInfo of resultSign.keystores) {
             const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, this.importWallet.value.password);
@@ -150,7 +151,8 @@ export class ImportPage implements OnInit {
             this.importWallet.value.name, storageUser, this.importedWallet);
           const resultSign = await this.heliosServersideService.signIn(this.importWallet.value.username,
             this.importWallet.value.password, null);
-          const userInfo = new UserInfo(resultSign.session_hash, resultSign['2fa_enabled'], this.importWallet.value.username);
+          const userInfo = new UserInfo(resultSign.session_hash, resultSign['2fa_enabled'], this.importWallet.value.username,
+          this.importWallet.value.password);
           await this.secureStorage.setStorage('userInfo', userInfo, secret);
           for (const keystoreInfo of resultSign.keystores) {
             const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, this.importWallet.value.password);
