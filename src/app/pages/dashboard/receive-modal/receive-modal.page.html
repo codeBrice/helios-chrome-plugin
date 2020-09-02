@@ -9,7 +9,7 @@
 <ion-content color=dark>
   <form [formGroup]="receiveForm">
     <ion-item color="dark">
-      <ion-label>From</ion-label>
+      <ion-label>Wallets</ion-label>
     <ion-select placeholder="Select One" formControlName="address">
       <ion-select-option *ngFor="let wallet of wallets" [value]="wallet.address">{{wallet.address | walletformat}}</ion-select-option>
     </ion-select>
