@@ -62,19 +62,6 @@ const routes: Routes = [
     path: 'send-transaction',
     loadChildren: () => import('./pages/external/send-transaction/send-transaction.module').then( m => m.SendTransactionPageModule)
   },
- 
-  {
-    path: 'export-privatekey-modal',
-    loadChildren: () => import('./pages/dashboard/export-privatekey-modal/export-privatekey-modal.module').then( m => m.ExportPrivatekeyModalPageModule)
-  },
-  {
-    path: 'export-privatekey/:privatekey',
-    loadChildren: () => import('./pages/wallet/export-privatekey/export-privatekey.module').then( m => m.ExportPrivatekeyPageModule)
-  }
-
-
-
-
 ];
 @NgModule({
   imports: [

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Storage } from '@ionic/storage';
 import { HeliosServiceService } from '../../services/helios-service.service';
 import { LoadingController, ActionSheetController, AlertController, ModalController, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,13 +6,10 @@ import * as moment from 'moment';
 import { CoingeckoService } from 'src/app/services/coingecko.service';
 import { SendModalPage } from './send-modal/send-modal.page';
 import { ReceiveModalPage } from './receive-modal/receive-modal.page';
-import { UserInfo } from 'src/app/entities/userInfo';
 import { HeliosServersideService } from 'src/app/services/helios-serverside.service';
 import { ErrorServer } from 'src/app/entities/errorServer';
 import cryptoJs from 'crypto-js';
 import { SecureStorage } from '../../utils/secure-storage';
-import { Wallet } from '../../entities/wallet';
-import { ExportPrivatekeyModalPage } from './export-privatekey-modal/export-privatekey-modal.page';
 
 @Component({
   selector: 'app-home',
@@ -121,13 +117,12 @@ export class DashboardPage implements OnInit {
             avatar: wallets[0].avatar,
             id: wallets[0].id,
             default: true,
-            privateKey: cryptoJs.AES.encrypt( wallets[0].privateKey, this.hash ).toString()
+            privateKey: wallets[0].privateKey
           };
           this.secureStorage.setStorage( 'defaultWallet', wallet, this.secret );
           defaultWalletStorage = wallet;
         } else {
           console.log( 'private key en dashboard', defaultWalletStorage.privateKey );
-          const privateKey = cryptoJs.AES.decrypt( defaultWalletStorage.privateKey, this.hash );
           const balance = await this.heliosService.getBalance( defaultWalletStorage.address );
           const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
           const wallet = {
@@ -138,7 +133,7 @@ export class DashboardPage implements OnInit {
             avatar: defaultWalletStorage.avatar,
             id: defaultWalletStorage.id,
             default: true,
-            privateKey: cryptoJs.AES.encrypt( privateKey , this.hash ).toString()
+            privateKey: defaultWalletStorage.privateKey
           };
           this.secureStorage.setStorage('defaultWallet', wallet, this.secret );
           defaultWalletStorage = wallet;
@@ -262,6 +257,21 @@ export class DashboardPage implements OnInit {
           }
         },
         {
+          text: 'Export Private key',
+          icon: 'key',
+          handler: async() => {
+            const bytes = cryptoJs.AES.decrypt(wallet.privateKey, this.hash);
+            this.alertController.create({
+              header: 'Private key',
+              message: `Your private key is: <strong>${bytes.toString(cryptoJs.enc.Utf8)}</strong>`,
+              buttons: [{
+                  text: 'Okay',
+                }
+              ]
+            }).then((val) => val.present());
+          }
+        },
+        {
         text: 'Share Address',
         icon: 'share',
         handler: () => {
@@ -361,8 +371,16 @@ export class DashboardPage implements OnInit {
       },{
         text: 'Export Private key',
         icon: 'key',
-        handler: () => {
-         this.presentModalExportPrivateKey();
+        handler: async() => {
+          const bytes = cryptoJs.AES.decrypt(wallet.privateKey, this.hash);
+          this.alertController.create({
+            header: 'Private key',
+            message: `Your private key is: <strong>${bytes.toString(cryptoJs.enc.Utf8)}</strong>`,
+            buttons: [{
+                text: 'Okay',
+              }
+            ]
+          }).then((val) => val.present());
         }
       },
       {
@@ -389,12 +407,6 @@ export class DashboardPage implements OnInit {
   async presentModalReceive() {
     const modal = await this.modalController.create({
       component: ReceiveModalPage
-    });
-    return await modal.present();
-  }
-  async presentModalExportPrivateKey() {
-    const modal = await this.modalController.create({
-      component: ExportPrivatekeyModalPage
     });
     return await modal.present();
   }

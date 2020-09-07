@@ -14,7 +14,9 @@
     <ion-grid>
         <ion-row class="ion-align-items-center">
             <ion-col size="12">
-                <ion-label color="light">To create a new wallet, you must use the same username and password of this session.
+                <ion-label color="light" *ngIf="!isLocal">The password of your keystore will be the same with which you log in.
+                </ion-label>
+                <ion-label color="light" *ngIf="isLocal">The password will be used to securely encrypt your keystore.
                 </ion-label>
             </ion-col>
         </ion-row>
@@ -25,14 +27,8 @@
                 <ion-label position="floating">Wallet Name</ion-label>
                 <ion-input type="text" formControlName="name"></ion-input>
               </ion-item>  
-
-              <ion-item color="dark" *ngIf="!isLocal">
-                <ion-label position="floating">Your account username</ion-label>
-                <ion-input type="text"   formControlName="username" [readonly]="isReadOnly"></ion-input>
-              </ion-item>  
-
-              <ion-item color="dark">
-                  <ion-label position="floating">Your account password</ion-label>
+              <ion-item color="dark" *ngIf="isLocal">
+                  <ion-label position="floating">Your keystore password</ion-label>
                   <ion-input type="password" formControlName="password"></ion-input>
                   <ion-row   *ngIf="createWallet.controls['password'].errors && createWallet.controls['password'].dirty ">
                     <p class="validator-error ion-text-center"  style=" color:red">Password must be at least 16 characters long.</p>

@@ -29,8 +29,8 @@ export class DetailPage implements OnInit {
       keystore: new FormControl('')
     });
     this._route.params.subscribe(params => {
-      this.generateWallet.value.privateKey = params['privatekey'];
-      this.generateWallet.value.keystore = params['keystore'];
+      this.generateWallet.get('privateKey').setValue(params['privateKey'].trim());
+      this.generateWallet.get('keystore').setValue(params['keystore']);
     });
   }
 
@@ -41,9 +41,9 @@ export class DetailPage implements OnInit {
     selBox.style.top = '0';
     selBox.style.opacity = '0';
     if ( formName === 'privateKey' ) {
-      selBox.value = sessionStorage.getItem('privateKey');
+      selBox.value = this.generateWallet.value.privateKey;
     } else {
-      selBox.value = sessionStorage.getItem('keystore');
+      selBox.value = this.generateWallet.value.keystore;
     }
     document.body.appendChild(selBox);
     selBox.focus();

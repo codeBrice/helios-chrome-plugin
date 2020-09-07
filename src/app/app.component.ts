@@ -25,7 +25,7 @@ export class AppComponent {
       icon: 'keypad'
     },
     {
-      title: 'Transaction',
+      title: 'Transactions',
       url: '/transaction',
       icon: '/assets/images/exchange.svg'
     },
@@ -35,7 +35,7 @@ export class AppComponent {
       icon: 'analytics'
     },
     {
-      title: 'Setting',
+      title: 'Settings',
       url: '/setting',
       icon: '/assets/images/settings.svg'
     }
