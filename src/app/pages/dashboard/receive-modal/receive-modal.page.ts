@@ -13,6 +13,7 @@ export class ReceiveModalPage implements OnInit {
 
   elementType: 'url' | 'canvas' | 'img' = 'canvas';
   wallets: any;
+  wallet:any;
   receiveForm: FormGroup;
 
   constructor(private modalController: ModalController, private formBuilder: FormBuilder,
@@ -22,6 +23,7 @@ export class ReceiveModalPage implements OnInit {
 
     this.receiveForm = this.formBuilder.group({
       address: new FormControl(''),
+
     });
     const secret  = await this.secureStorage.getSecret();
     const wallets = await this.secureStorage.getStorage( 'wallet' , secret );
@@ -57,5 +59,9 @@ export class ReceiveModalPage implements OnInit {
       duration: 2000
     });
     toast.present();
+  }
+
+  changeWallet(walletFromForm:string){
+    this.wallet= walletFromForm;
   }
 }

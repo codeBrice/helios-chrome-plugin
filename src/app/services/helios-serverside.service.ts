@@ -24,8 +24,8 @@ export class HeliosServersideService {
     this.saltRounds = 11;
     this.superagent = superagent.agent();
     this.useLocalStorage = false;
-    this.queryResponseTimeout = 4000; // Time till server responds
-    this.queryResponseDeadline = 8000; // Allowed time for page to load
+    this.queryResponseTimeout = 20000; // Time till server responds
+    this.queryResponseDeadline = 40000; // Allowed time for page to load
   }
 
     /**
