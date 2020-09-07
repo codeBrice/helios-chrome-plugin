@@ -20,12 +20,17 @@ export class DetailPage implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController,
     private router: Router,
+    private _route: ActivatedRoute
     ) { }
 
   ngOnInit() {
     this.generateWallet = this.formBuilder.group({
-      privateKey: new FormControl(sessionStorage.getItem('privateKey')),
-      keystore: new FormControl(sessionStorage.getItem('keystore'))
+      privateKey: new FormControl(''),
+      keystore: new FormControl('')
+    });
+    this._route.params.subscribe(params => {
+      this.generateWallet.get('privateKey').setValue(params['privateKey'].trim());
+      this.generateWallet.get('keystore').setValue(params['keystore']);
     });
   }
 
@@ -36,9 +41,9 @@ export class DetailPage implements OnInit {
     selBox.style.top = '0';
     selBox.style.opacity = '0';
     if ( formName === 'privateKey' ) {
-      selBox.value = sessionStorage.getItem('privateKey');
+      selBox.value = this.generateWallet.value.privateKey;
     } else {
-      selBox.value = sessionStorage.getItem('keystore');
+      selBox.value = this.generateWallet.value.keystore;
     }
     document.body.appendChild(selBox);
     selBox.focus();
@@ -68,7 +73,6 @@ export class DetailPage implements OnInit {
         }, {
           text: 'Yes',
           handler: () => {
-            sessionStorage.clear();
             this.router.navigate(['/dashboard']);
           }
         }

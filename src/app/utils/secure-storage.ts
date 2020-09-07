@@ -28,28 +28,42 @@ export class SecureStorage {
     }
 
     async setStorage( key: string , value: Object, secret: string) {
-        console.log('secret setOnly' , secret );
+        //console.log('secret setOnly' , secret );
         const valueJSON = this.encryptVal(value, secret);
-        console.log('objeto encrypt set chrome', {[this.encrypt(key, secret)]: valueJSON});
-        chrome.storage.local.set({[this.encrypt(key, secret)]: valueJSON}, function() {
-            //
-        });
+        if ( this.isExtension() ) {
+            //console.log('objeto encrypt set chrome', {[this.encrypt(key, secret)]: valueJSON});
+            chrome.storage.local.set({[this.encrypt(key, secret)]: valueJSON}, function() {
+                //
+            });
+        } else {
+            sessionStorage.setItem( key, valueJSON);
+        }
     }
 
     async getStorage( key: string, secret: string ) {
         try {
             // console.log('key que se va a buscar chrome', this.encrypt( key , secret ));
-            const property = await new Promise((resolve, reject) => {
-                chrome.storage.local.get(this.encrypt( key , secret ), function(result) {
-                    // console.log('objeto del get', result);
-                    resolve ( result ) ;
+            let property;
+            if ( this.isExtension() ) {
+                property = await new Promise((resolve, reject) => {
+                    chrome.storage.local.get(this.encrypt( key , secret ), function(result) {
+                        // console.log('objeto del get', result);
+                        resolve ( result ) ;
+                    });
                 });
-            });
-            if ( JSON.stringify(property) === '{}' ) {
+            } else {
+                property = sessionStorage.getItem( key );
+            }
+            if ( JSON.stringify(property) === '{}' || property === null ) {
                 return null;
             } else {
-                const propertyValue = this.encrypt( key, secret );
-                const getObject = this.decrypt( property[propertyValue] , secret );
+                let getObject;
+                if ( this.isExtension() ) {
+                    const propertyValue = this.encrypt( key, secret );
+                    getObject = this.decrypt( property[propertyValue] , secret );
+                } else {
+                    getObject = this.decrypt( property , secret );
+                }
                 return getObject;
             }
         } catch (error) {
@@ -59,13 +73,17 @@ export class SecureStorage {
     }
 
     clearStorage() {
-        chrome.storage.local.clear( function() {
-            let error = chrome.runtime.lastError;
-            if (error) {
-                console.error(error);
-                throw new Error('Failed to clear storage!');
-            }
-        });
+        if( this.isExtension() ) {
+            chrome.storage.local.clear( function() {
+                let error = chrome.runtime.lastError;
+                if (error) {
+                    console.error(error);
+                    throw new Error('Failed to clear storage!');
+                }
+            });
+        } else {
+            sessionStorage.clear();
+        }
     }
 
     generateHash( password: any ) {
@@ -75,12 +93,25 @@ export class SecureStorage {
     }
 
     async getSecret(){
-        const displayInfo = await new Promise((resolve, reject) => {
-            chrome.system.display.getInfo(function(display) {
-                resolve( display[0].id );
+        let displayInfo;
+        if( this.isExtension() ) {
+            displayInfo = await new Promise((resolve, reject) => {
+                chrome.system.display.getInfo(function(display) {
+                    resolve( display[0].id );
+                });
             });
-        });
+        } else {
+            displayInfo = 'test';
+        }
         const secret = cryptoJs.SHA256(JSON.stringify(displayInfo)).toString();
         return secret;
+    }
+
+    isExtension () {
+        if ( chrome.system == undefined && chrome.storage == undefined ) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

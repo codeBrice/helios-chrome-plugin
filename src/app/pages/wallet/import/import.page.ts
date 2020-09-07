@@ -5,7 +5,6 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { Wallet } from 'src/app/entities/wallet';
-import bcrypt from 'bcryptjs';
 import cryptoJs from 'crypto-js';
 import { SecureStorage } from '../../../utils/secure-storage';
 import { HeliosServersideService } from '../../../services/helios-serverside.service';
@@ -46,7 +45,7 @@ export class ImportPage implements OnInit {
     console.log('import wallet');
     this.importWallet = this.formBuilder.group({
       privateKey: new FormControl('', [Validators.required]),
-      password: new FormControl('', [Validators.required, Validators.minLength(16)]),
+      password: new FormControl(''),
       keystore: new FormControl('', [Validators.required]),
       username: new FormControl('', [Validators.required]),
       name: new FormControl('', [Validators.required])
@@ -58,7 +57,7 @@ export class ImportPage implements OnInit {
       this.importWallet.get('username').disable();
     } else {
       this.isReadOnly = true;
-      this.importWallet.get('username').setValue( userInfo.userName );
+      this.importWallet.get('username').setValue(userInfo.userName);
     }
   }
 
@@ -90,32 +89,35 @@ export class ImportPage implements OnInit {
     try {
       const secret = await this.secureStorage.getSecret();
       const wallets = await this.secureStorage.getStorage('wallet', secret);
+      const userInfoStorage = await this.secureStorage.getStorage('userInfo', this.secret);
       if (this.isLocal) {
-        const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', secret );
-        if ( userInfoLocal == null ) {
-          this.hash = this.secureStorage.generateHash( this.importWallet.value.password );
+        const userInfoLocal = await this.secureStorage.getStorage('userInfoLocal', secret);
+        if (userInfoLocal == null) {
+          this.hash = this.secureStorage.generateHash(this.importWallet.value.password);
         } else {
           this.hash = userInfoLocal.sessionHash;
         }
         this.secureStorage.setStorage('userInfoLocal', { sessionHash: this.hash }, secret);
       } else {
         const result = await this.heliosServersideService.signIn(this.importWallet.value.username,
-          this.importWallet.value.password, null);
-        const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.importWallet.value.username);
+          userInfoStorage.password, null);
+        const userInfo = new UserInfo(result.session_hash, result['2fa_enabled'], this.importWallet.value.username,
+          userInfoStorage.password);
         this.secureStorage.setStorage('userInfo', userInfo, secret);
       }
       if (this.privateKey) {
         if (!this.isLocal) {
           const privateKey = await this.heliosService.privateKeyToAccount(this.importWallet.value.privateKey,
-            this.importWallet.value.password);
+            userInfoStorage.password);
           const result = await this.secureStorage.getStorage('userInfo', this.secret);
           await this.heliosServersideService.addOnlineWallet(privateKey, this.importWallet.value.name, result, this.importedWallet);
           const resultSign = await this.heliosServersideService.signIn(this.importWallet.value.username,
-            this.importWallet.value.password, null);
-          const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.importWallet.value.username);
+            userInfoStorage.password, null);
+          const userInfo = new UserInfo(resultSign.session_hash, result['2fa_enabled'], this.importWallet.value.username,
+            userInfoStorage.password);
           this.secureStorage.setStorage('userInfo', userInfo, secret);
           for (const keystoreInfo of resultSign.keystores) {
-            const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, this.importWallet.value.password);
+            const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, userInfoStorage.password);
             const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
             this.walletArray.push(new Wallet(keystore.address,
               cryptoJs.AES.encrypt(keystore.privateKey, resultSign.session_hash).toString(),
@@ -141,19 +143,21 @@ export class ImportPage implements OnInit {
         }
       } else {
         if (!this.isLocal) {
-          this.importedWallet = true;
+          this.importedWallet = false;
           const keystore = await this.heliosService.jsonToAccount(this.importWallet.value.keystore,
             this.importWallet.value.password);
-          this.notRepeat(wallets, keystore.address);
+          const privateKey = await this.heliosService.privateKeyToAccount(keystore.privateKey,
+            userInfoStorage.password);
           const storageUser = await this.secureStorage.getStorage('userInfo', this.secret);
-          await this.heliosServersideService.addOnlineWallet(this.importWallet.value.keystore,
-            this.importWallet.value.name, storageUser, this.importedWallet);
+          await this.heliosServersideService.addOnlineWallet(privateKey, this.importWallet.value.name, storageUser, this.importedWallet);
           const resultSign = await this.heliosServersideService.signIn(this.importWallet.value.username,
-            this.importWallet.value.password, null);
-          const userInfo = new UserInfo(resultSign.session_hash, resultSign['2fa_enabled'], this.importWallet.value.username);
+            userInfoStorage.password, null);
+          const userInfo = new UserInfo(resultSign.session_hash, resultSign['2fa_enabled'], this.importWallet.value.username,
+            userInfoStorage.password);
+          this.notRepeat(wallets, keystore.address);
           await this.secureStorage.setStorage('userInfo', userInfo, secret);
           for (const keystoreInfo of resultSign.keystores) {
-            const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, this.importWallet.value.password);
+            const keystore = await this.heliosService.jsonToAccount(keystoreInfo.keystore, userInfo.password);
             const md5ToAvatar = cryptoJs.MD5(keystore.address).toString();
             this.walletArray.push(new Wallet(
               keystore.address,
@@ -182,15 +186,16 @@ export class ImportPage implements OnInit {
       const alert = await this.alertController.create({
         header: 'Success!',
         message: '<strong>Successfully imported wallet</strong>',
+        backdropDismiss: false,
         buttons: [
           {
             text: 'Continue',
             handler: () => {
-              sessionStorage.clear();
+
               this.router.navigate(['/dashboard']);
             }
           }
-        ]
+        ],
       });
       await alert.present();
     } catch (error) {

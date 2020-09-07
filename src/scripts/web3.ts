@@ -4,6 +4,8 @@ import Web3 from 'helios-web3';
 
 declare global {
     interface Window { helios: any; }
+    interface Window { ethereum: any; }
+    interface Window { web3: any; }
 }
 
 const availableNodes: any[] = [
@@ -80,26 +82,28 @@ async function connectToFirstAvailableNode() {
             // await helios.eth.net.getPeerCount();
             if (isConnected() || listen) {
                 console.log(`Successfully connected to ${node}`);
-                window.helios = { send,
-                   sendAsync, 
-                   enable ,
-                   selectedAddress,
-                   getBalance,
-                   getProtocolVersion,
-                   getHistoricalGasPrice,
-                   getConnectedNodes,
-                   getApproximateHistoricalNetworkTPCCapability,
-                   getApproximateHistoricalTPC,
-                   getFaucet,
-                   getBlockByHash,
-                   getTransactionReceipt,
-                   getTransactionByHash,
-                   getReceivableTransactions,
-                   sendRawBlock,
-                   getGasPrice,
-                   ping
-
-                  };
+                const objecExport = { send,
+                  sendAsync,
+                  enable ,
+                  selectedAddress,
+                  getBalance,
+                  getProtocolVersion,
+                  getHistoricalGasPrice,
+                  getConnectedNodes,
+                  getApproximateHistoricalNetworkTPCCapability,
+                  getApproximateHistoricalTPC,
+                  getFaucet,
+                  getBlockByHash,
+                  getTransactionReceipt,
+                  getTransactionByHash,
+                  getReceivableTransactions,
+                  sendRawBlock,
+                  getGasPrice,
+                  ping
+                };
+                window.helios = objecExport;
+                window.ethereum = objecExport;
+                window.web3 = objecExport;
                 return true;
             }
           } catch ( error ) {
