@@ -11,7 +11,7 @@
     <ion-item color="dark">
       <ion-label>Wallets</ion-label>
     <ion-select placeholder="Select One"  [(ngModel)]="wallet" (ngModelChange)="changeWallet(wallet);"    formControlName="address">
-      <ion-select-option  *ngFor="let wallet of wallets" [value]="wallet">{{wallet.address | walletformat}}</ion-select-option>
+      <ion-select-option  *ngFor="let wallet of wallets" [value]="wallet">{{wallet.name}}</ion-select-option>
     </ion-select>
     </ion-item>
   </form>
@@ -20,14 +20,10 @@
   <ion-card class="black" *ngIf="receiveForm.value.address">
     <ion-card-content class="ion-text-center">
       <ion-row>
-        <ion-col size="5">
-          <ion-icon style="font-size: 35px; float: right;" src="/assets/images/heliosSvg.svg"></ion-icon> 
-        </ion-col>
-        <ion-col size="6">
-          <span class="title" style="float: left;">{{wallet.name}}</span>
+        <ion-col size="12">
+          <span class="title" style="float: center;">{{wallet.name}}</span>
         </ion-col>
       </ion-row>
-      
       <br>
      <ngx-qrcode [qrc-element-type]="elementType" [qrc-value] = "wallet.address">
       </ngx-qrcode>
