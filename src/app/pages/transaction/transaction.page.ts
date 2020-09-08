@@ -38,19 +38,23 @@ export class TransactionPage implements OnInit {
       await loading.present();
       this.fromTx = 0;
       this.toTx = 10;
+      this.transactions = [];
       const transactionsPromises = [];
       try {
       await this.heliosService.connectToFirstAvailableNode();
       for (const wallet of wallets) {
         transactionsPromises.push(
-          new Promise(async (resolve, reject) => {
+          await new Promise(async (resolve, reject) => {
             try {
-              const tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
-              this.transactions = tx.map( data => {
+              let tx = await this.heliosService.getAllTransactions( wallet.address , startDate , endDate, this.fromTx, this.toTx);
+              tx.map( data => {
                 data.timestamp = moment.unix(data.timestamp);
                 return data;
               });
-              console.log ( 'getTransactions', tx );
+              for ( let txs of tx ) {
+                this.transactions.push( txs );
+              }
+              //console.log ( 'getTransactions', tx );
               resolve();
             } catch (error) {
               reject(error);
@@ -58,6 +62,7 @@ export class TransactionPage implements OnInit {
           }
         ));
       }
+      this.transactions = this.transactions.sort((a, b) => b.timestamp - a.timestamp);
       await Promise.all(transactionsPromises);
     } catch (error) {
       const toast = await this.toastController.create({
