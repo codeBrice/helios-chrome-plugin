@@ -46,6 +46,7 @@ export class DashboardPage implements OnInit {
   secret: string;
   mainWallet: any[];
   hash: any;
+  totalBalance: any;
   private readonly HELIOS_ID = 'helios-protocol';
 
   ngOnInit() {
@@ -100,6 +101,7 @@ export class DashboardPage implements OnInit {
         this.helios = await this.coingeckoService.getCoin(this.HELIOS_ID).toPromise();
         this.wallets = [];
         this.balance = 0;
+        this.totalBalance=null;
         (this.helios.market_data.price_change_percentage_24h > 0) ? this.up = true : this.up = false;
         let receivable = false;
         const walletPromises = [];
@@ -164,6 +166,8 @@ export class DashboardPage implements OnInit {
                 toast.present();
               }
               const balance = await this.heliosService.getBalance(wallet.address);
+              this.totalBalance = Number(this.totalBalance)+Number(balance);
+             console.log(  this.totalBalance);
               const usd = Number(balance) * Number(this.helios.market_data.current_price.usd);
               this.wallets.push({
                 address: wallet.address ,
