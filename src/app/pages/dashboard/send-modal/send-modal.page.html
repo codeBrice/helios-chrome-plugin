@@ -10,7 +10,7 @@
   <form [formGroup]="sendForm">
     <ion-item color="dark">
       <ion-label position="floating">Amount</ion-label>
-      <ion-input type="number" inputmode="decimal" formControlName="amount" (ionChange)="updateTotals()"></ion-input>
+      <ion-input type="number" inputmode="decimal" formControlName="amount" (ionChange)="updateTotals();checkAvalaibleBalance()"></ion-input>
     </ion-item>
     <ion-item color="dark">
       <ion-label>Currency</ion-label>
@@ -32,7 +32,7 @@
     </ion-item>
     <ion-item color="dark">
       <ion-label>From</ion-label>
-    <ion-select placeholder="Select One" formControlName="from">
+    <ion-select placeholder="Select One" formControlName="from"  [(ngModel)]="wallet" (ngModelChange)="setBalanceToWallet(wallet);" >
       <ion-select-option *ngFor="let wallet of wallets" [value]="wallet.address">hls: {{wallet.balance | number:'1.0-2'}} usd: {{wallet.usd | number:'1.0-2'}}</ion-select-option>
     </ion-select>
     </ion-item>
@@ -65,7 +65,7 @@
       <br>
       <ion-row>
         <ion-col size="12">
-          <ion-button expand="block" color="helios" (click)="send()" class="button" [disabled]="sendForm.invalid">Send</ion-button>
+          <ion-button expand="block" color="helios" (click)="send()" class="button" [disabled]="isInvalid || sendForm.invalid ">Send</ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
