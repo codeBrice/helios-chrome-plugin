@@ -183,6 +183,7 @@ export class SendModalPage implements OnInit {
   if(wallet!==undefined){
   this.wallet=wallet;
   this.globalWallet = await this.heliosService.getBalance(wallet);
+  this.checkAvalaibleBalance();
  }}
 
   checkAvalaibleBalance(){
