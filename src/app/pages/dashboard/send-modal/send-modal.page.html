@@ -13,10 +13,14 @@
       <ion-input type="number" inputmode="decimal" formControlName="amount" (ionChange)="updateTotals();checkAvalaibleBalance()"></ion-input>
     </ion-item>
     <ion-item color="dark">
+      <ion-label position="floating">Gas limit</ion-label>
+      <ion-input type="number" inputmode="decimal" formControlName="gasPrice" (ionChange)="updateTotals();checkAvalaibleBalance()"></ion-input>
+    </ion-item>
+    <ion-item color="dark">
       <ion-label>Currency</ion-label>
     <ion-select placeholder="Select One" formControlName="currency">
       <ion-select-option value="hls">Helios</ion-select-option>
-      <ion-select-option value="usd">Usd</ion-select-option>
+      <!-- <ion-select-option value="usd">Usd</ion-select-option> -->
     </ion-select>
     </ion-item>
     <ion-item color="dark">

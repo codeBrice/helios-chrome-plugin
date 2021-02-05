@@ -116,7 +116,6 @@ export class SendTransactionPage implements OnInit {
 
 
   updateTotals() {
-    console.log( 'updateTotals');
     if (this.sendForm.value.currency === 'hls') {
       this.totalHls = this.sendForm.value.amount || 0;
       this.totalUsd = Number(this.sendForm.value.amount) * Number(this.currentPrice);

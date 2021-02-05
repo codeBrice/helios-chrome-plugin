@@ -43,7 +43,8 @@ export class SendModalPage implements OnInit {
       currency: new FormControl('hls', [Validators.required]),
       to: new FormControl('', [Validators.required]),
       toAddress: new FormControl('', [Validators.required]),
-      from: new FormControl('', [Validators.required])
+      from: new FormControl('', [Validators.required]),
+      gasPrice: new FormControl('21000', [Validators.required])
     }, {
       validator: [this.isAddress('toAddress')]
     });
@@ -63,7 +64,7 @@ export class SendModalPage implements OnInit {
           cssClass: 'custom-class custom-loading'
         });
       await loading.present();
-      this.gasPrice = await this.heliosService.getGasPrice();
+      this.gasPrice = this.sendForm.value.gasPrice;
       const helios: any = await this.coingeckoService.getCoin(this.HELIOS_ID).toPromise();
       for (const wallet of wallets) {
           const balance = await this.heliosService.getBalance(wallet.address);
@@ -87,7 +88,7 @@ export class SendModalPage implements OnInit {
     }
   }
 
-  updateTotals() {
+  async updateTotals() {
     if (this.sendForm.value.currency === 'hls') {
       this.totalHls = this.sendForm.value.amount || 0;
       this.totalUsd = Number(this.sendForm.value.amount) * Number(this.currentPrice);
@@ -95,6 +96,8 @@ export class SendModalPage implements OnInit {
       this.totalUsd = this.sendForm.value.amount || 0;
       this.totalHls = Number(this.sendForm.value.amount)  / Number(this.currentPrice);
     }
+    this.gasPrice = this.sendForm.value.gasPrice;
+    this.totalHls = await this.heliosService.gasPriceSumAmount( this.totalHls , this.gasPrice );
   }
 
   async send() {
@@ -186,13 +189,20 @@ export class SendModalPage implements OnInit {
   this.checkAvalaibleBalance();
  }}
 
-  checkAvalaibleBalance(){
-  if(this.globalWallet<this.sendForm.value.amount||this.globalWallet==undefined){
+  async checkAvalaibleBalance(){
+  if(this.globalWallet<this.sendForm.value.amount||this.globalWallet==undefined || this.globalWallet <= this.totalHls){
+      if ( this.globalWallet <= this.totalHls ) {
+        const toast = await this.toastController.create({
+          cssClass: 'text-red',
+          message: 'Insufficient funds. Consider the gas commission to pay.',
+          duration: 3000
+        });
+        toast.present();
+      }
       this.isInvalid=true;
-  }else{
-    this.isInvalid=false;
+    }else{
+      this.isInvalid=false;
+    }
   }
-
-}
 
 }
