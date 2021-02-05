@@ -20,7 +20,9 @@ export class SendModalPage implements OnInit {
               private storage: Storage, private loadingController: LoadingController,
               private coingeckoService: CoingeckoService, private heliosService: HeliosServiceService,
               public toastController: ToastController,
-              private router: Router, private secureStorage: SecureStorage) { }
+              private router: Router, private secureStorage: SecureStorage) {
+               }
+              
 
   sendForm: FormGroup;
   contactsList: Contact[];
@@ -30,6 +32,9 @@ export class SendModalPage implements OnInit {
   totalHls = 0;
   totalUsd = 0;
   secret: string;
+  globalWallet:any;
+  wallet:any;
+  isInvalid:boolean=true;
   private readonly HELIOS_ID = 'helios-protocol';
 
   async ngOnInit() {
@@ -104,6 +109,7 @@ export class SendModalPage implements OnInit {
 
     try {
 
+
       const transaction = {
         from: this.sendForm.value.from,
         to: this.sendForm.value.toAddress,
@@ -111,6 +117,10 @@ export class SendModalPage implements OnInit {
         gas: 21000,
         gasPrice: this.heliosService.toWei(String(this.gasPrice))
       };
+    /*  const fromBalance = await this.heliosService.getBalance(transaction.from);
+      if (fromBalance < this.sendForm.value.amount) {
+        throw new Error('Insufficient funds.');
+      }*/
       const userInfo = await this.secureStorage.getStorage( 'userInfo' , this.secret );
       if (userInfo) {
         const key = this.wallets.find(element => element.address === this.sendForm.value.from).privateKey;
@@ -129,6 +139,7 @@ export class SendModalPage implements OnInit {
           duration: 2000
       });
       toast.present();
+      
 
     } catch (error) {
       const toast = await this.toastController.create({
@@ -138,9 +149,10 @@ export class SendModalPage implements OnInit {
       });
       toast.present();
     }
-
+  /*  if (result){
+      this.modalController.dismiss(result);
+    }*/
     this.modalController.dismiss(result);
-
     await loading.dismiss();
   }
 
@@ -166,4 +178,21 @@ export class SendModalPage implements OnInit {
   dismiss() {
     this.modalController.dismiss(false);
   }
+
+ async setBalanceToWallet(wallet:any){
+  if(wallet!==undefined){
+  this.wallet=wallet;
+  this.globalWallet = await this.heliosService.getBalance(wallet);
+  this.checkAvalaibleBalance();
+ }}
+
+  checkAvalaibleBalance(){
+  if(this.globalWallet<this.sendForm.value.amount||this.globalWallet==undefined){
+      this.isInvalid=true;
+  }else{
+    this.isInvalid=false;
+  }
+
+}
+
 }

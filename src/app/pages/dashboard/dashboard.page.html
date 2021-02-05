@@ -34,7 +34,7 @@
         </ion-card-header>
         <ion-card-content  *ngFor ="let wallet of mainWallet" class="ion-text-center ion-no-padding">
            <!-- <span class="title text-yellow">$ </span><span class="text-white balance">{{balance | number:'1.0-2'}} </span>-->
-           <ion-icon class="text-white balance-main-logo" src="/assets/images/heliosSvg.svg"></ion-icon><span class="balance-accounts"> {{wallet.balance | number:'1.0-2'}}</span>
+           <ion-icon class="text-white balance-main-logo" src="/assets/images/heliosSvg.svg"></ion-icon><span class="balance-accounts"> {{totalBalance | number:'1.0-2'}}</span>
             <ion-icon *ngIf="up" class="text-yellow" src="/assets/images/diagonal-arrow.svg"></ion-icon>
             <ion-icon *ngIf="!up" class="text-yellow" src="/assets/images/diagonal-arrow-down.svg"></ion-icon>
             <br>
