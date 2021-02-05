@@ -352,6 +352,20 @@ export class HeliosServiceService {
     }
   }
 
+  async gasPriceSumAmount( amount , gasPrice){
+    try {
+      if (await this.isConnected()) {
+        const amountInWei = await this.web3.utils.toWei(String(amount))
+        const sum = parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(gasPrice)))) + 
+        parseFloat(this.web3.utils.fromWei(String(this.web3.utils.toBN(amountInWei))));
+        return sum;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to get sum gas price and amount to tip');
+    }
+  }
+
   /**
    * To weiEther
    * @param value
